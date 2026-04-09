@@ -202,8 +202,6 @@ class BybitClient:
                             return float(val) if val not in (None, "", "N/A") else default
                         except (ValueError, TypeError):
                             return default
-
-                    logger.info(f"USDT fields from Bybit: {usdt_info}")
                     available = safe_float(usdt_info.get("availableToWithdraw")) or \
                                 safe_float(usdt_info.get("availableToBorrow")) or \
                                 safe_float(usdt_info.get("walletBalance"))

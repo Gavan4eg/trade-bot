@@ -83,6 +83,11 @@ class TradingEngine:
         self.range_wait_hours = 4  # Max time to wait for range formation
         self.sweep_wait_hours = 4  # Max time to wait for sweep after range
 
+        # Klines cache to avoid rate limit (cache for 60 seconds)
+        self._klines_cache: Optional[list] = None
+        self._klines_cache_time: Optional[datetime] = None
+        self._klines_cache_ttl = 60  # seconds
+
     async def start(self):
         """Start the trading engine"""
         self.is_running = True
@@ -339,9 +344,22 @@ class TradingEngine:
                 level="success", source="pipeline"
             )
 
+    def _get_cached_klines(self) -> list:
+        """Get klines with 60s cache to avoid rate limit"""
+        now = datetime.utcnow()
+        if (self._klines_cache is not None and
+                self._klines_cache_time is not None and
+                (now - self._klines_cache_time).total_seconds() < self._klines_cache_ttl):
+            return self._klines_cache
+        candles = self.client.get_klines(interval="5", limit=12)
+        if candles:
+            self._klines_cache = candles
+            self._klines_cache_time = now
+        return candles or []
+
     async def _check_for_confirmation(self, state: AlertState, price: float):
         """Check if entry is confirmed after sweep"""
-        candles = self.client.get_klines(interval="5", limit=12)  # Last hour on 5m
+        candles = self._get_cached_klines()  # cached, max 1 request per 60s
 
         result = self.confirmation_engine.check_confirmation(
             sweep=state.sweep,

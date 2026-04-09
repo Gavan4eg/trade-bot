@@ -21,7 +21,7 @@ class MarketDataService:
         self.current_price: float = 0.0
         self.last_update: Optional[datetime] = None
 
-    async def start(self, interval: float = 1.0) -> None:
+    async def start(self, interval: float = 3.0) -> None:
         """Start market data polling"""
         if self.is_running:
             return
