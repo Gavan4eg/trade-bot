@@ -506,7 +506,8 @@ function App() {
     const [botStatus, setBotStatus] = useState({ is_active:false, testnet:true });
     const [tab, setTab]             = useState('dashboard');
 
-    const { lastMessage, connected } = useWebSocket(`ws://${window.location.host}/ws`);
+    const wsProto = window.location.protocol === 'https:' ? 'wss' : 'ws';
+    const { lastMessage, connected } = useWebSocket(`${wsProto}://${window.location.host}/ws`);
 
     useEffect(() => {
         if (!lastMessage) return;
