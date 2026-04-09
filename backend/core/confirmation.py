@@ -233,18 +233,18 @@ class ConfirmationEngine:
         if avg <= 0:
             return False
 
-        # For high sweep, check long liquidations spike
+        # HIGH sweep = short squeeze → shorts ликвидируются → проверяем short_liquidations
         if sweep.direction == SweepDirection.HIGH:
-            long_liqs = liquidation_data.get("long_liquidations", 0)
-            if long_liqs > avg * 2:
-                logger.debug(f"Long liquidation spike: {long_liqs:.2f} vs avg {avg:.2f}")
+            short_liqs = liquidation_data.get("short_liquidations", 0)
+            if short_liqs > avg:  # порог: выше среднего (не x2, уже отфильтровано trdr.io)
+                logger.debug(f"Short liquidation spike at HIGH sweep: {short_liqs:.0f} vs avg {avg:.0f}")
                 return True
 
-        # For low sweep, check short liquidations spike
+        # LOW sweep = long squeeze → longs ликвидируются → проверяем long_liquidations
         else:
-            short_liqs = liquidation_data.get("short_liquidations", 0)
-            if short_liqs > avg * 2:
-                logger.debug(f"Short liquidation spike: {short_liqs:.2f} vs avg {avg:.2f}")
+            long_liqs = liquidation_data.get("long_liquidations", 0)
+            if long_liqs > avg:
+                logger.debug(f"Long liquidation spike at LOW sweep: {long_liqs:.0f} vs avg {avg:.0f}")
                 return True
 
         return False

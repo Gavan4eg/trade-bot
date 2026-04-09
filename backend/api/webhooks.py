@@ -124,8 +124,9 @@ async def receive_trdr_webhook(
             "timestamp": datetime.utcnow().isoformat()
         }
     })
+    _log_price = raw_data.get('price') or (raw_data.get('markets') or [{}])[0].get('price', '?')
     await ws_manager.send_log(
-        f"📨 Webhook received from {request.client.host} | type={raw_data.get('type') or raw_data.get('name','?')} price={raw_data.get('price','?')}",
+        f"📨 Webhook received from {request.client.host} | type={raw_data.get('type') or raw_data.get('name','?')} price={_log_price}",
         level="info", source="webhook"
     )
 
