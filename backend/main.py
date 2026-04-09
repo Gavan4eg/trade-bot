@@ -88,7 +88,7 @@ async def lifespan(app: FastAPI):
     bybit_client = BybitClient(testnet=settings.bybit_testnet)
     risk_manager = RiskManager()
     trade_executor = TradeExecutor(bybit_client, risk_manager)
-    position_manager = PositionManager(bybit_client, trade_executor)
+    position_manager = PositionManager(bybit_client, trade_executor, risk_manager)
 
     # Initialize core components
     alert_processor = AlertProcessor()

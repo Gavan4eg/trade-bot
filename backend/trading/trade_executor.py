@@ -188,9 +188,9 @@ class TradeExecutor:
             return False
 
         current_qty = trade.executed_quantity or trade.quantity
-        close_qty = current_qty * (percent / 100)
+        close_qty = round(current_qty * (percent / 100), 3)  # Bybit требует 3 знака
 
-        if close_qty <= 0:
+        if close_qty < 0.001:  # Минимальный ордер Bybit
             return False
 
         side = "Sell" if trade.direction == TradeDirection.LONG else "Buy"

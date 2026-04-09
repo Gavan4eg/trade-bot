@@ -6,6 +6,7 @@ from ..models.position import Position, PositionStatus
 from ..config import settings
 from .bybit_client import BybitClient
 from .trade_executor import TradeExecutor
+from .risk_manager import RiskManager
 
 logger = logging.getLogger(__name__)
 
@@ -16,10 +17,12 @@ class PositionManager:
     def __init__(
         self,
         bybit_client: BybitClient,
-        trade_executor: TradeExecutor
+        trade_executor: TradeExecutor,
+        risk_manager: RiskManager = None
     ):
         self.client = bybit_client
         self.executor = trade_executor
+        self.risk_manager = risk_manager
         self.positions: Dict[int, Position] = {}
         self._trades: Dict[int, Trade] = {}  # trade_id → Trade (для TP/SL)
 
@@ -131,6 +134,12 @@ class PositionManager:
             # Move stop to breakeven
             self._move_stop_to_breakeven(position, trade)
 
+            # Sync trailing stop activation check
+            if position.current_quantity <= 0:
+                position.status = PositionStatus.CLOSED
+                if self.risk_manager:
+                    self.risk_manager.register_trade_close(position.direction.value, position.realized_pnl)
+
     def _handle_tp2(
         self,
         position: Position,
@@ -153,6 +162,11 @@ class PositionManager:
                 f"TP2 hit at {current_price}, closed {close_percent}% "
                 f"of remaining position"
             )
+
+            if position.current_quantity <= 0:
+                position.status = PositionStatus.CLOSED
+                if self.risk_manager:
+                    self.risk_manager.register_trade_close(position.direction.value, position.realized_pnl)
 
     def _move_stop_to_breakeven(
         self,
@@ -253,7 +267,6 @@ class PositionManager:
         if qty <= 0:
             return
 
-        # В paper trading — просто рассчитываем PnL и закрываем
         if position.direction == TradeDirection.LONG:
             pnl = (current_price - position.entry_price) * qty
         else:
@@ -268,6 +281,9 @@ class PositionManager:
         position.current_quantity = 0
         position.status = PositionStatus.CLOSED
         position.closed_at = datetime.utcnow()
+
+        # ✅ Уведомляем risk manager что позиция закрыта
+        self.risk_manager.register_trade_close(position.direction.value, pnl)
 
         logger.info(
             f"Position closed by {reason} at {current_price:.2f} | "
@@ -296,6 +312,10 @@ class PositionManager:
             position.status = PositionStatus.CLOSED
             position.closed_at = datetime.utcnow()
             position.realized_pnl = trade.realized_pnl
+
+            # ✅ Уведомляем risk manager
+            if self.risk_manager:
+                self.risk_manager.register_trade_close(position.direction.value, position.realized_pnl)
 
             # Remove from active positions
             if position.trade_id in self.positions:
