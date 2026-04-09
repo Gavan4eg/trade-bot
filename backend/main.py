@@ -195,7 +195,10 @@ app = FastAPI(
     title="BTC Trading Bot",
     description="Trading bot with trdr.io signals integration",
     version="1.0.0",
-    lifespan=lifespan
+    lifespan=lifespan,
+    docs_url=None,
+    redoc_url=None,
+    openapi_url=None,
 )
 
 # CORS middleware

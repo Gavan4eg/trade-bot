@@ -230,8 +230,8 @@ async def receive_trdr_webhook(
         level="success", source="webhook"
     )
 
-    # Process alert in background
-    background_tasks.add_task(process_alert_background, alert, raw_data)
+    # Process alert in background (pass parsed_data so price/type are normalized)
+    background_tasks.add_task(process_alert_background, alert, parsed_data)
 
     return {
         "status": "received",
