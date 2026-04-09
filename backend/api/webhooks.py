@@ -124,6 +124,10 @@ async def receive_trdr_webhook(
             "timestamp": datetime.utcnow().isoformat()
         }
     })
+    await ws_manager.send_log(
+        f"📨 Webhook received from {request.client.host} | type={raw_data.get('type') or raw_data.get('name','?')} price={raw_data.get('price','?')}",
+        level="info", source="webhook"
+    )
 
     # Parse trdr.io format — pass all raw fields directly and let the model handle it
     parsed_data = {}
@@ -182,10 +186,12 @@ async def receive_trdr_webhook(
     alert = alert_processor.parse_webhook(payload.model_dump())
 
     if not alert:
+        await ws_manager.send_log(f"❌ Invalid alert type: {payload.type}", level="error", source="webhook")
         raise HTTPException(status_code=400, detail="Invalid alert type")
 
     # Check if should process
     if not alert_processor.should_process(alert):
+        await ws_manager.send_log(f"⏭ Alert skipped (cooldown or priority): {alert.alert_type.value}", level="warning", source="webhook")
         return {
             "status": "skipped",
             "reason": "Alert filtered (cooldown or priority)"
@@ -218,6 +224,11 @@ async def receive_trdr_webhook(
         "priority": alert.priority,
         "timestamp": alert.timestamp.isoformat()
     })
+
+    await ws_manager.send_log(
+        f"✅ Alert #{alert.id} saved | {alert.alert_type.value} @ ${alert.price:,.0f}",
+        level="success", source="webhook"
+    )
 
     # Process alert in background
     background_tasks.add_task(process_alert_background, alert, raw_data)
@@ -282,6 +293,10 @@ async def process_alert_background(alert, alert_raw: dict):
                 f"[LIQUIDATION → CONFIRMATION] Alert {alert_id} | "
                 f"side={side} → добавлен как confirming factor"
             )
+            await ws_manager.send_log(
+                f"💧 Liquidation #{alert_id} → injected as confirmation factor (side={side})",
+                level="success", source="pipeline"
+            )
         else:
             logger.info(
                 f"Alert {alert_id} [LIQUIDATION]: нет активного Diamond алерта — игнорируем. "
@@ -289,6 +304,10 @@ async def process_alert_background(alert, alert_raw: dict):
             )
             webhook_logger.info(
                 f"[LIQUIDATION IGNORED] Alert {alert_id} | нет Diamond в пайплайне"
+            )
+            await ws_manager.send_log(
+                f"💧 Liquidation #{alert_id} ignored — no active Diamond in pipeline",
+                level="warning", source="pipeline"
             )
 
     # ── Diamond сигналы: полный пайплайн ────────────────────────────────────
@@ -309,14 +328,26 @@ async def process_alert_background(alert, alert_raw: dict):
             f"[PIPELINE] Alert {alert_id} | type={alert_type} | запуск пайплайна"
         )
 
+        await ws_manager.send_log(
+            f"🔷 Diamond #{alert_id} [{alert_type}] → starting pipeline (range → sweep → confirm → trade)",
+            level="info", source="pipeline"
+        )
         success = await _trading_engine.process_alert_direct(alert)
 
         if success:
             logger.info(f"Alert {alert_id}: пайплайн запущен успешно")
             webhook_logger.info(f"[PIPELINE OK] Alert {alert_id} | пайплайн активен")
+            await ws_manager.send_log(
+                f"🔷 Diamond #{alert_id} pipeline started successfully",
+                level="success", source="pipeline"
+            )
         else:
             logger.warning(f"Alert {alert_id}: пайплайн не запущен (движок занят или остановлен)")
             webhook_logger.warning(f"[PIPELINE SKIP] Alert {alert_id}")
+            await ws_manager.send_log(
+                f"⚠️ Diamond #{alert_id} pipeline skipped (engine busy or stopped)",
+                level="warning", source="pipeline"
+            )
 
     else:
         logger.info(f"Alert {alert_id}: тип '{alert_type}' не требует торговли")

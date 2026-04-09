@@ -268,6 +268,12 @@ class TradingEngine:
                         f"H={detected_range.local_high}, L={detected_range.local_low}, "
                         f"Width={detected_range.width_percent}%"
                     )
+                    await ws_manager.send_log(
+                        f"📐 Range detected for alert #{alert_id}: "
+                        f"H=${detected_range.local_high:,.0f} L=${detected_range.local_low:,.0f} "
+                        f"({detected_range.width_percent:.1f}%) → waiting for sweep",
+                        level="info", source="pipeline"
+                    )
 
                     # Move to sweep detection
                     state.alert.status = AlertStatus.WAITING_SWEEP
@@ -279,6 +285,10 @@ class TradingEngine:
 
         # Timeout - expire alert
         logger.warning(f"Range detection timed out for alert {alert_id}")
+        await ws_manager.send_log(
+            f"⌛ Alert #{alert_id} expired — range not detected in {self.range_wait_hours}h",
+            level="warning", source="pipeline"
+        )
         state.alert.status = AlertStatus.EXPIRED
         await self._broadcast_alert_update(state.alert)
         self._cleanup_state(alert_id)
@@ -323,6 +333,11 @@ class TradingEngine:
                 f"Sweep detected for alert {state.alert.id}: "
                 f"{sweep.direction.value} sweep at {sweep.sweep_price}"
             )
+            await ws_manager.send_log(
+                f"⚡ Sweep detected for alert #{state.alert.id}: "
+                f"{sweep.direction.value.upper()} @ ${sweep.sweep_price:,.0f} → checking confirmation",
+                level="success", source="pipeline"
+            )
 
     async def _check_for_confirmation(self, state: AlertState, price: float):
         """Check if entry is confirmed after sweep"""
@@ -346,6 +361,12 @@ class TradingEngine:
                 f"Entry confirmed for alert {state.alert.id}: "
                 f"direction={result.trade_direction}, confirmations={result.confirmations_met}"
             )
+            await ws_manager.send_log(
+                f"✅ Entry confirmed for alert #{state.alert.id}: "
+                f"{result.trade_direction.upper()} entry=${result.entry_price:,.0f} "
+                f"SL=${result.stop_loss:,.0f} ({result.confirmations_met} confirmations) → executing trade",
+                level="success", source="pipeline"
+            )
 
             # Execute trade
             await self._execute_trade(state, result)
@@ -356,6 +377,10 @@ class TradingEngine:
 
         if not self.risk_manager.can_open_position(direction.value):
             logger.warning(f"Cannot open {direction.value} position - risk limits")
+            await ws_manager.send_log(
+                f"🚫 Alert #{state.alert.id} rejected — risk limits exceeded (max positions or daily loss)",
+                level="error", source="pipeline"
+            )
             state.alert.status = AlertStatus.REJECTED
             await self._broadcast_alert_update(state.alert)
             self._cleanup_state(state.alert.id)
@@ -481,11 +506,21 @@ class TradingEngine:
                 f"Trade executed for alert {state.alert.id}: "
                 f"{direction.value} {trade.quantity} BTC @ {trade.entry_price}"
             )
+            await ws_manager.send_log(
+                f"💹 Trade opened for alert #{state.alert.id}: "
+                f"{direction.value.upper()} {trade.quantity} BTC @ ${trade.entry_price:,.0f} "
+                f"SL=${trade.stop_loss:,.0f} TP1=${trade.take_profit_1:,.0f}",
+                level="success", source="trade"
+            )
 
             # Cleanup state (trade is now managed by position manager)
             self._cleanup_state(state.alert.id)
         else:
             logger.error(f"Failed to execute trade for alert {state.alert.id}")
+            await ws_manager.send_log(
+                f"❌ Trade FAILED for alert #{state.alert.id} — order rejected by exchange",
+                level="error", source="trade"
+            )
             state.alert.status = AlertStatus.REJECTED
             await self._broadcast_alert_update(state.alert)
             self._cleanup_state(state.alert.id)

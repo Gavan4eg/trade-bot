@@ -103,6 +103,19 @@ class WebSocketManager:
             "data": status_data
         })
 
+    async def send_log(self, message: str, level: str = "info", source: str = "") -> None:
+        """Send log message to UI"""
+        from datetime import datetime
+        await self.broadcast({
+            "type": "log",
+            "data": {
+                "message": message,
+                "level": level,  # info | success | warning | error
+                "source": source,
+                "timestamp": datetime.utcnow().strftime("%H:%M:%S")
+            }
+        })
+
     def get_connection_count(self) -> int:
         """Get number of active connections"""
         return len(self.active_connections)
