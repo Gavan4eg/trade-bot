@@ -190,11 +190,20 @@ async def receive_trdr_webhook(
         await ws_manager.send_log(f"❌ Invalid alert type: {payload.type}", level="error", source="webhook")
         raise HTTPException(status_code=400, detail="Invalid alert type")
 
-    # Aggregated Liquidation всегда проходит — это confirmation фактор, не основной алерт
+    # Aggregated Liquidation — не сохраняем в БД и не показываем в UI
+    # Просто инжектируем в пайплайн как confirmation фактор
     is_liquidation = "Aggregated Liquidation" in (payload.type or "")
 
-    # Check if should process (skip cooldown for liquidations)
-    if not is_liquidation and not alert_processor.should_process(alert):
+    if is_liquidation:
+        await ws_manager.send_log(
+            f"💧 Liquidation received @ ${alert.price:,.0f} — injecting into pipeline",
+            level="info", source="webhook"
+        )
+        background_tasks.add_task(process_alert_background, alert, parsed_data)
+        return {"status": "received", "type": "liquidation", "price": alert.price}
+
+    # Check if should process
+    if not alert_processor.should_process(alert):
         await ws_manager.send_log(f"⏭ Alert skipped (cooldown or priority): {alert.alert_type.value}", level="warning", source="webhook")
         return {
             "status": "skipped",

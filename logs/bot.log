@@ -1796,3 +1796,4 @@ pip install python-multipart
 2026-04-09 23:00:02,286 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
 2026-04-09 23:26:50,821 - backend.trading.bybit_client - ERROR - Error getting ticker: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
 2026-04-09 23:35:48,131 - backend.trading.bybit_client - ERROR - Error getting ticker: HTTPSConnectionPool(host='api-testnet.bybit.com', port=443): Read timed out. (read timeout=10)
+2026-04-10 01:18:09,821 - backend.trading.bybit_client - ERROR - Error getting ticker: HTTPSConnectionPool(host='api-testnet.bybit.com', port=443): Read timed out. (read timeout=10)
