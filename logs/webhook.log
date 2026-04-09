@@ -1,0 +1,129 @@
+2026-04-09 10:39:04,625 - webhook - INFO - === WEBHOOK [GET] ===
+2026-04-09 10:39:04,626 - webhook - INFO - From: 127.0.0.1
+2026-04-09 10:39:04,628 - webhook - INFO - Headers: {'host': 'localhost:8000', 'connection': 'keep-alive', 'sec-ch-ua': '"Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"macOS"', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'none', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'ru,en-US;q=0.9,en;q=0.8,es;q=0.7'}
+2026-04-09 10:39:04,629 - webhook - INFO - Raw data: {'symbol': 'BTCUSDT'}
+2026-04-09 10:39:04,629 - webhook - INFO - Parsed trdr.io format: type=None, price=None, side=None
+2026-04-09 10:40:48,107 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-09 10:40:48,107 - webhook - INFO - From: 127.0.0.1
+2026-04-09 10:40:48,107 - webhook - INFO - Headers: {'host': 'localhost:8000', 'user-agent': 'curl/8.7.1', 'accept': '*/*', 'content-type': 'application/json', 'content-length': '545'}
+2026-04-09 10:40:48,108 - webhook - INFO - Raw data: {'name': 'Aggregated Liquidation', 'time': '2026-04-09T10:00:00.000Z', 'unixtime': 1775692800, 'cooldown': 300, 'timeframe': '1 hour', 'side': 'short', 'continuation': 0, 'message': 'Alert: Aggregated Liquidation\nSide: Short 🔴\n\nBTC/USDT on Binance USDⓈ-M\nPrice: 72491\n • Liquidations (aggregation) (15 minutes, Any Size)\n Shorts: 5336600 > 2000000', 'base': 'BTC', 'exchange': 'Binance USDⓈ-M', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 72491, 'quote': 'USDT'}
+2026-04-09 10:40:48,108 - webhook - INFO - Parsed trdr.io format: type=Aggregated Liquidation, price=72491, side=short
+2026-04-09 10:45:01,823 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-09 10:45:01,823 - webhook - INFO - From: 127.0.0.1
+2026-04-09 10:45:01,823 - webhook - INFO - Headers: {'host': 'localhost:8000', 'user-agent': 'curl/8.7.1', 'accept': '*/*', 'content-type': 'application/json', 'content-length': '437'}
+2026-04-09 10:45:01,823 - webhook - INFO - Raw data: {'name': 'BTC Diamond', 'time': '2026-04-09T10:00:00.000Z', 'unixtime': 1775692800, 'cooldown': 300, 'timeframe': '1 hour', 'side': 'long', 'continuation': 0, 'message': 'Alert: BTC Diamond\nSide: Long 🟢\n\nBTC/USDT on Binance USDⓈ-M\nPrice: 72491', 'base': 'BTC', 'exchange': 'Binance USDⓈ-M', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 72491, 'quote': 'USDT'}
+2026-04-09 10:45:01,824 - webhook - INFO - Parsed trdr.io format: type=BTC Diamond, price=72491, side=long
+2026-04-09 10:53:58,978 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-09 10:53:58,979 - webhook - INFO - From: 127.0.0.1
+2026-04-09 10:53:58,979 - webhook - INFO - Headers: {'host': 'localhost:8000', 'user-agent': 'python-requests/2.33.1', 'accept-encoding': 'gzip, deflate, zstd', 'accept': '*/*', 'connection': 'keep-alive', 'content-length': '420', 'content-type': 'application/json'}
+2026-04-09 10:53:58,979 - webhook - INFO - Raw data: {'name': 'Aggregated Liquidation', 'time': '2026-04-09T08:53:58.000Z', 'unixtime': 1775724838, 'cooldown': 300, 'timeframe': '1 hour', 'side': 'short', 'continuation': 0, 'message': 'Alert: Aggregated Liquidation\nSide: Short 🔴\n\nBTC/USDT\nPrice: 65000\n Shorts: 5500000 > 2000000', 'base': 'BTC', 'exchange': 'Binance USDⓈ-M', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 65000, 'quote': 'USDT'}
+2026-04-09 10:53:58,979 - webhook - INFO - Parsed trdr.io format: type=Aggregated Liquidation, price=65000, side=short, ticker=BTCUSDT
+2026-04-09 10:53:59,009 - webhook - INFO - [BG] Alert 13 | type=Aggregated Liquidation | side=short | price=65000
+2026-04-09 10:53:59,009 - webhook - INFO - [TRADE] Alert 13 | LIQUIDATION long | entry=65477.803572107056 SL=65150.41
+2026-04-09 10:53:59,019 - webhook - INFO - [TRADE OK] Alert 13 | trade_id=1 | qty=0.305 | TP1=66132.59 | TP2=66459.98 | RR=2.0
+2026-04-09 10:58:12,054 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-09 10:58:12,054 - webhook - INFO - From: 127.0.0.1
+2026-04-09 10:58:12,054 - webhook - INFO - Headers: {'host': 'localhost:8000', 'user-agent': 'python-requests/2.33.1', 'accept-encoding': 'gzip, deflate, zstd', 'accept': '*/*', 'connection': 'keep-alive', 'content-length': '366', 'content-type': 'application/json'}
+2026-04-09 10:58:12,054 - webhook - INFO - Raw data: {'name': 'BTC Diamond', 'time': '2026-04-09T08:58:12.000Z', 'unixtime': 1775725092, 'cooldown': 60, 'timeframe': '1 hour', 'side': 'long', 'continuation': 0, 'message': 'Alert: BTC Diamond\nSide: Long\n\nBTC/USDT\nPrice: 64726', 'base': 'BTC', 'exchange': 'Binance USDⓈ-M', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 64725.69753961994, 'quote': 'USDT'}
+2026-04-09 10:58:12,054 - webhook - INFO - Parsed trdr.io format: type=BTC Diamond, price=64725.69753961994, side=long, ticker=BTCUSDT
+2026-04-09 10:58:12,068 - webhook - INFO - [BG] Alert 14 | type=BTC Diamond | side=long | price=64725.69753961994
+2026-04-09 10:58:12,068 - webhook - INFO - [PIPELINE] Alert 14 | type=BTC Diamond | запуск пайплайна
+2026-04-09 10:58:12,068 - webhook - INFO - [PIPELINE OK] Alert 14 | пайплайн активен
+2026-04-09 11:01:23,170 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-09 11:01:23,170 - webhook - INFO - From: 127.0.0.1
+2026-04-09 11:01:23,170 - webhook - INFO - Headers: {'host': 'localhost:8000', 'user-agent': 'python-requests/2.33.1', 'accept-encoding': 'gzip, deflate, zstd', 'accept': '*/*', 'connection': 'keep-alive', 'content-length': '366', 'content-type': 'application/json'}
+2026-04-09 11:01:23,170 - webhook - INFO - Raw data: {'name': 'BTC Diamond', 'time': '2026-04-09T09:01:23.000Z', 'unixtime': 1775725283, 'cooldown': 60, 'timeframe': '1 hour', 'side': 'long', 'continuation': 0, 'message': 'Alert: BTC Diamond\nSide: Long\n\nBTC/USDT\nPrice: 65124', 'base': 'BTC', 'exchange': 'Binance USDⓈ-M', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 65123.73505617674, 'quote': 'USDT'}
+2026-04-09 11:01:23,170 - webhook - INFO - Parsed trdr.io format: type=BTC Diamond, price=65123.73505617674, side=long, ticker=BTCUSDT
+2026-04-09 11:01:23,193 - webhook - INFO - [BG] Alert 15 | type=BTC Diamond | side=long | price=65123.73505617674
+2026-04-09 11:01:23,194 - webhook - INFO - [PIPELINE] Alert 15 | type=BTC Diamond | запуск пайплайна
+2026-04-09 11:01:23,194 - webhook - INFO - [PIPELINE OK] Alert 15 | пайплайн активен
+2026-04-09 11:04:23,923 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-09 11:04:23,923 - webhook - INFO - From: 127.0.0.1
+2026-04-09 11:04:23,923 - webhook - INFO - Headers: {'host': 'localhost:8000', 'user-agent': 'python-requests/2.33.1', 'accept-encoding': 'gzip, deflate, zstd', 'accept': '*/*', 'connection': 'keep-alive', 'content-length': '366', 'content-type': 'application/json'}
+2026-04-09 11:04:23,923 - webhook - INFO - Raw data: {'name': 'BTC Diamond', 'time': '2026-04-09T09:04:23.000Z', 'unixtime': 1775725463, 'cooldown': 60, 'timeframe': '1 hour', 'side': 'long', 'continuation': 0, 'message': 'Alert: BTC Diamond\nSide: Long\n\nBTC/USDT\nPrice: 64925', 'base': 'BTC', 'exchange': 'Binance USDⓈ-M', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 64925.06849833373, 'quote': 'USDT'}
+2026-04-09 11:04:23,923 - webhook - INFO - Parsed trdr.io format: type=BTC Diamond, price=64925.06849833373, side=long, ticker=BTCUSDT
+2026-04-09 11:04:23,931 - webhook - INFO - [BG] Alert 16 | type=BTC Diamond | side=long | price=64925.06849833373
+2026-04-09 11:04:23,931 - webhook - INFO - [PIPELINE] Alert 16 | type=BTC Diamond | запуск пайплайна
+2026-04-09 11:04:23,931 - webhook - INFO - [PIPELINE OK] Alert 16 | пайплайн активен
+2026-04-09 11:08:50,562 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-09 11:08:50,562 - webhook - INFO - From: 127.0.0.1
+2026-04-09 11:08:50,562 - webhook - INFO - Headers: {'host': 'localhost:8000', 'user-agent': 'python-requests/2.33.1', 'accept-encoding': 'gzip, deflate, zstd', 'accept': '*/*', 'connection': 'keep-alive', 'content-length': '367', 'content-type': 'application/json'}
+2026-04-09 11:08:50,562 - webhook - INFO - Raw data: {'name': 'BTC Diamond', 'time': '2026-04-09T09:08:50.000Z', 'unixtime': 1775725730, 'cooldown': 60, 'timeframe': '1 hour', 'side': 'long', 'continuation': 0, 'message': 'Alert: BTC Diamond\nSide: Long\n\nBTC/USDT\nPrice: 64960', 'base': 'BTC', 'exchange': 'Binance USDⓈ-M', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 64959.953432103495, 'quote': 'USDT'}
+2026-04-09 11:08:50,563 - webhook - INFO - Parsed trdr.io format: type=BTC Diamond, price=64959.953432103495, side=long, ticker=BTCUSDT
+2026-04-09 11:08:50,572 - webhook - INFO - [BG] Alert 1 | type=BTC Diamond | side=long | price=64959.953432103495
+2026-04-09 11:08:50,573 - webhook - INFO - [PIPELINE] Alert 1 | type=BTC Diamond | запуск пайплайна
+2026-04-09 11:08:50,573 - webhook - INFO - [PIPELINE OK] Alert 1 | пайплайн активен
+2026-04-09 11:52:28,533 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-09 11:52:28,533 - webhook - INFO - From: 127.0.0.1
+2026-04-09 11:52:28,533 - webhook - INFO - Headers: {'host': 'localhost:8000', 'user-agent': 'curl/8.7.1', 'accept': '*/*', 'content-type': 'application/json', 'content-length': '101'}
+2026-04-09 11:52:28,533 - webhook - INFO - Raw data: {'name': 'BTC Diamond', 'price': 1468928, 'side': 'long', 'ticker': 'BTCUSDT', 'time': '2026-04-09T12:00:00Z'}
+2026-04-09 11:52:28,533 - webhook - INFO - Parsed trdr.io format: type=BTC Diamond, price=1468928, side=long, ticker=BTCUSDT
+2026-04-09 11:52:28,566 - webhook - INFO - [BG] Alert 1 | type=BTC Diamond | side=long | price=1468928
+2026-04-09 11:52:28,566 - webhook - INFO - [PIPELINE] Alert 1 | type=BTC Diamond | запуск пайплайна
+2026-04-09 11:52:28,567 - webhook - INFO - [PIPELINE OK] Alert 1 | пайплайн активен
+2026-04-09 11:57:34,893 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-09 11:57:34,896 - webhook - INFO - From: 127.0.0.1
+2026-04-09 11:57:34,897 - webhook - INFO - Headers: {'host': 'localhost:8000', 'user-agent': 'curl/8.7.1', 'accept': '*/*', 'content-type': 'application/json', 'content-length': '101'}
+2026-04-09 11:57:34,897 - webhook - INFO - Raw data: {'name': 'BTC Diamond', 'price': 1468928, 'side': 'long', 'ticker': 'BTCUSDT', 'time': '2026-04-09T12:00:00Z'}
+2026-04-09 11:57:34,897 - webhook - INFO - Parsed trdr.io format: type=BTC Diamond, price=1468928, side=long, ticker=BTCUSDT
+2026-04-09 11:57:34,912 - webhook - INFO - [BG] Alert 2 | type=BTC Diamond | side=long | price=1468928
+2026-04-09 11:57:34,912 - webhook - INFO - [PIPELINE] Alert 2 | type=BTC Diamond | запуск пайплайна
+2026-04-09 11:57:34,913 - webhook - INFO - [PIPELINE OK] Alert 2 | пайплайн активен
+2026-04-09 11:58:32,773 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-09 11:58:32,773 - webhook - INFO - From: 127.0.0.1
+2026-04-09 11:58:32,773 - webhook - INFO - Headers: {'host': 'localhost:8000', 'user-agent': 'curl/8.7.1', 'accept': '*/*', 'content-type': 'application/json', 'content-length': '100'}
+2026-04-09 11:58:32,773 - webhook - INFO - Raw data: {'name': 'BTC Diamond', 'price': 900000, 'side': 'long', 'ticker': 'BTCUSDT', 'time': '2026-04-09T12:01:00Z'}
+2026-04-09 11:58:32,773 - webhook - INFO - Parsed trdr.io format: type=BTC Diamond, price=900000, side=long, ticker=BTCUSDT
+2026-04-09 11:59:59,203 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-09 11:59:59,204 - webhook - INFO - From: 127.0.0.1
+2026-04-09 11:59:59,204 - webhook - INFO - Headers: {'host': 'localhost:8000', 'user-agent': 'curl/8.7.1', 'accept': '*/*', 'content-type': 'application/json', 'content-length': '101'}
+2026-04-09 11:59:59,204 - webhook - INFO - Raw data: {'name': 'BTC Diamond', 'price': 1468928, 'side': 'long', 'ticker': 'BTCUSDT', 'time': '2026-04-09T12:00:00Z'}
+2026-04-09 11:59:59,204 - webhook - INFO - Parsed trdr.io format: type=BTC Diamond, price=1468928, side=long, ticker=BTCUSDT
+2026-04-09 11:59:59,220 - webhook - INFO - [BG] Alert 3 | type=BTC Diamond | side=long | price=1468928
+2026-04-09 11:59:59,221 - webhook - INFO - [PIPELINE] Alert 3 | type=BTC Diamond | запуск пайплайна
+2026-04-09 11:59:59,221 - webhook - INFO - [PIPELINE OK] Alert 3 | пайплайн активен
+2026-04-09 12:01:52,507 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-09 12:01:52,507 - webhook - INFO - From: 127.0.0.1
+2026-04-09 12:01:52,507 - webhook - INFO - Headers: {'host': 'localhost:8000', 'user-agent': 'curl/8.7.1', 'accept': '*/*', 'content-type': 'application/json', 'content-length': '101'}
+2026-04-09 12:01:52,507 - webhook - INFO - Raw data: {'name': 'BTC Diamond', 'price': 1468928, 'side': 'long', 'ticker': 'BTCUSDT', 'time': '2026-04-09T12:00:00Z'}
+2026-04-09 12:01:52,508 - webhook - INFO - Parsed trdr.io format: type=BTC Diamond, price=1468928, side=long, ticker=BTCUSDT
+2026-04-09 12:01:52,522 - webhook - INFO - [BG] Alert 4 | type=BTC Diamond | side=long | price=1468928
+2026-04-09 12:01:52,522 - webhook - INFO - [PIPELINE] Alert 4 | type=BTC Diamond | запуск пайплайна
+2026-04-09 12:01:52,522 - webhook - INFO - [PIPELINE OK] Alert 4 | пайплайн активен
+2026-04-09 12:02:21,797 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-09 12:02:21,798 - webhook - INFO - From: 127.0.0.1
+2026-04-09 12:02:21,798 - webhook - INFO - Headers: {'host': 'localhost:8000', 'user-agent': 'curl/8.7.1', 'accept': '*/*', 'content-type': 'application/json', 'content-length': '101'}
+2026-04-09 12:02:21,798 - webhook - INFO - Raw data: {'name': 'BTC Diamond', 'price': 1468928, 'side': 'long', 'ticker': 'BTCUSDT', 'time': '2026-04-09T12:00:00Z'}
+2026-04-09 12:02:21,798 - webhook - INFO - Parsed trdr.io format: type=BTC Diamond, price=1468928, side=long, ticker=BTCUSDT
+2026-04-09 12:03:32,069 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-09 12:03:32,069 - webhook - INFO - From: 127.0.0.1
+2026-04-09 12:03:32,069 - webhook - INFO - Headers: {'host': 'localhost:8000', 'user-agent': 'curl/8.7.1', 'accept': '*/*', 'content-type': 'application/json', 'content-length': '101'}
+2026-04-09 12:03:32,069 - webhook - INFO - Raw data: {'name': 'BTC Diamond', 'price': 1468928, 'side': 'long', 'ticker': 'BTCUSDT', 'time': '2026-04-09T12:00:00Z'}
+2026-04-09 12:03:32,069 - webhook - INFO - Parsed trdr.io format: type=BTC Diamond, price=1468928, side=long, ticker=BTCUSDT
+2026-04-09 12:03:32,080 - webhook - INFO - [BG] Alert 5 | type=BTC Diamond | side=long | price=1468928
+2026-04-09 12:03:32,080 - webhook - INFO - [PIPELINE] Alert 5 | type=BTC Diamond | запуск пайплайна
+2026-04-09 12:03:32,081 - webhook - INFO - [PIPELINE OK] Alert 5 | пайплайн активен
+2026-04-09 12:04:06,612 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-09 12:04:06,613 - webhook - INFO - From: 127.0.0.1
+2026-04-09 12:04:06,613 - webhook - INFO - Headers: {'host': 'localhost:8000', 'user-agent': 'curl/8.7.1', 'accept': '*/*', 'content-type': 'application/json', 'content-length': '101'}
+2026-04-09 12:04:06,613 - webhook - INFO - Raw data: {'name': 'BTC Diamond', 'price': 1468928, 'side': 'long', 'ticker': 'BTCUSDT', 'time': '2026-04-09T12:00:00Z'}
+2026-04-09 12:04:06,613 - webhook - INFO - Parsed trdr.io format: type=BTC Diamond, price=1468928, side=long, ticker=BTCUSDT
+2026-04-09 12:04:06,644 - webhook - INFO - [BG] Alert 6 | type=BTC Diamond | side=long | price=1468928
+2026-04-09 12:04:06,644 - webhook - INFO - [PIPELINE] Alert 6 | type=BTC Diamond | запуск пайплайна
+2026-04-09 12:04:06,644 - webhook - INFO - [PIPELINE OK] Alert 6 | пайплайн активен
+2026-04-09 12:06:37,609 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-09 12:06:37,610 - webhook - INFO - From: 127.0.0.1
+2026-04-09 12:06:37,610 - webhook - INFO - Headers: {'host': 'localhost:8000', 'user-agent': 'curl/8.7.1', 'accept': '*/*', 'content-type': 'application/json', 'content-length': '101'}
+2026-04-09 12:06:37,610 - webhook - INFO - Raw data: {'name': 'BTC Diamond', 'price': 1468928, 'side': 'long', 'ticker': 'BTCUSDT', 'time': '2026-04-09T12:00:00Z'}
+2026-04-09 12:06:37,610 - webhook - INFO - Parsed trdr.io format: type=BTC Diamond, price=1468928, side=long, ticker=BTCUSDT
+2026-04-09 12:06:37,637 - webhook - INFO - [BG] Alert 7 | type=BTC Diamond | side=long | price=1468928
+2026-04-09 12:06:37,637 - webhook - INFO - [PIPELINE] Alert 7 | type=BTC Diamond | запуск пайплайна
+2026-04-09 12:06:37,637 - webhook - INFO - [PIPELINE OK] Alert 7 | пайплайн активен
+2026-04-09 12:08:15,116 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-09 12:08:15,116 - webhook - INFO - From: 127.0.0.1
+2026-04-09 12:08:15,116 - webhook - INFO - Headers: {'host': 'localhost:8000', 'user-agent': 'curl/8.7.1', 'accept': '*/*', 'content-type': 'application/json', 'content-length': '101'}
+2026-04-09 12:08:15,116 - webhook - INFO - Raw data: {'name': 'BTC Diamond', 'price': 1468928, 'side': 'long', 'ticker': 'BTCUSDT', 'time': '2026-04-09T12:00:00Z'}
+2026-04-09 12:08:15,116 - webhook - INFO - Parsed trdr.io format: type=BTC Diamond, price=1468928, side=long, ticker=BTCUSDT
+2026-04-09 12:08:15,186 - webhook - INFO - [BG] Alert 8 | type=BTC Diamond | side=long | price=1468928
+2026-04-09 12:08:15,186 - webhook - INFO - [PIPELINE] Alert 8 | type=BTC Diamond | запуск пайплайна
+2026-04-09 12:08:15,187 - webhook - INFO - [PIPELINE OK] Alert 8 | пайплайн активен

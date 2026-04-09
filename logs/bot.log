@@ -1,0 +1,1049 @@
+2026-04-08 15:12:05,338 - backend.main - INFO - Starting BTC Trading Bot...
+2026-04-08 15:12:05,361 - backend.database.db - INFO - Database initialized
+2026-04-08 15:12:05,361 - backend.trading.bybit_client - INFO - BybitClient initialized in PAPER TRADING mode
+2026-04-08 15:12:05,362 - backend.services.market_data - INFO - Market data service started
+2026-04-08 15:12:05,362 - backend.main - INFO - Bot initialized (testnet=True)
+2026-04-08 15:12:18,406 - backend.api.webhooks - INFO - === WEBHOOK RECEIVED ===
+2026-04-08 15:12:18,409 - backend.api.webhooks - INFO - From: 37.97.190.248
+2026-04-08 15:12:18,410 - backend.api.webhooks - INFO - Raw data: {'name': 'Aggregated Liquidation', 'time': '2026-04-08T13:12:18.227Z', 'unixtime': 1775653938, 'cooldown': 300, 'timeframe': '1 hour', 'side': 'short', 'continuation': 0, 'message': 'Alert: Aggregated Liquidation\\nSide: Short 🔴\\n\\nBTC/USD on Binance COIN-M\\nPrice: 72494\\n • Liquidations (aggregation) (15 minutes, Any Size)\\n Shorts: 5336600 > 2000000', 'base': 'BTC', 'exchange': 'Binance COIN-M', 'symbol': 'BTC/USD', 'ticker': 'BTCUSD_PERP', 'price': 72494, 'quote': 'USD'}
+2026-04-08 15:12:18,410 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-08 15:12:18,410 - webhook - INFO - From: 37.97.190.248
+2026-04-08 15:12:18,410 - webhook - INFO - Headers: {'host': 'metals-baghdad-telescope-aberdeen.trycloudflare.com', 'user-agent': 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)', 'content-length': '461', 'accept': '*/*', 'accept-encoding': 'gzip', 'cdn-loop': 'cloudflare; loops=1; subreqs=1', 'cf-connecting-ip': '37.97.190.248', 'cf-ew-via': '15', 'cf-ipcountry': 'NL', 'cf-ray': '9e9185da47e05406-MAD', 'cf-visitor': '{"scheme":"https"}', 'cf-warp-tag-id': '64315a4b-edf5-4071-8ac3-31eb90093b8c', 'cf-worker': 'trycloudflare.com', 'connection': 'keep-alive', 'content-type': 'application/json', 'origin': 'https://trdr.io', 'x-forwarded-for': '37.97.190.248', 'x-forwarded-proto': 'https'}
+2026-04-08 15:12:18,412 - webhook - INFO - Raw data: {'name': 'Aggregated Liquidation', 'time': '2026-04-08T13:12:18.227Z', 'unixtime': 1775653938, 'cooldown': 300, 'timeframe': '1 hour', 'side': 'short', 'continuation': 0, 'message': 'Alert: Aggregated Liquidation\\nSide: Short 🔴\\n\\nBTC/USD on Binance COIN-M\\nPrice: 72494\\n • Liquidations (aggregation) (15 minutes, Any Size)\\n Shorts: 5336600 > 2000000', 'base': 'BTC', 'exchange': 'Binance COIN-M', 'symbol': 'BTC/USD', 'ticker': 'BTCUSD_PERP', 'price': 72494, 'quote': 'USD'}
+2026-04-08 15:12:18,475 - backend.api.webhooks - INFO - Parsed: type=Aggregated Liquidation, price=72494.0, message=Alert: Aggregated Liquidation\nSide: Short 🔴\n\nBTC/USD on Binance COIN-M\nPrice: 72494\n • Liquidations (aggregation) (15 minutes, Any Size)\n Shorts: 5336600 > 2000000
+2026-04-08 15:12:18,476 - backend.core.alert_processor - INFO - Parsed alert: Aggregated Liquidation at $72494.0
+2026-04-08 15:12:18,498 - backend.api.webhooks - INFO - === WEBHOOK RECEIVED ===
+2026-04-08 15:12:18,498 - backend.api.webhooks - INFO - From: 37.97.190.248
+2026-04-08 15:12:18,498 - backend.api.webhooks - INFO - Raw data: {'name': 'Aggregated Liquidation', 'time': '2026-04-08T13:12:18.207Z', 'unixtime': 1775653938, 'cooldown': 300, 'timeframe': '1 hour', 'side': 'short', 'continuation': 0, 'message': 'Alert: Aggregated Liquidation\\nSide: Short 🔴\\n\\nBTC/USDT on Binance USDⓈ-M\\nPrice: 72491\\n • Liquidations (aggregation) (15 minutes, Any Size)\\n Shorts: 5336600 > 2000000', 'base': 'BTC', 'exchange': 'Binance USDⓈ-M', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 72491, 'quote': 'USDT'}
+2026-04-08 15:12:18,498 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-08 15:12:18,499 - webhook - INFO - From: 37.97.190.248
+2026-04-08 15:12:18,499 - webhook - INFO - Headers: {'host': 'metals-baghdad-telescope-aberdeen.trycloudflare.com', 'user-agent': 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)', 'content-length': '464', 'accept': '*/*', 'accept-encoding': 'gzip', 'cdn-loop': 'cloudflare; loops=1; subreqs=1', 'cf-connecting-ip': '37.97.190.248', 'cf-ew-via': '15', 'cf-ipcountry': 'NL', 'cf-ray': '9e9185da416a2956-MAD', 'cf-visitor': '{"scheme":"https"}', 'cf-warp-tag-id': '64315a4b-edf5-4071-8ac3-31eb90093b8c', 'cf-worker': 'trycloudflare.com', 'connection': 'keep-alive', 'content-type': 'application/json', 'origin': 'https://trdr.io', 'x-forwarded-for': '37.97.190.248', 'x-forwarded-proto': 'https'}
+2026-04-08 15:12:18,499 - webhook - INFO - Raw data: {'name': 'Aggregated Liquidation', 'time': '2026-04-08T13:12:18.207Z', 'unixtime': 1775653938, 'cooldown': 300, 'timeframe': '1 hour', 'side': 'short', 'continuation': 0, 'message': 'Alert: Aggregated Liquidation\\nSide: Short 🔴\\n\\nBTC/USDT on Binance USDⓈ-M\\nPrice: 72491\\n • Liquidations (aggregation) (15 minutes, Any Size)\\n Shorts: 5336600 > 2000000', 'base': 'BTC', 'exchange': 'Binance USDⓈ-M', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 72491, 'quote': 'USDT'}
+2026-04-08 15:12:18,501 - backend.api.webhooks - INFO - Parsed: type=Aggregated Liquidation, price=72491.0, message=Alert: Aggregated Liquidation\nSide: Short 🔴\n\nBTC/USDT on Binance USDⓈ-M\nPrice: 72491\n • Liquidations (aggregation) (15 minutes, Any Size)\n Shorts: 5336600 > 2000000
+2026-04-08 15:12:18,501 - backend.core.alert_processor - INFO - Parsed alert: Aggregated Liquidation at $72491.0
+2026-04-08 15:12:18,607 - backend.core.alert_processor - INFO - Registered alert: Aggregated Liquidation
+2026-04-08 15:12:18,619 - backend.api.webhooks - INFO - Background processing for alert 7
+2026-04-08 15:12:18,622 - backend.core.alert_processor - INFO - Registered alert: Aggregated Liquidation
+2026-04-08 15:12:18,626 - backend.api.webhooks - INFO - Background processing for alert 8
+2026-04-08 15:13:54,435 - backend.api.webhooks - INFO - === WEBHOOK RECEIVED ===
+2026-04-08 15:13:54,437 - backend.api.webhooks - INFO - From: 37.97.190.248
+2026-04-08 15:13:54,437 - backend.api.webhooks - INFO - Raw data: {'name': 'BTC Diamond', 'time': '2026-04-08T13:13:54.219Z', 'unixtime': 1775654034, 'cooldown': 180, 'timeframe': '10 minutes', 'side': 'short', 'continuation': 0, 'message': 'Alert: BTC Diamond\\nSide: Short 🔴\\n\\nBTC/USDT on Binance\\nPrice: 72637\\n • Order Book Depth Overlay (1% - 2.5%)\\n Ratio: -69.94 BTC/USDT on Binance USDⓈ-M\\nPrice: 72601\\n • Order Book Depth Overlay (1% - 2.5%)\\n Ratio: -30.1 < -30', 'base': 'BTC', 'markets': [{'exchange': 'Binance', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 72637, 'quote': 'USDT'}, {'exchange': 'Binance USDⓈ-M', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 72601, 'quote': 'USDT'}]}
+2026-04-08 15:13:54,437 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-08 15:13:54,437 - webhook - INFO - From: 37.97.190.248
+2026-04-08 15:13:54,437 - webhook - INFO - Headers: {'host': 'metals-baghdad-telescope-aberdeen.trycloudflare.com', 'user-agent': 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)', 'content-length': '627', 'accept': '*/*', 'accept-encoding': 'gzip', 'cdn-loop': 'cloudflare; loops=1; subreqs=1', 'cf-connecting-ip': '37.97.190.248', 'cf-ew-via': '15', 'cf-ipcountry': 'NL', 'cf-ray': '9e918832627a66ae-AMS', 'cf-visitor': '{"scheme":"https"}', 'cf-warp-tag-id': '64315a4b-edf5-4071-8ac3-31eb90093b8c', 'cf-worker': 'trycloudflare.com', 'connection': 'keep-alive', 'content-type': 'application/json', 'origin': 'https://trdr.io', 'x-forwarded-for': '37.97.190.248', 'x-forwarded-proto': 'https'}
+2026-04-08 15:13:54,444 - webhook - INFO - Raw data: {'name': 'BTC Diamond', 'time': '2026-04-08T13:13:54.219Z', 'unixtime': 1775654034, 'cooldown': 180, 'timeframe': '10 minutes', 'side': 'short', 'continuation': 0, 'message': 'Alert: BTC Diamond\\nSide: Short 🔴\\n\\nBTC/USDT on Binance\\nPrice: 72637\\n • Order Book Depth Overlay (1% - 2.5%)\\n Ratio: -69.94 BTC/USDT on Binance USDⓈ-M\\nPrice: 72601\\n • Order Book Depth Overlay (1% - 2.5%)\\n Ratio: -30.1 < -30', 'base': 'BTC', 'markets': [{'exchange': 'Binance', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 72637, 'quote': 'USDT'}, {'exchange': 'Binance USDⓈ-M', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 72601, 'quote': 'USDT'}]}
+2026-04-08 15:13:54,458 - backend.api.webhooks - INFO - Parsed: type=BTC Diamond, price=None, message=Alert: BTC Diamond\nSide: Short 🔴\n\nBTC/USDT on Binance\nPrice: 72637\n • Order Book Depth Overlay (1% - 2.5%)\n Ratio: -69.94 BTC/USDT on Binance USDⓈ-M\nPrice: 72601\n • Order Book Depth Overlay (1% - 2.5%)\n Ratio: -30.1 < -30
+2026-04-08 15:13:54,463 - backend.core.alert_processor - INFO - Parsed alert: BTC Diamond at $0.0
+2026-04-08 15:13:54,463 - backend.core.alert_processor - WARNING - Alert with invalid price: 0.0
+2026-04-08 15:16:55,181 - backend.api.webhooks - INFO - === WEBHOOK RECEIVED ===
+2026-04-08 15:16:55,183 - backend.api.webhooks - INFO - From: 37.97.190.248
+2026-04-08 15:16:55,184 - backend.api.webhooks - INFO - Raw data: {'name': 'BTC Diamond', 'time': '2026-04-08T13:16:55.059Z', 'unixtime': 1775654214, 'cooldown': 180, 'timeframe': '10 minutes', 'side': 'short', 'continuation': 0, 'message': 'Alert: BTC Diamond\\nSide: Short 🔴\\n\\nBTC/USDT on Binance\\nPrice: 72630\\n • Order Book Depth Overlay (1% - 2.5%)\\n Ratio: -67.45 BTC/USDT on Binance USDⓈ-M\\nPrice: 72597\\n • Order Book Depth Overlay (1% - 2.5%)\\n Ratio: -30.28 < -30', 'base': 'BTC', 'markets': [{'exchange': 'Binance', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 72630, 'quote': 'USDT'}, {'exchange': 'Binance USDⓈ-M', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 72597, 'quote': 'USDT'}]}
+2026-04-08 15:16:55,184 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-08 15:16:55,186 - webhook - INFO - From: 37.97.190.248
+2026-04-08 15:16:55,186 - webhook - INFO - Headers: {'host': 'metals-baghdad-telescope-aberdeen.trycloudflare.com', 'user-agent': 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)', 'content-length': '628', 'accept': '*/*', 'accept-encoding': 'gzip', 'cdn-loop': 'cloudflare; loops=1; subreqs=1', 'cf-connecting-ip': '37.97.190.248', 'cf-ew-via': '15', 'cf-ipcountry': 'NL', 'cf-ray': '9e918c9c8201f5e7-MAD', 'cf-visitor': '{"scheme":"https"}', 'cf-warp-tag-id': '64315a4b-edf5-4071-8ac3-31eb90093b8c', 'cf-worker': 'trycloudflare.com', 'connection': 'keep-alive', 'content-type': 'application/json', 'origin': 'https://trdr.io', 'x-forwarded-for': '37.97.190.248', 'x-forwarded-proto': 'https'}
+2026-04-08 15:16:55,195 - webhook - INFO - Raw data: {'name': 'BTC Diamond', 'time': '2026-04-08T13:16:55.059Z', 'unixtime': 1775654214, 'cooldown': 180, 'timeframe': '10 minutes', 'side': 'short', 'continuation': 0, 'message': 'Alert: BTC Diamond\\nSide: Short 🔴\\n\\nBTC/USDT on Binance\\nPrice: 72630\\n • Order Book Depth Overlay (1% - 2.5%)\\n Ratio: -67.45 BTC/USDT on Binance USDⓈ-M\\nPrice: 72597\\n • Order Book Depth Overlay (1% - 2.5%)\\n Ratio: -30.28 < -30', 'base': 'BTC', 'markets': [{'exchange': 'Binance', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 72630, 'quote': 'USDT'}, {'exchange': 'Binance USDⓈ-M', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 72597, 'quote': 'USDT'}]}
+2026-04-08 15:16:55,241 - backend.api.webhooks - INFO - Parsed: type=BTC Diamond, price=None, message=Alert: BTC Diamond\nSide: Short 🔴\n\nBTC/USDT on Binance\nPrice: 72630\n • Order Book Depth Overlay (1% - 2.5%)\n Ratio: -67.45 BTC/USDT on Binance USDⓈ-M\nPrice: 72597\n • Order Book Depth Overlay (1% - 2.5%)\n Ratio: -30.28 < -30
+2026-04-08 15:16:55,248 - backend.core.alert_processor - INFO - Parsed alert: BTC Diamond at $0.0
+2026-04-08 15:16:55,248 - backend.core.alert_processor - WARNING - Alert with invalid price: 0.0
+2026-04-08 15:19:56,174 - backend.api.webhooks - INFO - === WEBHOOK RECEIVED ===
+2026-04-08 15:19:56,175 - backend.api.webhooks - INFO - From: 37.97.190.248
+2026-04-08 15:19:56,175 - backend.api.webhooks - INFO - Raw data: {'name': 'BTC Diamond', 'time': '2026-04-08T13:19:55.996Z', 'unixtime': 1775654395, 'cooldown': 180, 'timeframe': '10 minutes', 'side': 'short', 'continuation': 0, 'message': 'Alert: BTC Diamond\\nSide: Short 🔴\\n\\nBTC/USDT on Binance\\nPrice: 72600\\n • Order Book Depth Overlay (1% - 2.5%)\\n Ratio: -65.07 BTC/USDT on Binance USDⓈ-M\\nPrice: 72564\\n • Order Book Depth Overlay (1% - 2.5%)\\n Ratio: -31.68 < -30', 'base': 'BTC', 'markets': [{'exchange': 'Binance', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 72600, 'quote': 'USDT'}, {'exchange': 'Binance USDⓈ-M', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 72564, 'quote': 'USDT'}]}
+2026-04-08 15:19:56,176 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-08 15:19:56,176 - webhook - INFO - From: 37.97.190.248
+2026-04-08 15:19:56,176 - webhook - INFO - Headers: {'host': 'metals-baghdad-telescope-aberdeen.trycloudflare.com', 'user-agent': 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)', 'content-length': '628', 'accept': '*/*', 'accept-encoding': 'gzip', 'cdn-loop': 'cloudflare; loops=1; subreqs=1', 'cf-connecting-ip': '37.97.190.248', 'cf-ew-via': '15', 'cf-ipcountry': 'NL', 'cf-ray': '9e919107705aeeda-AMS', 'cf-visitor': '{"scheme":"https"}', 'cf-warp-tag-id': '64315a4b-edf5-4071-8ac3-31eb90093b8c', 'cf-worker': 'trycloudflare.com', 'connection': 'keep-alive', 'content-type': 'application/json', 'origin': 'https://trdr.io', 'x-forwarded-for': '37.97.190.248', 'x-forwarded-proto': 'https'}
+2026-04-08 15:19:56,178 - webhook - INFO - Raw data: {'name': 'BTC Diamond', 'time': '2026-04-08T13:19:55.996Z', 'unixtime': 1775654395, 'cooldown': 180, 'timeframe': '10 minutes', 'side': 'short', 'continuation': 0, 'message': 'Alert: BTC Diamond\\nSide: Short 🔴\\n\\nBTC/USDT on Binance\\nPrice: 72600\\n • Order Book Depth Overlay (1% - 2.5%)\\n Ratio: -65.07 BTC/USDT on Binance USDⓈ-M\\nPrice: 72564\\n • Order Book Depth Overlay (1% - 2.5%)\\n Ratio: -31.68 < -30', 'base': 'BTC', 'markets': [{'exchange': 'Binance', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 72600, 'quote': 'USDT'}, {'exchange': 'Binance USDⓈ-M', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 72564, 'quote': 'USDT'}]}
+2026-04-08 15:19:56,185 - backend.api.webhooks - INFO - Parsed: type=BTC Diamond, price=None, message=Alert: BTC Diamond\nSide: Short 🔴\n\nBTC/USDT on Binance\nPrice: 72600\n • Order Book Depth Overlay (1% - 2.5%)\n Ratio: -65.07 BTC/USDT on Binance USDⓈ-M\nPrice: 72564\n • Order Book Depth Overlay (1% - 2.5%)\n Ratio: -31.68 < -30
+2026-04-08 15:19:56,187 - backend.core.alert_processor - INFO - Parsed alert: BTC Diamond at $0.0
+2026-04-08 15:19:56,187 - backend.core.alert_processor - WARNING - Alert with invalid price: 0.0
+2026-04-08 15:31:55,356 - backend.api.webhooks - INFO - === WEBHOOK RECEIVED ===
+2026-04-08 15:31:55,418 - backend.api.webhooks - INFO - From: 37.97.190.248
+2026-04-08 15:31:55,422 - backend.api.webhooks - INFO - Raw data: {'name': 'Aggregated Liquidation', 'time': '2026-04-08T13:31:55.054Z', 'unixtime': 1775655115, 'cooldown': 300, 'timeframe': '1 hour', 'side': 'long', 'continuation': 0, 'message': 'Alert: Aggregated Liquidation\\nSide: Long 🟢\\n\\nBTC/USDT on Binance USDⓈ-M\\nPrice: 72197\\n • Liquidations (aggregation) (1 hour, Any Size)\\n Longs: 1009800 > 1000000', 'base': 'BTC', 'exchange': 'Binance USDⓈ-M', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 72197, 'quote': 'USDT'}
+2026-04-08 15:31:55,899 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-08 15:31:56,378 - webhook - INFO - From: 37.97.190.248
+2026-04-08 15:31:56,379 - webhook - INFO - Headers: {'host': 'metals-baghdad-telescope-aberdeen.trycloudflare.com', 'user-agent': 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)', 'content-length': '457', 'accept': '*/*', 'accept-encoding': 'gzip', 'cdn-loop': 'cloudflare; loops=1; subreqs=1', 'cf-connecting-ip': '37.97.190.248', 'cf-ew-via': '15', 'cf-ipcountry': 'NL', 'cf-ray': '9e91a29591cf9d56-AMS', 'cf-visitor': '{"scheme":"https"}', 'cf-warp-tag-id': '64315a4b-edf5-4071-8ac3-31eb90093b8c', 'cf-worker': 'trycloudflare.com', 'connection': 'keep-alive', 'content-type': 'application/json', 'origin': 'https://trdr.io', 'x-forwarded-for': '37.97.190.248', 'x-forwarded-proto': 'https'}
+2026-04-08 15:31:56,380 - webhook - INFO - Raw data: {'name': 'Aggregated Liquidation', 'time': '2026-04-08T13:31:55.054Z', 'unixtime': 1775655115, 'cooldown': 300, 'timeframe': '1 hour', 'side': 'long', 'continuation': 0, 'message': 'Alert: Aggregated Liquidation\\nSide: Long 🟢\\n\\nBTC/USDT on Binance USDⓈ-M\\nPrice: 72197\\n • Liquidations (aggregation) (1 hour, Any Size)\\n Longs: 1009800 > 1000000', 'base': 'BTC', 'exchange': 'Binance USDⓈ-M', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 72197, 'quote': 'USDT'}
+2026-04-08 15:31:56,410 - backend.api.webhooks - INFO - Parsed: type=Aggregated Liquidation, price=72197.0, message=Alert: Aggregated Liquidation\nSide: Long 🟢\n\nBTC/USDT on Binance USDⓈ-M\nPrice: 72197\n • Liquidations (aggregation) (1 hour, Any Size)\n Longs: 1009800 > 1000000
+2026-04-08 15:31:56,451 - backend.core.alert_processor - INFO - Parsed alert: Aggregated Liquidation at $72197.0
+2026-04-08 15:31:56,456 - backend.core.alert_processor - INFO - Alert Aggregated Liquidation in cooldown, 10m remaining
+2026-04-08 15:31:56,490 - backend.api.webhooks - INFO - === WEBHOOK RECEIVED ===
+2026-04-08 15:31:56,491 - backend.api.webhooks - INFO - From: 37.97.190.248
+2026-04-08 15:31:56,493 - backend.api.webhooks - INFO - Raw data: {'name': 'Aggregated Liquidation', 'time': '2026-04-08T13:31:55.069Z', 'unixtime': 1775655115, 'cooldown': 300, 'timeframe': '1 hour', 'side': 'long', 'continuation': 0, 'message': 'Alert: Aggregated Liquidation\\nSide: Long 🟢\\n\\nBTC/USD on Binance COIN-M\\nPrice: 72193\\n • Liquidations (aggregation) (1 hour, Any Size)\\n Longs: 1009800 > 1000000', 'base': 'BTC', 'exchange': 'Binance COIN-M', 'symbol': 'BTC/USD', 'ticker': 'BTCUSD_PERP', 'price': 72193, 'quote': 'USD'}
+2026-04-08 15:31:56,493 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-08 15:31:56,493 - webhook - INFO - From: 37.97.190.248
+2026-04-08 15:31:56,493 - webhook - INFO - Headers: {'host': 'metals-baghdad-telescope-aberdeen.trycloudflare.com', 'user-agent': 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)', 'content-length': '454', 'accept': '*/*', 'accept-encoding': 'gzip', 'cdn-loop': 'cloudflare; loops=1; subreqs=1', 'cf-connecting-ip': '37.97.190.248', 'cf-ew-via': '15', 'cf-ipcountry': 'NL', 'cf-ray': '9e91a2959071fc28-MAD', 'cf-visitor': '{"scheme":"https"}', 'cf-warp-tag-id': '64315a4b-edf5-4071-8ac3-31eb90093b8c', 'cf-worker': 'trycloudflare.com', 'connection': 'keep-alive', 'content-type': 'application/json', 'origin': 'https://trdr.io', 'x-forwarded-for': '37.97.190.248', 'x-forwarded-proto': 'https'}
+2026-04-08 15:31:56,493 - webhook - INFO - Raw data: {'name': 'Aggregated Liquidation', 'time': '2026-04-08T13:31:55.069Z', 'unixtime': 1775655115, 'cooldown': 300, 'timeframe': '1 hour', 'side': 'long', 'continuation': 0, 'message': 'Alert: Aggregated Liquidation\\nSide: Long 🟢\\n\\nBTC/USD on Binance COIN-M\\nPrice: 72193\\n • Liquidations (aggregation) (1 hour, Any Size)\\n Longs: 1009800 > 1000000', 'base': 'BTC', 'exchange': 'Binance COIN-M', 'symbol': 'BTC/USD', 'ticker': 'BTCUSD_PERP', 'price': 72193, 'quote': 'USD'}
+2026-04-08 15:31:56,503 - backend.api.webhooks - INFO - Parsed: type=Aggregated Liquidation, price=72193.0, message=Alert: Aggregated Liquidation\nSide: Long 🟢\n\nBTC/USD on Binance COIN-M\nPrice: 72193\n • Liquidations (aggregation) (1 hour, Any Size)\n Longs: 1009800 > 1000000
+2026-04-08 15:31:56,518 - backend.core.alert_processor - INFO - Parsed alert: Aggregated Liquidation at $72193.0
+2026-04-08 15:31:56,518 - backend.core.alert_processor - INFO - Alert Aggregated Liquidation in cooldown, 10m remaining
+2026-04-08 15:34:02,880 - backend.main - INFO - Starting BTC Trading Bot...
+2026-04-08 15:34:02,886 - backend.database.db - INFO - Database initialized
+2026-04-08 15:34:02,886 - backend.trading.bybit_client - INFO - BybitClient initialized in PAPER TRADING mode
+2026-04-08 15:34:02,886 - backend.services.market_data - INFO - Market data service started
+2026-04-08 15:34:02,886 - backend.main - INFO - Bot initialized (testnet=True)
+2026-04-08 15:34:58,518 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-08 15:35:49,978 - backend.main - INFO - Starting BTC Trading Bot...
+2026-04-08 15:35:49,981 - backend.database.db - INFO - Database initialized
+2026-04-08 15:35:49,981 - backend.trading.bybit_client - INFO - BybitClient initialized in PAPER TRADING mode
+2026-04-08 15:35:49,981 - backend.services.market_data - INFO - Market data service started
+2026-04-08 15:35:49,981 - backend.main - INFO - Bot initialized (testnet=True)
+2026-04-08 15:35:49,982 - backend.main - INFO - Shutting down...
+2026-04-08 15:35:49,982 - backend.services.market_data - INFO - Market data service stopped
+2026-04-08 15:36:15,466 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-08 15:36:16,073 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-08 15:36:29,023 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-08 15:36:29,307 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-08 15:36:41,988 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-08 15:36:42,230 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-08 15:37:05,482 - backend.api.webhooks - INFO - === WEBHOOK RECEIVED ===
+2026-04-08 15:37:05,483 - backend.api.webhooks - INFO - From: 37.97.190.248
+2026-04-08 15:37:05,483 - backend.api.webhooks - INFO - Raw data: {'name': 'Aggregated Liquidation', 'time': '2026-04-08T13:37:05.300Z', 'unixtime': 1775655425, 'cooldown': 300, 'timeframe': '1 hour', 'side': 'long', 'continuation': 0, 'message': 'Alert: Aggregated Liquidation\\nSide: Long 🟢\\n\\nBTC/USD on Binance COIN-M\\nPrice: 72002\\n • Liquidations (aggregation) (1 hour, Any Size)\\n Longs: 2862100 > 1000000', 'base': 'BTC', 'exchange': 'Binance COIN-M', 'symbol': 'BTC/USD', 'ticker': 'BTCUSD_PERP', 'price': 72002, 'quote': 'USD'}
+2026-04-08 15:37:05,483 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-08 15:37:05,484 - webhook - INFO - From: 37.97.190.248
+2026-04-08 15:37:05,484 - webhook - INFO - Headers: {'host': 'metals-baghdad-telescope-aberdeen.trycloudflare.com', 'user-agent': 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)', 'content-length': '454', 'accept': '*/*', 'accept-encoding': 'gzip', 'cdn-loop': 'cloudflare; loops=1; subreqs=1', 'cf-connecting-ip': '37.97.190.248', 'cf-ew-via': '15', 'cf-ipcountry': 'NL', 'cf-ray': '9e91aa2890d2b8c4-AMS', 'cf-visitor': '{"scheme":"https"}', 'cf-warp-tag-id': '64315a4b-edf5-4071-8ac3-31eb90093b8c', 'cf-worker': 'trycloudflare.com', 'connection': 'keep-alive', 'content-type': 'application/json', 'origin': 'https://trdr.io', 'x-forwarded-for': '37.97.190.248', 'x-forwarded-proto': 'https'}
+2026-04-08 15:37:05,484 - webhook - INFO - Raw data: {'name': 'Aggregated Liquidation', 'time': '2026-04-08T13:37:05.300Z', 'unixtime': 1775655425, 'cooldown': 300, 'timeframe': '1 hour', 'side': 'long', 'continuation': 0, 'message': 'Alert: Aggregated Liquidation\\nSide: Long 🟢\\n\\nBTC/USD on Binance COIN-M\\nPrice: 72002\\n • Liquidations (aggregation) (1 hour, Any Size)\\n Longs: 2862100 > 1000000', 'base': 'BTC', 'exchange': 'Binance COIN-M', 'symbol': 'BTC/USD', 'ticker': 'BTCUSD_PERP', 'price': 72002, 'quote': 'USD'}
+2026-04-08 15:37:05,485 - webhook - INFO - Parsed trdr.io format: type=Aggregated Liquidation, price=72002, side=long
+2026-04-08 15:37:05,487 - backend.api.webhooks - INFO - Parsed: type=Aggregated Liquidation, price=72002.0, side=long
+2026-04-08 15:37:05,491 - backend.core.alert_processor - INFO - Parsed alert: Aggregated Liquidation at $72002.0
+2026-04-08 15:37:05,505 - backend.api.webhooks - INFO - === WEBHOOK RECEIVED ===
+2026-04-08 15:37:05,505 - backend.api.webhooks - INFO - From: 37.97.190.248
+2026-04-08 15:37:05,505 - backend.api.webhooks - INFO - Raw data: {'name': 'Aggregated Liquidation', 'time': '2026-04-08T13:37:05.287Z', 'unixtime': 1775655425, 'cooldown': 300, 'timeframe': '1 hour', 'side': 'long', 'continuation': 0, 'message': 'Alert: Aggregated Liquidation\\nSide: Long 🟢\\n\\nBTC/USDT on Binance USDⓈ-M\\nPrice: 72007\\n • Liquidations (aggregation) (1 hour, Any Size)\\n Longs: 2862100 > 1000000', 'base': 'BTC', 'exchange': 'Binance USDⓈ-M', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 72007, 'quote': 'USDT'}
+2026-04-08 15:37:05,505 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-08 15:37:05,505 - webhook - INFO - From: 37.97.190.248
+2026-04-08 15:37:05,505 - webhook - INFO - Headers: {'host': 'metals-baghdad-telescope-aberdeen.trycloudflare.com', 'user-agent': 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)', 'content-length': '457', 'accept': '*/*', 'accept-encoding': 'gzip', 'cdn-loop': 'cloudflare; loops=1; subreqs=1', 'cf-connecting-ip': '37.97.190.248', 'cf-ew-via': '15', 'cf-ipcountry': 'NL', 'cf-ray': '9e91aa289045b91e-AMS', 'cf-visitor': '{"scheme":"https"}', 'cf-warp-tag-id': '64315a4b-edf5-4071-8ac3-31eb90093b8c', 'cf-worker': 'trycloudflare.com', 'connection': 'keep-alive', 'content-type': 'application/json', 'origin': 'https://trdr.io', 'x-forwarded-for': '37.97.190.248', 'x-forwarded-proto': 'https'}
+2026-04-08 15:37:05,505 - webhook - INFO - Raw data: {'name': 'Aggregated Liquidation', 'time': '2026-04-08T13:37:05.287Z', 'unixtime': 1775655425, 'cooldown': 300, 'timeframe': '1 hour', 'side': 'long', 'continuation': 0, 'message': 'Alert: Aggregated Liquidation\\nSide: Long 🟢\\n\\nBTC/USDT on Binance USDⓈ-M\\nPrice: 72007\\n • Liquidations (aggregation) (1 hour, Any Size)\\n Longs: 2862100 > 1000000', 'base': 'BTC', 'exchange': 'Binance USDⓈ-M', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 72007, 'quote': 'USDT'}
+2026-04-08 15:37:05,505 - webhook - INFO - Parsed trdr.io format: type=Aggregated Liquidation, price=72007, side=long
+2026-04-08 15:37:05,505 - backend.api.webhooks - INFO - Parsed: type=Aggregated Liquidation, price=72007.0, side=long
+2026-04-08 15:37:05,506 - backend.core.alert_processor - INFO - Parsed alert: Aggregated Liquidation at $72007.0
+2026-04-08 15:37:05,532 - backend.core.alert_processor - INFO - Registered alert: Aggregated Liquidation
+2026-04-08 15:37:05,533 - backend.api.webhooks - INFO - Background processing for alert 9
+2026-04-08 15:37:05,533 - backend.core.alert_processor - INFO - Registered alert: Aggregated Liquidation
+2026-04-08 15:37:05,534 - backend.api.webhooks - INFO - Background processing for alert 10
+2026-04-08 15:37:32,056 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 2
+2026-04-08 15:39:52,948 - backend.main - INFO - Starting BTC Trading Bot...
+2026-04-08 15:39:52,953 - backend.database.db - INFO - Database initialized
+2026-04-08 15:39:52,953 - backend.trading.bybit_client - INFO - BybitClient initialized in PAPER TRADING mode
+2026-04-08 15:39:52,953 - backend.services.market_data - INFO - Market data service started
+2026-04-08 15:39:52,953 - backend.main - INFO - Bot initialized (testnet=True)
+2026-04-08 15:39:56,225 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-08 15:40:22,812 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-08 15:40:23,179 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-08 15:46:05,271 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 2
+2026-04-08 15:46:07,147 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 1
+2026-04-08 15:47:18,396 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-08 15:47:19,079 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-08 15:47:33,458 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-08 15:48:45,948 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-08 15:49:02,245 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-08 15:50:15,230 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-08 15:51:12,371 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-08 21:13:46,886 - backend.main - INFO - Shutting down...
+2026-04-08 21:13:46,894 - backend.services.market_data - INFO - Market data service stopped
+2026-04-08 21:13:49,820 - backend.main - INFO - Starting BTC Trading Bot...
+2026-04-08 21:13:49,827 - backend.database.db - INFO - Database initialized
+2026-04-08 21:13:49,827 - backend.trading.bybit_client - INFO - BybitClient initialized in PAPER TRADING mode
+2026-04-08 21:13:49,827 - backend.services.market_data - INFO - Market data service started
+2026-04-08 21:13:49,827 - backend.main - INFO - Bot initialized (testnet=True)
+2026-04-08 21:13:52,277 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-08 21:13:55,409 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-08 23:03:21,994 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-08 23:03:26,612 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 10:32:25,868 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 10:34:46,951 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 10:38:17,232 - backend.api.webhooks - WARNING - Invalid webhook token from 127.0.0.1
+2026-04-09 10:38:35,948 - backend.api.webhooks - WARNING - Invalid webhook token from 127.0.0.1
+2026-04-09 10:38:47,816 - backend.api.webhooks - WARNING - Invalid webhook token from 127.0.0.1
+2026-04-09 10:39:04,624 - backend.api.webhooks - INFO - === WEBHOOK RECEIVED ===
+2026-04-09 10:39:04,625 - backend.api.webhooks - INFO - From: 127.0.0.1
+2026-04-09 10:39:04,625 - backend.api.webhooks - INFO - Raw data: {'symbol': 'BTCUSDT'}
+2026-04-09 10:39:04,625 - webhook - INFO - === WEBHOOK [GET] ===
+2026-04-09 10:39:04,626 - webhook - INFO - From: 127.0.0.1
+2026-04-09 10:39:04,628 - webhook - INFO - Headers: {'host': 'localhost:8000', 'connection': 'keep-alive', 'sec-ch-ua': '"Chromium";v="146", "Not-A.Brand";v="24", "Google Chrome";v="146"', 'sec-ch-ua-mobile': '?0', 'sec-ch-ua-platform': '"macOS"', 'upgrade-insecure-requests': '1', 'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36', 'accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7', 'sec-fetch-site': 'none', 'sec-fetch-mode': 'navigate', 'sec-fetch-user': '?1', 'sec-fetch-dest': 'document', 'accept-encoding': 'gzip, deflate, br, zstd', 'accept-language': 'ru,en-US;q=0.9,en;q=0.8,es;q=0.7'}
+2026-04-09 10:39:04,629 - webhook - INFO - Raw data: {'symbol': 'BTCUSDT'}
+2026-04-09 10:39:04,629 - webhook - INFO - Parsed trdr.io format: type=None, price=None, side=None
+2026-04-09 10:39:04,633 - backend.api.webhooks - INFO - Parsed: type=None, price=None, side=None
+2026-04-09 10:39:04,647 - backend.core.alert_processor - ERROR - Failed to parse webhook: 1 validation error for AlertWebhook
+type
+  Input should be a valid string [type=string_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.5/v/string_type
+2026-04-09 10:40:48,102 - backend.api.webhooks - INFO - === WEBHOOK RECEIVED ===
+2026-04-09 10:40:48,106 - backend.api.webhooks - INFO - From: 127.0.0.1
+2026-04-09 10:40:48,107 - backend.api.webhooks - INFO - Raw data: {'name': 'Aggregated Liquidation', 'time': '2026-04-09T10:00:00.000Z', 'unixtime': 1775692800, 'cooldown': 300, 'timeframe': '1 hour', 'side': 'short', 'continuation': 0, 'message': 'Alert: Aggregated Liquidation\nSide: Short 🔴\n\nBTC/USDT on Binance USDⓈ-M\nPrice: 72491\n • Liquidations (aggregation) (15 minutes, Any Size)\n Shorts: 5336600 > 2000000', 'base': 'BTC', 'exchange': 'Binance USDⓈ-M', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 72491, 'quote': 'USDT'}
+2026-04-09 10:40:48,107 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-09 10:40:48,107 - webhook - INFO - From: 127.0.0.1
+2026-04-09 10:40:48,107 - webhook - INFO - Headers: {'host': 'localhost:8000', 'user-agent': 'curl/8.7.1', 'accept': '*/*', 'content-type': 'application/json', 'content-length': '545'}
+2026-04-09 10:40:48,108 - webhook - INFO - Raw data: {'name': 'Aggregated Liquidation', 'time': '2026-04-09T10:00:00.000Z', 'unixtime': 1775692800, 'cooldown': 300, 'timeframe': '1 hour', 'side': 'short', 'continuation': 0, 'message': 'Alert: Aggregated Liquidation\nSide: Short 🔴\n\nBTC/USDT on Binance USDⓈ-M\nPrice: 72491\n • Liquidations (aggregation) (15 minutes, Any Size)\n Shorts: 5336600 > 2000000', 'base': 'BTC', 'exchange': 'Binance USDⓈ-M', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 72491, 'quote': 'USDT'}
+2026-04-09 10:40:48,108 - webhook - INFO - Parsed trdr.io format: type=Aggregated Liquidation, price=72491, side=short
+2026-04-09 10:40:48,112 - backend.api.webhooks - INFO - Parsed: type=Aggregated Liquidation, price=72491.0, side=short
+2026-04-09 10:40:48,122 - backend.core.alert_processor - INFO - Parsed alert: Aggregated Liquidation at $72491.0
+2026-04-09 10:40:48,258 - backend.core.alert_processor - INFO - Registered alert: Aggregated Liquidation
+2026-04-09 10:40:48,260 - backend.api.webhooks - INFO - Background processing for alert 11
+2026-04-09 10:40:57,265 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 10:43:01,162 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 10:43:01,733 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 10:45:01,821 - backend.api.webhooks - INFO - === WEBHOOK RECEIVED ===
+2026-04-09 10:45:01,822 - backend.api.webhooks - INFO - From: 127.0.0.1
+2026-04-09 10:45:01,823 - backend.api.webhooks - INFO - Raw data: {'name': 'BTC Diamond', 'time': '2026-04-09T10:00:00.000Z', 'unixtime': 1775692800, 'cooldown': 300, 'timeframe': '1 hour', 'side': 'long', 'continuation': 0, 'message': 'Alert: BTC Diamond\nSide: Long 🟢\n\nBTC/USDT on Binance USDⓈ-M\nPrice: 72491', 'base': 'BTC', 'exchange': 'Binance USDⓈ-M', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 72491, 'quote': 'USDT'}
+2026-04-09 10:45:01,823 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-09 10:45:01,823 - webhook - INFO - From: 127.0.0.1
+2026-04-09 10:45:01,823 - webhook - INFO - Headers: {'host': 'localhost:8000', 'user-agent': 'curl/8.7.1', 'accept': '*/*', 'content-type': 'application/json', 'content-length': '437'}
+2026-04-09 10:45:01,823 - webhook - INFO - Raw data: {'name': 'BTC Diamond', 'time': '2026-04-09T10:00:00.000Z', 'unixtime': 1775692800, 'cooldown': 300, 'timeframe': '1 hour', 'side': 'long', 'continuation': 0, 'message': 'Alert: BTC Diamond\nSide: Long 🟢\n\nBTC/USDT on Binance USDⓈ-M\nPrice: 72491', 'base': 'BTC', 'exchange': 'Binance USDⓈ-M', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 72491, 'quote': 'USDT'}
+2026-04-09 10:45:01,824 - webhook - INFO - Parsed trdr.io format: type=BTC Diamond, price=72491, side=long
+2026-04-09 10:45:01,826 - backend.api.webhooks - INFO - Parsed: type=BTC Diamond, price=72491.0, side=long
+2026-04-09 10:45:01,827 - backend.core.alert_processor - INFO - Parsed alert: BTC Diamond at $72491.0
+2026-04-09 10:45:01,853 - backend.core.alert_processor - INFO - Registered alert: BTC Diamond
+2026-04-09 10:45:01,854 - backend.api.webhooks - INFO - Background processing for alert 12
+2026-04-09 10:45:09,270 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 10:45:09,720 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 10:49:25,029 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 10:49:25,553 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 10:52:49,961 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 10:52:50,062 - backend.main - INFO - Shutting down...
+2026-04-09 10:52:50,062 - backend.services.market_data - INFO - Market data service stopped
+2026-04-09 10:52:52,811 - backend.main - INFO - Starting BTC Trading Bot...
+2026-04-09 10:52:52,817 - backend.database.db - INFO - Database initialized
+2026-04-09 10:52:52,817 - backend.trading.bybit_client - INFO - BybitClient initialized in PAPER TRADING mode
+2026-04-09 10:52:52,817 - backend.services.market_data - INFO - Market data service started
+2026-04-09 10:52:52,817 - backend.core.trading_engine - INFO - Trading engine started
+2026-04-09 10:52:52,817 - backend.api.webhooks - INFO - Trading components wired to webhook handler (engine=True)
+2026-04-09 10:52:52,817 - backend.main - INFO - Bot initialized (testnet=True)
+2026-04-09 10:53:02,277 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 10:53:58,978 - backend.api.webhooks - INFO - === WEBHOOK RECEIVED ===
+2026-04-09 10:53:58,978 - backend.api.webhooks - INFO - From: 127.0.0.1
+2026-04-09 10:53:58,978 - backend.api.webhooks - INFO - Raw data: {'name': 'Aggregated Liquidation', 'time': '2026-04-09T08:53:58.000Z', 'unixtime': 1775724838, 'cooldown': 300, 'timeframe': '1 hour', 'side': 'short', 'continuation': 0, 'message': 'Alert: Aggregated Liquidation\nSide: Short 🔴\n\nBTC/USDT\nPrice: 65000\n Shorts: 5500000 > 2000000', 'base': 'BTC', 'exchange': 'Binance USDⓈ-M', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 65000, 'quote': 'USDT'}
+2026-04-09 10:53:58,978 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-09 10:53:58,979 - webhook - INFO - From: 127.0.0.1
+2026-04-09 10:53:58,979 - webhook - INFO - Headers: {'host': 'localhost:8000', 'user-agent': 'python-requests/2.33.1', 'accept-encoding': 'gzip, deflate, zstd', 'accept': '*/*', 'connection': 'keep-alive', 'content-length': '420', 'content-type': 'application/json'}
+2026-04-09 10:53:58,979 - webhook - INFO - Raw data: {'name': 'Aggregated Liquidation', 'time': '2026-04-09T08:53:58.000Z', 'unixtime': 1775724838, 'cooldown': 300, 'timeframe': '1 hour', 'side': 'short', 'continuation': 0, 'message': 'Alert: Aggregated Liquidation\nSide: Short 🔴\n\nBTC/USDT\nPrice: 65000\n Shorts: 5500000 > 2000000', 'base': 'BTC', 'exchange': 'Binance USDⓈ-M', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 65000, 'quote': 'USDT'}
+2026-04-09 10:53:58,979 - webhook - INFO - Parsed trdr.io format: type=Aggregated Liquidation, price=65000, side=short, ticker=BTCUSDT
+2026-04-09 10:53:58,981 - backend.api.webhooks - INFO - Parsed: type=Aggregated Liquidation, price=65000.0, side=short
+2026-04-09 10:53:58,982 - backend.core.alert_processor - INFO - Parsed alert: Aggregated Liquidation at $65000.0, side=short
+2026-04-09 10:53:59,008 - backend.core.alert_processor - INFO - Registered alert: Aggregated Liquidation
+2026-04-09 10:53:59,009 - webhook - INFO - [BG] Alert 13 | type=Aggregated Liquidation | side=short | price=65000
+2026-04-09 10:53:59,009 - backend.api.webhooks - INFO - Alert 13 [LIQUIDATION]: long @ 65477.803572107056, SL=65150.41
+2026-04-09 10:53:59,009 - webhook - INFO - [TRADE] Alert 13 | LIQUIDATION long | entry=65477.803572107056 SL=65150.41
+2026-04-09 10:53:59,010 - backend.trading.risk_manager - INFO - Position size calculated: 0.305 BTC (risk: $100.00, stop distance: $327.39)
+2026-04-09 10:53:59,011 - backend.trading.bybit_client - INFO - [PAPER] Order placed: Buy 0.305 @ 65477.803572107056
+2026-04-09 10:53:59,011 - backend.trading.trade_executor - INFO - Position opened: long 0.305 BTC @ 65477.803572107056, SL: 65150.41, TP1: 66132.59, TP2: 66459.98, RR: 2.0
+2026-04-09 10:53:59,011 - backend.trading.risk_manager - INFO - Trade registered: long, active longs: 1, active shorts: 0
+2026-04-09 10:53:59,015 - backend.trading.position_manager - INFO - Position created for trade 1
+2026-04-09 10:53:59,019 - backend.api.webhooks - INFO - Alert 13: позиция открыта — long 0.305 BTC @ 65477.803572107056 | SL=65150.41 | TP1=66132.59 | TP2=66459.98 | RR=2.0 | trade_id=1
+2026-04-09 10:53:59,019 - webhook - INFO - [TRADE OK] Alert 13 | trade_id=1 | qty=0.305 | TP1=66132.59 | TP2=66459.98 | RR=2.0
+2026-04-09 10:54:01,036 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 66142.59
+2026-04-09 10:54:02,927 - backend.trading.bybit_client - INFO - [PAPER] Order placed: Sell 0.1525 @ 66222.35803981978
+2026-04-09 10:54:02,928 - backend.trading.trade_executor - INFO - Partial close: 50% of position, closed 0.1525 BTC, remaining 0.1525
+2026-04-09 10:54:02,928 - backend.trading.position_manager - INFO - TP1 hit at 66222.35803981978, closed 50% of position, realized PnL: 113.54
+2026-04-09 10:54:02,928 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 10:54:02,929 - backend.trading.trade_executor - INFO - Stop loss updated to 65543.28137567916
+2026-04-09 10:54:02,929 - backend.trading.position_manager - INFO - Stop moved to breakeven: 65543.28137567916
+2026-04-09 10:54:03,685 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 10:54:04,276 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 10:54:21,427 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 66469.98
+2026-04-09 10:54:22,954 - backend.trading.bybit_client - INFO - [PAPER] Order placed: Sell 0.04575 @ 66536.26648044388
+2026-04-09 10:54:22,955 - backend.trading.trade_executor - INFO - Partial close: 30% of position, closed 0.04575 BTC, remaining 0.10675
+2026-04-09 10:54:22,955 - backend.trading.position_manager - INFO - TP2 hit at 66536.26648044388, closed 30% of remaining position
+2026-04-09 10:54:24,957 - backend.trading.position_manager - INFO - Trailing stop activated at 66565.8831481862, trailing stop: 66233.05
+2026-04-09 10:54:30,964 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 10:54:30,964 - backend.trading.trade_executor - INFO - Stop loss updated to 66264.16
+2026-04-09 10:54:34,971 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 10:54:34,971 - backend.trading.trade_executor - INFO - Stop loss updated to 66358.72
+2026-04-09 10:54:41,612 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 10:54:41,839 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 66137.6301
+2026-04-09 10:54:41,918 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 10:54:51,204 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 10:54:51,440 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 10:55:36,354 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 10:55:36,802 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 10:56:21,151 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 10:56:21,153 - backend.trading.trade_executor - INFO - Stop loss updated to 66381.78
+2026-04-09 10:57:43,257 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 10:57:43,258 - backend.trading.trade_executor - INFO - Stop loss updated to 66403.24
+2026-04-09 10:57:43,538 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 10:57:43,939 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 10:57:45,262 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 10:57:45,263 - backend.trading.trade_executor - INFO - Stop loss updated to 66484.3
+2026-04-09 10:58:03,869 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 10:58:03,973 - backend.main - INFO - Shutting down...
+2026-04-09 10:58:03,973 - backend.core.trading_engine - INFO - Trading engine stopped
+2026-04-09 10:58:03,974 - backend.services.market_data - INFO - Market data service stopped
+2026-04-09 10:58:05,749 - backend.main - INFO - Starting BTC Trading Bot...
+2026-04-09 10:58:05,753 - backend.database.db - INFO - Database initialized
+2026-04-09 10:58:05,753 - backend.trading.bybit_client - INFO - BybitClient initialized in PAPER TRADING mode
+2026-04-09 10:58:05,753 - backend.services.market_data - INFO - Market data service started
+2026-04-09 10:58:05,753 - backend.core.trading_engine - INFO - Trading engine started
+2026-04-09 10:58:05,753 - backend.api.webhooks - INFO - Trading components wired to webhook handler (engine=True)
+2026-04-09 10:58:05,754 - backend.main - INFO - Bot initialized (testnet=True)
+2026-04-09 10:58:12,053 - backend.api.webhooks - INFO - === WEBHOOK RECEIVED ===
+2026-04-09 10:58:12,053 - backend.api.webhooks - INFO - From: 127.0.0.1
+2026-04-09 10:58:12,054 - backend.api.webhooks - INFO - Raw data: {'name': 'BTC Diamond', 'time': '2026-04-09T08:58:12.000Z', 'unixtime': 1775725092, 'cooldown': 60, 'timeframe': '1 hour', 'side': 'long', 'continuation': 0, 'message': 'Alert: BTC Diamond\nSide: Long\n\nBTC/USDT\nPrice: 64726', 'base': 'BTC', 'exchange': 'Binance USDⓈ-M', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 64725.69753961994, 'quote': 'USDT'}
+2026-04-09 10:58:12,054 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-09 10:58:12,054 - webhook - INFO - From: 127.0.0.1
+2026-04-09 10:58:12,054 - webhook - INFO - Headers: {'host': 'localhost:8000', 'user-agent': 'python-requests/2.33.1', 'accept-encoding': 'gzip, deflate, zstd', 'accept': '*/*', 'connection': 'keep-alive', 'content-length': '366', 'content-type': 'application/json'}
+2026-04-09 10:58:12,054 - webhook - INFO - Raw data: {'name': 'BTC Diamond', 'time': '2026-04-09T08:58:12.000Z', 'unixtime': 1775725092, 'cooldown': 60, 'timeframe': '1 hour', 'side': 'long', 'continuation': 0, 'message': 'Alert: BTC Diamond\nSide: Long\n\nBTC/USDT\nPrice: 64726', 'base': 'BTC', 'exchange': 'Binance USDⓈ-M', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 64725.69753961994, 'quote': 'USDT'}
+2026-04-09 10:58:12,054 - webhook - INFO - Parsed trdr.io format: type=BTC Diamond, price=64725.69753961994, side=long, ticker=BTCUSDT
+2026-04-09 10:58:12,054 - backend.api.webhooks - INFO - Parsed: type=BTC Diamond, price=64725.69753961994, side=long
+2026-04-09 10:58:12,055 - backend.core.alert_processor - INFO - Parsed alert: BTC Diamond at $64725.69753961994, side=long
+2026-04-09 10:58:12,067 - backend.core.alert_processor - INFO - Registered alert: BTC Diamond
+2026-04-09 10:58:12,068 - webhook - INFO - [BG] Alert 14 | type=BTC Diamond | side=long | price=64725.69753961994
+2026-04-09 10:58:12,068 - backend.api.webhooks - INFO - Alert 14 [BTC Diamond]: передаю в пайплайн (range → sweep → confirmation → trade)
+2026-04-09 10:58:12,068 - webhook - INFO - [PIPELINE] Alert 14 | type=BTC Diamond | запуск пайплайна
+2026-04-09 10:58:12,068 - backend.core.trading_engine - INFO - Alert 14 (BTC Diamond) entered pipeline (range → sweep → confirmation → trade)
+2026-04-09 10:58:12,068 - backend.api.webhooks - INFO - Alert 14: пайплайн запущен успешно
+2026-04-09 10:58:12,068 - webhook - INFO - [PIPELINE OK] Alert 14 | пайплайн активен
+2026-04-09 10:58:12,068 - backend.core.trading_engine - INFO - Starting range detection for alert 14
+2026-04-09 10:58:12,079 - backend.core.range_detector - INFO - Range too wide: 5.64%
+2026-04-09 10:58:12,079 - backend.core.range_detector - INFO - Range detected: High=65507.90, Low=62011.16, Width=5.64%, Valid=False
+2026-04-09 10:58:18,958 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 10:59:12,104 - backend.core.range_detector - INFO - Range too wide: 6.09%
+2026-04-09 10:59:12,105 - backend.core.range_detector - INFO - Range detected: High=68203.36, Low=64287.22, Width=6.09%, Valid=False
+2026-04-09 10:59:20,303 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 10:59:20,834 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 10:59:57,877 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 10:59:58,174 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 11:00:12,144 - backend.core.range_detector - INFO - Range too wide: 6.37%
+2026-04-09 11:00:12,144 - backend.core.range_detector - INFO - Range detected: High=67198.07, Low=63171.87, Width=6.37%, Valid=False
+2026-04-09 11:00:53,769 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 11:00:54,317 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 11:01:12,165 - backend.core.range_detector - INFO - Range detected: High=65569.45, Low=63187.24, Width=3.77%, Valid=True
+2026-04-09 11:01:12,166 - backend.core.trading_engine - INFO - Range detected for alert 14: H=65569.45, L=63187.24, Width=3.77%
+2026-04-09 11:01:12,874 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 11:01:12,975 - backend.main - INFO - Shutting down...
+2026-04-09 11:01:12,975 - backend.core.trading_engine - INFO - Trading engine stopped
+2026-04-09 11:01:12,975 - backend.services.market_data - INFO - Market data service stopped
+2026-04-09 11:01:14,690 - backend.main - INFO - Starting BTC Trading Bot...
+2026-04-09 11:01:14,693 - backend.database.db - INFO - Database initialized
+2026-04-09 11:01:14,693 - backend.trading.bybit_client - INFO - BybitClient initialized in PAPER TRADING mode
+2026-04-09 11:01:14,693 - backend.services.market_data - INFO - Market data service started
+2026-04-09 11:01:14,693 - backend.core.trading_engine - INFO - Trading engine started
+2026-04-09 11:01:14,693 - backend.api.webhooks - INFO - Trading components wired to webhook handler (engine=True)
+2026-04-09 11:01:14,693 - backend.main - INFO - Bot initialized (testnet=True)
+2026-04-09 11:01:23,169 - backend.api.webhooks - INFO - === WEBHOOK RECEIVED ===
+2026-04-09 11:01:23,169 - backend.api.webhooks - INFO - From: 127.0.0.1
+2026-04-09 11:01:23,169 - backend.api.webhooks - INFO - Raw data: {'name': 'BTC Diamond', 'time': '2026-04-09T09:01:23.000Z', 'unixtime': 1775725283, 'cooldown': 60, 'timeframe': '1 hour', 'side': 'long', 'continuation': 0, 'message': 'Alert: BTC Diamond\nSide: Long\n\nBTC/USDT\nPrice: 65124', 'base': 'BTC', 'exchange': 'Binance USDⓈ-M', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 65123.73505617674, 'quote': 'USDT'}
+2026-04-09 11:01:23,170 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-09 11:01:23,170 - webhook - INFO - From: 127.0.0.1
+2026-04-09 11:01:23,170 - webhook - INFO - Headers: {'host': 'localhost:8000', 'user-agent': 'python-requests/2.33.1', 'accept-encoding': 'gzip, deflate, zstd', 'accept': '*/*', 'connection': 'keep-alive', 'content-length': '366', 'content-type': 'application/json'}
+2026-04-09 11:01:23,170 - webhook - INFO - Raw data: {'name': 'BTC Diamond', 'time': '2026-04-09T09:01:23.000Z', 'unixtime': 1775725283, 'cooldown': 60, 'timeframe': '1 hour', 'side': 'long', 'continuation': 0, 'message': 'Alert: BTC Diamond\nSide: Long\n\nBTC/USDT\nPrice: 65124', 'base': 'BTC', 'exchange': 'Binance USDⓈ-M', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 65123.73505617674, 'quote': 'USDT'}
+2026-04-09 11:01:23,170 - webhook - INFO - Parsed trdr.io format: type=BTC Diamond, price=65123.73505617674, side=long, ticker=BTCUSDT
+2026-04-09 11:01:23,170 - backend.api.webhooks - INFO - Parsed: type=BTC Diamond, price=65123.73505617674, side=long
+2026-04-09 11:01:23,170 - backend.core.alert_processor - INFO - Parsed alert: BTC Diamond at $65123.73505617674, side=long
+2026-04-09 11:01:23,193 - backend.core.alert_processor - INFO - Registered alert: BTC Diamond
+2026-04-09 11:01:23,193 - webhook - INFO - [BG] Alert 15 | type=BTC Diamond | side=long | price=65123.73505617674
+2026-04-09 11:01:23,194 - backend.api.webhooks - INFO - Alert 15 [BTC Diamond]: передаю в пайплайн (range → sweep → confirmation → trade)
+2026-04-09 11:01:23,194 - webhook - INFO - [PIPELINE] Alert 15 | type=BTC Diamond | запуск пайплайна
+2026-04-09 11:01:23,194 - backend.core.trading_engine - INFO - Alert 15 (BTC Diamond) entered pipeline (range → sweep → confirmation → trade)
+2026-04-09 11:01:23,194 - backend.api.webhooks - INFO - Alert 15: пайплайн запущен успешно
+2026-04-09 11:01:23,194 - webhook - INFO - [PIPELINE OK] Alert 15 | пайплайн активен
+2026-04-09 11:01:23,194 - backend.core.trading_engine - INFO - Starting range detection for alert 15
+2026-04-09 11:01:23,196 - backend.core.range_detector - INFO - Range detected: High=65368.36, Low=64789.76, Width=0.89%, Valid=True
+2026-04-09 11:01:23,196 - backend.core.trading_engine - INFO - Range detected for alert 15: H=65368.36, L=64789.76, Width=0.89%
+2026-04-09 11:01:24,224 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 64595.39
+2026-04-09 11:01:24,704 - backend.core.liquidity_tracker - INFO - Low sweep detected: price 64445.63 < local low 64789.76
+2026-04-09 11:01:24,705 - backend.core.liquidity_tracker - INFO - Registered low sweep at 64445.63
+2026-04-09 11:01:24,705 - backend.core.trading_engine - INFO - Sweep detected for alert 15: low sweep at 64445.62661857681
+2026-04-09 11:01:25,246 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 64919.34
+2026-04-09 11:01:37,526 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 11:01:40,720 - backend.core.confirmation - INFO - Confirmation achieved: 2/2 conditions met. Direction: long
+2026-04-09 11:01:40,721 - backend.core.trading_engine - INFO - Entry confirmed for alert 15: direction=long, confirmations=2
+2026-04-09 11:01:40,721 - backend.trading.risk_manager - INFO - Position size calculated: 0.128 BTC (risk: $100.00, stop distance: $778.42)
+2026-04-09 11:01:40,721 - backend.trading.bybit_client - INFO - [PAPER] Order placed: Buy 0.128 @ 65159.59839681875
+2026-04-09 11:01:40,721 - backend.trading.trade_executor - INFO - Position opened: long 0.128 BTC @ 65159.59839681875, SL: 64381.18099195824, TP1: 66716.43, TP2: 67494.85, RR: 2.0
+2026-04-09 11:01:40,722 - backend.trading.risk_manager - INFO - Trade registered: long, active longs: 1, active shorts: 0
+2026-04-09 11:01:40,722 - backend.trading.position_manager - INFO - Position created for trade None
+2026-04-09 11:01:40,722 - backend.core.trading_engine - INFO - Trade executed for alert 15: long 0.128 BTC @ 65159.59839681875
+2026-04-09 11:01:41,580 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 66783.15
+2026-04-09 11:01:43,594 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 66783.15
+2026-04-09 11:01:44,989 - backend.trading.bybit_client - INFO - [PAPER] Order placed: Sell 0.064 @ 66768.72804151059
+2026-04-09 11:01:44,991 - backend.trading.trade_executor - INFO - Partial close: 50% of position, closed 0.064 BTC, remaining 0.064
+2026-04-09 11:01:44,991 - backend.trading.position_manager - INFO - TP1 hit at 66768.72804151059, closed 50% of position, realized PnL: 102.98
+2026-04-09 11:01:44,991 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 11:01:44,991 - backend.trading.trade_executor - INFO - Stop loss updated to 65224.75799521557
+2026-04-09 11:01:44,991 - backend.trading.position_manager - INFO - Stop moved to breakeven: 65224.75799521557
+2026-04-09 11:01:45,621 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 66783.15
+2026-04-09 11:01:47,649 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 66783.15
+2026-04-09 11:01:49,664 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 66783.15
+2026-04-09 11:01:51,675 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 66783.15
+2026-04-09 11:01:53,697 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 67562.34
+2026-04-09 11:01:55,709 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 67562.34
+2026-04-09 11:01:57,009 - backend.trading.bybit_client - INFO - [PAPER] Order placed: Sell 0.0192 @ 67697.32087915769
+2026-04-09 11:01:57,009 - backend.trading.trade_executor - INFO - Partial close: 30% of position, closed 0.0192 BTC, remaining 0.044800000000000006
+2026-04-09 11:01:57,009 - backend.trading.position_manager - INFO - TP2 hit at 67697.32087915769, closed 30% of remaining position
+2026-04-09 11:01:57,721 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 67562.34
+2026-04-09 11:01:58,367 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 11:01:58,802 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 11:01:59,011 - backend.trading.position_manager - INFO - Trailing stop activated at 67438.60683016929, trailing stop: 67101.41
+2026-04-09 11:01:59,739 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 67562.34
+2026-04-09 11:02:01,015 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 11:02:01,017 - backend.trading.trade_executor - INFO - Stop loss updated to 67120.87
+2026-04-09 11:02:01,752 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 67562.34
+2026-04-09 11:02:03,023 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 11:02:03,023 - backend.trading.trade_executor - INFO - Stop loss updated to 67258.05
+2026-04-09 11:02:03,782 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 67562.34
+2026-04-09 11:02:08,710 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 11:02:08,935 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 11:02:11,032 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 11:02:11,032 - backend.trading.trade_executor - INFO - Stop loss updated to 67270.94
+2026-04-09 11:02:27,056 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 11:02:27,056 - backend.trading.trade_executor - INFO - Stop loss updated to 67325.06
+2026-04-09 11:02:27,077 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 11:02:27,284 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 11:02:51,088 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 11:02:51,089 - backend.trading.trade_executor - INFO - Stop loss updated to 67346.55
+2026-04-09 11:02:57,101 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 11:02:57,101 - backend.trading.trade_executor - INFO - Stop loss updated to 67362.94
+2026-04-09 11:02:59,103 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 11:02:59,103 - backend.trading.trade_executor - INFO - Stop loss updated to 67433.74
+2026-04-09 11:03:07,115 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 11:03:07,116 - backend.trading.trade_executor - INFO - Stop loss updated to 67452.68
+2026-04-09 11:03:11,121 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 11:03:11,121 - backend.trading.trade_executor - INFO - Stop loss updated to 67499.13
+2026-04-09 11:03:13,124 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 11:03:13,125 - backend.trading.trade_executor - INFO - Stop loss updated to 67512.03
+2026-04-09 11:03:19,134 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 11:03:19,135 - backend.trading.trade_executor - INFO - Stop loss updated to 67579.76
+2026-04-09 11:03:21,137 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 11:03:21,137 - backend.trading.trade_executor - INFO - Stop loss updated to 67620.33
+2026-04-09 11:03:23,140 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 11:03:23,141 - backend.trading.trade_executor - INFO - Stop loss updated to 67690.95
+2026-04-09 11:03:25,143 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 11:03:25,143 - backend.trading.trade_executor - INFO - Stop loss updated to 67786.64
+2026-04-09 11:03:27,145 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 11:03:27,145 - backend.trading.trade_executor - INFO - Stop loss updated to 67875.42
+2026-04-09 11:03:35,154 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 11:03:35,154 - backend.trading.trade_executor - INFO - Stop loss updated to 67893.64
+2026-04-09 11:03:43,166 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 11:03:43,167 - backend.trading.trade_executor - INFO - Stop loss updated to 67927.67
+2026-04-09 11:03:47,177 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 11:03:47,178 - backend.trading.trade_executor - INFO - Stop loss updated to 68047.36
+2026-04-09 11:03:49,181 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 11:03:49,181 - backend.trading.trade_executor - INFO - Stop loss updated to 68115.63
+2026-04-09 11:03:51,183 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 11:03:51,184 - backend.trading.trade_executor - INFO - Stop loss updated to 68126.0
+2026-04-09 11:03:55,193 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 11:03:55,193 - backend.trading.trade_executor - INFO - Stop loss updated to 68166.41
+2026-04-09 11:03:57,194 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 11:03:57,195 - backend.trading.trade_executor - INFO - Stop loss updated to 68235.56
+2026-04-09 11:03:59,198 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 11:03:59,199 - backend.trading.trade_executor - INFO - Stop loss updated to 68257.0
+2026-04-09 11:04:03,205 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 11:04:03,205 - backend.trading.trade_executor - INFO - Stop loss updated to 68279.36
+2026-04-09 11:04:21,229 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 11:04:21,325 - backend.main - INFO - Shutting down...
+2026-04-09 11:04:21,325 - backend.core.trading_engine - INFO - Trading engine stopped
+2026-04-09 11:04:21,325 - backend.services.market_data - INFO - Market data service stopped
+2026-04-09 11:04:22,957 - backend.main - INFO - Starting BTC Trading Bot...
+2026-04-09 11:04:22,960 - backend.database.db - INFO - Database initialized
+2026-04-09 11:04:22,960 - backend.trading.bybit_client - INFO - BybitClient initialized in PAPER TRADING mode
+2026-04-09 11:04:22,960 - backend.services.market_data - INFO - Market data service started
+2026-04-09 11:04:22,960 - backend.core.trading_engine - INFO - Trading engine started
+2026-04-09 11:04:22,960 - backend.api.webhooks - INFO - Trading components wired to webhook handler (engine=True)
+2026-04-09 11:04:22,960 - backend.main - INFO - Bot initialized (testnet=True)
+2026-04-09 11:04:23,922 - backend.api.webhooks - INFO - === WEBHOOK RECEIVED ===
+2026-04-09 11:04:23,922 - backend.api.webhooks - INFO - From: 127.0.0.1
+2026-04-09 11:04:23,923 - backend.api.webhooks - INFO - Raw data: {'name': 'BTC Diamond', 'time': '2026-04-09T09:04:23.000Z', 'unixtime': 1775725463, 'cooldown': 60, 'timeframe': '1 hour', 'side': 'long', 'continuation': 0, 'message': 'Alert: BTC Diamond\nSide: Long\n\nBTC/USDT\nPrice: 64925', 'base': 'BTC', 'exchange': 'Binance USDⓈ-M', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 64925.06849833373, 'quote': 'USDT'}
+2026-04-09 11:04:23,923 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-09 11:04:23,923 - webhook - INFO - From: 127.0.0.1
+2026-04-09 11:04:23,923 - webhook - INFO - Headers: {'host': 'localhost:8000', 'user-agent': 'python-requests/2.33.1', 'accept-encoding': 'gzip, deflate, zstd', 'accept': '*/*', 'connection': 'keep-alive', 'content-length': '366', 'content-type': 'application/json'}
+2026-04-09 11:04:23,923 - webhook - INFO - Raw data: {'name': 'BTC Diamond', 'time': '2026-04-09T09:04:23.000Z', 'unixtime': 1775725463, 'cooldown': 60, 'timeframe': '1 hour', 'side': 'long', 'continuation': 0, 'message': 'Alert: BTC Diamond\nSide: Long\n\nBTC/USDT\nPrice: 64925', 'base': 'BTC', 'exchange': 'Binance USDⓈ-M', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 64925.06849833373, 'quote': 'USDT'}
+2026-04-09 11:04:23,923 - webhook - INFO - Parsed trdr.io format: type=BTC Diamond, price=64925.06849833373, side=long, ticker=BTCUSDT
+2026-04-09 11:04:23,923 - backend.api.webhooks - INFO - Parsed: type=BTC Diamond, price=64925.06849833373, side=long
+2026-04-09 11:04:23,923 - backend.core.alert_processor - INFO - Parsed alert: BTC Diamond at $64925.06849833373, side=long
+2026-04-09 11:04:23,930 - backend.core.alert_processor - INFO - Registered alert: BTC Diamond
+2026-04-09 11:04:23,931 - webhook - INFO - [BG] Alert 16 | type=BTC Diamond | side=long | price=64925.06849833373
+2026-04-09 11:04:23,931 - backend.api.webhooks - INFO - Alert 16 [BTC Diamond]: передаю в пайплайн (range → sweep → confirmation → trade)
+2026-04-09 11:04:23,931 - webhook - INFO - [PIPELINE] Alert 16 | type=BTC Diamond | запуск пайплайна
+2026-04-09 11:04:23,931 - backend.core.trading_engine - INFO - Alert 16 (BTC Diamond) entered pipeline (range → sweep → confirmation → trade)
+2026-04-09 11:04:23,931 - backend.api.webhooks - INFO - Alert 16: пайплайн запущен успешно
+2026-04-09 11:04:23,931 - webhook - INFO - [PIPELINE OK] Alert 16 | пайплайн активен
+2026-04-09 11:04:23,931 - backend.core.trading_engine - INFO - Starting range detection for alert 16
+2026-04-09 11:04:23,937 - backend.core.range_detector - INFO - Range detected: High=65409.61, Low=64648.73, Width=1.18%, Valid=True
+2026-04-09 11:04:23,937 - backend.core.trading_engine - INFO - Range detected for alert 16: H=65409.61, L=64648.73, Width=1.18%
+2026-04-09 11:04:24,945 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 64454.78
+2026-04-09 11:04:24,962 - backend.core.liquidity_tracker - INFO - Low sweep detected: price 64393.94 < local low 64648.73
+2026-04-09 11:04:24,962 - backend.core.liquidity_tracker - INFO - Registered low sweep at 64393.94
+2026-04-09 11:04:24,962 - backend.core.trading_engine - INFO - Sweep detected for alert 16: low sweep at 64393.93821746922
+2026-04-09 11:04:25,963 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 64778.03
+2026-04-09 11:04:28,299 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 11:04:28,969 - backend.core.confirmation - INFO - Confirmation achieved: 2/2 conditions met. Direction: long
+2026-04-09 11:04:28,971 - backend.core.trading_engine - INFO - Entry confirmed for alert 16: direction=long, confirmations=2
+2026-04-09 11:04:28,971 - backend.trading.risk_manager - INFO - Position size calculated: 0.167 BTC (risk: $100.00, stop distance: $599.35)
+2026-04-09 11:04:28,971 - backend.trading.bybit_client - INFO - [PAPER] Order placed: Buy 0.167 @ 64928.89172253191
+2026-04-09 11:04:28,971 - backend.trading.trade_executor - INFO - Position opened: long 0.167 BTC @ 64928.89172253191, SL: 64329.54427925175, TP1: 66127.59, TP2: 66726.93, RR: 2.0
+2026-04-09 11:04:28,972 - backend.trading.risk_manager - INFO - Trade registered: long, active longs: 1, active shorts: 0
+2026-04-09 11:04:28,972 - backend.trading.position_manager - INFO - Position created for trade None
+2026-04-09 11:04:28,995 - backend.core.trading_engine - INFO - Trade executed for alert 16: long 0.167 BTC @ 64928.89172253191
+2026-04-09 11:04:29,039 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 66193.72
+2026-04-09 11:04:31,006 - backend.trading.bybit_client - INFO - [PAPER] Order placed: Sell 0.0835 @ 66157.97207043828
+2026-04-09 11:04:31,007 - backend.trading.trade_executor - INFO - Partial close: 50% of position, closed 0.0835 BTC, remaining 0.0835
+2026-04-09 11:04:31,007 - backend.trading.position_manager - INFO - TP1 hit at 66157.97207043828, closed 50% of position, realized PnL: 102.63
+2026-04-09 11:04:31,007 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 11:04:31,008 - backend.trading.trade_executor - INFO - Stop loss updated to 64993.820614254444
+2026-04-09 11:04:31,008 - backend.trading.position_manager - INFO - Stop moved to breakeven: 64993.820614254444
+2026-04-09 11:04:31,053 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 66193.72
+2026-04-09 11:04:31,539 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 11:04:31,778 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 11:04:33,069 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 66193.72
+2026-04-09 11:04:35,099 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 66193.72
+2026-04-09 11:04:35,833 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 11:04:36,011 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 11:04:37,115 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 66193.72
+2026-04-09 11:04:37,583 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 11:04:37,774 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 11:04:39,111 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 11:04:39,135 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 66193.72
+2026-04-09 11:04:39,299 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 11:04:41,167 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 66793.66
+2026-04-09 11:04:43,159 - backend.trading.bybit_client - INFO - [PAPER] Order placed: Sell 0.02505 @ 66877.81429884645
+2026-04-09 11:04:43,160 - backend.trading.trade_executor - INFO - Partial close: 30% of position, closed 0.02505 BTC, remaining 0.05845
+2026-04-09 11:04:43,160 - backend.trading.position_manager - INFO - TP2 hit at 66877.81429884645, closed 30% of remaining position
+2026-04-09 11:04:43,161 - backend.trading.position_manager - INFO - Trailing stop activated at 66877.81429884645, trailing stop: 66543.43
+2026-04-09 11:04:43,193 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 66793.66
+2026-04-09 11:04:45,228 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 66793.66
+2026-04-09 11:04:47,267 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 66793.66
+2026-04-09 11:04:49,290 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 66793.66
+2026-04-09 11:04:51,319 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 66793.66
+2026-04-09 11:04:53,952 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 11:04:54,199 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 11:04:57,696 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 11:04:57,917 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 11:04:59,415 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 11:04:59,585 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 11:05:00,125 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 11:05:00,292 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 11:05:09,750 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 11:05:09,915 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 11:05:45,805 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 11:05:46,229 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 11:06:21,197 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 11:06:21,495 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 11:06:52,879 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 11:06:52,880 - backend.trading.trade_executor - INFO - Stop loss updated to 66600.47
+2026-04-09 11:06:54,902 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 11:06:54,903 - backend.trading.trade_executor - INFO - Stop loss updated to 66634.78
+2026-04-09 11:06:56,925 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 11:06:56,925 - backend.trading.trade_executor - INFO - Stop loss updated to 66682.44
+2026-04-09 11:06:57,489 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 11:06:58,034 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 11:06:58,945 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 11:06:58,948 - backend.trading.trade_executor - INFO - Stop loss updated to 66794.64
+2026-04-09 11:07:00,968 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 11:07:00,969 - backend.trading.trade_executor - INFO - Stop loss updated to 66905.42
+2026-04-09 11:08:34,155 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 11:08:34,157 - backend.trading.trade_executor - INFO - Stop loss updated to 66953.2
+2026-04-09 11:08:36,172 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 11:08:36,173 - backend.trading.trade_executor - INFO - Stop loss updated to 66996.58
+2026-04-09 11:08:47,282 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 11:08:47,383 - backend.main - INFO - Shutting down...
+2026-04-09 11:08:47,383 - backend.core.trading_engine - INFO - Trading engine stopped
+2026-04-09 11:08:47,384 - backend.services.market_data - INFO - Market data service stopped
+2026-04-09 11:08:49,538 - backend.main - INFO - Starting BTC Trading Bot...
+2026-04-09 11:08:49,541 - backend.database.db - INFO - Database initialized
+2026-04-09 11:08:49,541 - backend.trading.bybit_client - INFO - BybitClient initialized in PAPER TRADING mode
+2026-04-09 11:08:49,541 - backend.services.market_data - INFO - Market data service started
+2026-04-09 11:08:49,541 - backend.core.trading_engine - INFO - Trading engine started
+2026-04-09 11:08:49,541 - backend.api.webhooks - INFO - Trading components wired to webhook handler (engine=True)
+2026-04-09 11:08:49,541 - backend.main - INFO - Bot initialized (testnet=True)
+2026-04-09 11:08:50,562 - backend.api.webhooks - INFO - === WEBHOOK RECEIVED ===
+2026-04-09 11:08:50,562 - backend.api.webhooks - INFO - From: 127.0.0.1
+2026-04-09 11:08:50,562 - backend.api.webhooks - INFO - Raw data: {'name': 'BTC Diamond', 'time': '2026-04-09T09:08:50.000Z', 'unixtime': 1775725730, 'cooldown': 60, 'timeframe': '1 hour', 'side': 'long', 'continuation': 0, 'message': 'Alert: BTC Diamond\nSide: Long\n\nBTC/USDT\nPrice: 64960', 'base': 'BTC', 'exchange': 'Binance USDⓈ-M', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 64959.953432103495, 'quote': 'USDT'}
+2026-04-09 11:08:50,562 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-09 11:08:50,562 - webhook - INFO - From: 127.0.0.1
+2026-04-09 11:08:50,562 - webhook - INFO - Headers: {'host': 'localhost:8000', 'user-agent': 'python-requests/2.33.1', 'accept-encoding': 'gzip, deflate, zstd', 'accept': '*/*', 'connection': 'keep-alive', 'content-length': '367', 'content-type': 'application/json'}
+2026-04-09 11:08:50,562 - webhook - INFO - Raw data: {'name': 'BTC Diamond', 'time': '2026-04-09T09:08:50.000Z', 'unixtime': 1775725730, 'cooldown': 60, 'timeframe': '1 hour', 'side': 'long', 'continuation': 0, 'message': 'Alert: BTC Diamond\nSide: Long\n\nBTC/USDT\nPrice: 64960', 'base': 'BTC', 'exchange': 'Binance USDⓈ-M', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 64959.953432103495, 'quote': 'USDT'}
+2026-04-09 11:08:50,563 - webhook - INFO - Parsed trdr.io format: type=BTC Diamond, price=64959.953432103495, side=long, ticker=BTCUSDT
+2026-04-09 11:08:50,563 - backend.api.webhooks - INFO - Parsed: type=BTC Diamond, price=64959.953432103495, side=long
+2026-04-09 11:08:50,563 - backend.core.alert_processor - INFO - Parsed alert: BTC Diamond at $64959.953432103495, side=long
+2026-04-09 11:08:50,572 - backend.core.alert_processor - INFO - Registered alert: BTC Diamond
+2026-04-09 11:08:50,572 - webhook - INFO - [BG] Alert 1 | type=BTC Diamond | side=long | price=64959.953432103495
+2026-04-09 11:08:50,572 - backend.api.webhooks - INFO - Alert 1 [BTC Diamond]: передаю в пайплайн (range → sweep → confirmation → trade)
+2026-04-09 11:08:50,573 - webhook - INFO - [PIPELINE] Alert 1 | type=BTC Diamond | запуск пайплайна
+2026-04-09 11:08:50,573 - backend.core.trading_engine - INFO - Alert 1 (BTC Diamond) entered pipeline (range → sweep → confirmation → trade)
+2026-04-09 11:08:50,573 - backend.api.webhooks - INFO - Alert 1: пайплайн запущен успешно
+2026-04-09 11:08:50,573 - webhook - INFO - [PIPELINE OK] Alert 1 | пайплайн активен
+2026-04-09 11:08:50,573 - backend.core.trading_engine - INFO - Starting range detection for alert 1
+2026-04-09 11:08:50,578 - backend.core.range_detector - INFO - Range detected: High=65058.93, Low=64575.09, Width=0.75%, Valid=True
+2026-04-09 11:08:50,578 - backend.core.trading_engine - INFO - Range detected for alert 1: H=65058.93, L=64575.09, Width=0.75%
+2026-04-09 11:08:51,593 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 64381.36
+2026-04-09 11:08:53,546 - backend.core.liquidity_tracker - INFO - Low sweep detected: price 64256.58 < local low 64575.09
+2026-04-09 11:08:53,550 - backend.core.liquidity_tracker - INFO - Registered low sweep at 64256.58
+2026-04-09 11:08:53,550 - backend.core.trading_engine - INFO - Sweep detected for alert 1: low sweep at 64256.57867954901
+2026-04-09 11:08:53,647 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 64704.24
+2026-04-09 11:08:54,773 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 11:08:55,553 - backend.core.confirmation - INFO - Confirmation achieved: 2/2 conditions met. Direction: long
+2026-04-09 11:08:55,555 - backend.core.trading_engine - INFO - Entry confirmed for alert 1: direction=long, confirmations=2
+2026-04-09 11:08:55,556 - backend.trading.risk_manager - INFO - Position size calculated: 0.145 BTC (risk: $100.00, stop distance: $691.32)
+2026-04-09 11:08:55,558 - backend.trading.bybit_client - INFO - [PAPER] Order placed: Buy 0.145 @ 64883.643163723784
+2026-04-09 11:08:55,559 - backend.trading.trade_executor - INFO - Position opened: long 0.145 BTC @ 64883.643163723784, SL: 64192.32210086947, TP1: 66266.29, TP2: 66957.61, RR: 2.0
+2026-04-09 11:08:55,559 - backend.trading.risk_manager - INFO - Trade registered: long, active longs: 1, active shorts: 0
+2026-04-09 11:08:55,559 - backend.trading.position_manager - INFO - Position created for trade None
+2026-04-09 11:08:55,582 - backend.core.trading_engine - INFO - Trade executed for alert 1: long 0.145 BTC @ 64883.643163723784
+2026-04-09 11:08:55,686 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 66332.56
+2026-04-09 11:08:57,596 - backend.trading.bybit_client - INFO - [PAPER] Order placed: Sell 0.0725 @ 66522.77521912941
+2026-04-09 11:08:57,597 - backend.trading.trade_executor - INFO - Partial close: 50% of position, closed 0.0725 BTC, remaining 0.0725
+2026-04-09 11:08:57,597 - backend.trading.position_manager - INFO - TP1 hit at 66522.77521912941, closed 50% of position, realized PnL: 118.84
+2026-04-09 11:08:57,597 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 11:08:57,597 - backend.trading.trade_executor - INFO - Stop loss updated to 64948.52680688751
+2026-04-09 11:08:57,597 - backend.trading.position_manager - INFO - Stop moved to breakeven: 64948.52680688751
+2026-04-09 11:08:57,705 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 66332.56
+2026-04-09 11:08:59,729 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 66332.56
+2026-04-09 11:09:01,751 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 66332.56
+2026-04-09 11:09:03,766 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 66332.56
+2026-04-09 11:09:05,784 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 66332.56
+2026-04-09 11:09:07,810 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 67024.57
+2026-04-09 11:09:09,739 - backend.trading.bybit_client - INFO - [PAPER] Order placed: Sell 0.02175 @ 67095.82340751858
+2026-04-09 11:09:09,739 - backend.trading.trade_executor - INFO - Partial close: 30% of position, closed 0.02175 BTC, remaining 0.050749999999999997
+2026-04-09 11:09:09,740 - backend.trading.position_manager - INFO - TP2 hit at 67095.82340751858, closed 30% of remaining position
+2026-04-09 11:09:09,740 - backend.trading.position_manager - INFO - Trailing stop activated at 67095.82340751858, trailing stop: 66760.34
+2026-04-09 11:09:09,826 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 67024.57
+2026-04-09 11:09:11,851 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 67024.57
+2026-04-09 11:09:13,798 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 11:09:13,798 - backend.trading.trade_executor - INFO - Stop loss updated to 66803.37
+2026-04-09 11:09:13,870 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 67024.57
+2026-04-09 11:09:15,890 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 67024.57
+2026-04-09 11:09:17,910 - backend.trading.bybit_client - INFO - [TEST] Simulated price set to 67024.57
+2026-04-09 11:09:23,900 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 11:09:23,900 - backend.trading.trade_executor - INFO - Stop loss updated to 66886.32
+2026-04-09 11:09:25,634 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 11:09:25,860 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 11:09:25,916 - backend.trading.bybit_client - INFO - [PAPER] Trading stop set for BTCUSDT
+2026-04-09 11:09:25,917 - backend.trading.trade_executor - INFO - Stop loss updated to 67000.08
+2026-04-09 11:10:14,451 - backend.trading.position_manager - INFO - Position closed by trailing_stop at 66986.30 | PnL: $+106.71 | Total realized: $+273.66
+2026-04-09 11:11:49,046 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 11:11:49,511 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 11:24:51,779 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 11:24:51,880 - backend.main - INFO - Shutting down...
+2026-04-09 11:24:51,880 - backend.core.trading_engine - INFO - Trading engine stopped
+2026-04-09 11:24:51,880 - backend.services.market_data - INFO - Market data service stopped
+2026-04-09 11:24:53,591 - backend.main - INFO - Starting BTC Trading Bot...
+2026-04-09 11:24:53,597 - backend.database.db - INFO - Database initialized
+2026-04-09 11:24:53,910 - backend.trading.bybit_client - INFO - BybitClient initialized (testnet=True)
+2026-04-09 11:24:53,910 - backend.services.market_data - INFO - Market data service started
+2026-04-09 11:24:53,910 - backend.core.trading_engine - INFO - Trading engine started
+2026-04-09 11:24:53,910 - backend.api.webhooks - INFO - Trading components wired to webhook handler (engine=True)
+2026-04-09 11:24:53,910 - backend.main - INFO - Bot initialized (testnet=True)
+2026-04-09 11:25:36,600 - backend.trading.bybit_client - ERROR - Failed to get balance: OK
+2026-04-09 11:26:15,997 - backend.main - INFO - Shutting down...
+2026-04-09 11:26:15,997 - backend.core.trading_engine - INFO - Trading engine stopped
+2026-04-09 11:26:15,998 - backend.services.market_data - INFO - Market data service stopped
+2026-04-09 11:26:17,837 - backend.main - INFO - Starting BTC Trading Bot...
+2026-04-09 11:26:17,840 - backend.database.db - INFO - Database initialized
+2026-04-09 11:26:17,957 - backend.trading.bybit_client - INFO - BybitClient initialized (testnet=True)
+2026-04-09 11:26:17,957 - backend.services.market_data - INFO - Market data service started
+2026-04-09 11:26:17,957 - backend.core.trading_engine - INFO - Trading engine started
+2026-04-09 11:26:17,957 - backend.api.webhooks - INFO - Trading components wired to webhook handler (engine=True)
+2026-04-09 11:26:17,957 - backend.main - INFO - Bot initialized (testnet=True)
+2026-04-09 11:26:21,483 - backend.trading.bybit_client - ERROR - Failed to get balance: OK
+2026-04-09 11:29:59,293 - backend.trading.bybit_client - ERROR - Failed to get balance: OK
+2026-04-09 11:30:07,520 - backend.main - INFO - Shutting down...
+2026-04-09 11:30:07,521 - backend.core.trading_engine - INFO - Trading engine stopped
+2026-04-09 11:30:07,521 - backend.services.market_data - INFO - Market data service stopped
+2026-04-09 11:30:09,361 - backend.main - INFO - Starting BTC Trading Bot...
+2026-04-09 11:30:09,364 - backend.database.db - INFO - Database initialized
+2026-04-09 11:30:09,470 - backend.trading.bybit_client - INFO - BybitClient initialized (testnet=True)
+2026-04-09 11:30:09,471 - backend.services.market_data - INFO - Market data service started
+2026-04-09 11:30:09,471 - backend.core.trading_engine - INFO - Trading engine started
+2026-04-09 11:30:09,471 - backend.api.webhooks - INFO - Trading components wired to webhook handler (engine=True)
+2026-04-09 11:30:09,471 - backend.main - INFO - Bot initialized (testnet=True)
+2026-04-09 11:30:18,842 - backend.trading.bybit_client - WARNING - USDT не найден в Unified аккаунте. Доступные монеты: []. Пополните testnet баланс на testnet.bybit.com
+2026-04-09 11:31:25,330 - backend.trading.bybit_client - WARNING - USDT не найден в Unified аккаунте. Доступные монеты: []. Пополните testnet баланс на testnet.bybit.com
+2026-04-09 11:45:12,328 - backend.trading.bybit_client - ERROR - Error getting balance: could not convert string to float: ''
+2026-04-09 11:45:54,431 - backend.main - INFO - Shutting down...
+2026-04-09 11:45:54,432 - backend.core.trading_engine - INFO - Trading engine stopped
+2026-04-09 11:45:54,432 - backend.services.market_data - INFO - Market data service stopped
+2026-04-09 11:45:59,030 - backend.main - INFO - Starting BTC Trading Bot...
+2026-04-09 11:45:59,033 - backend.database.db - INFO - Database initialized
+2026-04-09 11:45:59,145 - backend.trading.bybit_client - INFO - BybitClient initialized (testnet=True)
+2026-04-09 11:45:59,145 - backend.services.market_data - INFO - Market data service started
+2026-04-09 11:45:59,145 - backend.core.trading_engine - INFO - Trading engine started
+2026-04-09 11:45:59,145 - backend.api.webhooks - INFO - Trading components wired to webhook handler (engine=True)
+2026-04-09 11:45:59,145 - backend.main - INFO - Bot initialized (testnet=True)
+2026-04-09 11:51:44,813 - backend.main - INFO - Shutting down...
+2026-04-09 11:51:44,815 - backend.core.trading_engine - INFO - Trading engine stopped
+2026-04-09 11:51:44,815 - backend.services.market_data - INFO - Market data service stopped
+2026-04-09 11:51:47,231 - backend.main - INFO - Starting BTC Trading Bot...
+2026-04-09 11:51:47,241 - backend.database.db - INFO - Database initialized
+2026-04-09 11:51:47,367 - backend.trading.bybit_client - INFO - BybitClient initialized (testnet=True)
+2026-04-09 11:51:47,367 - backend.services.market_data - INFO - Market data service started
+2026-04-09 11:51:47,367 - backend.core.trading_engine - INFO - Trading engine started
+2026-04-09 11:51:47,367 - backend.api.webhooks - INFO - Trading components wired to webhook handler (engine=True)
+2026-04-09 11:51:47,369 - backend.main - INFO - Bot initialized (testnet=True)
+2026-04-09 11:51:58,593 - backend.trading.bybit_client - INFO - USDT fields from Bybit: {'spotBorrow': '0', 'availableToBorrow': '', 'bonus': '0', 'accruedInterest': '0', 'availableToWithdraw': '', 'totalOrderIM': '0', 'equity': '35235.3567', 'totalPositionMM': '0', 'usdValue': '35238.49264674', 'unrealisedPnl': '0', 'collateralSwitch': True, 'spotHedgingQty': '0', 'borrowAmount': '0.000000000000000000', 'totalPositionIM': '0', 'walletBalance': '35235.3567', 'cumRealisedPnl': '0', 'locked': '0', 'marginCollateral': True, 'coin': 'USDT'}
+2026-04-09 11:52:28,532 - backend.api.webhooks - INFO - === WEBHOOK RECEIVED ===
+2026-04-09 11:52:28,533 - backend.api.webhooks - INFO - From: 127.0.0.1
+2026-04-09 11:52:28,533 - backend.api.webhooks - INFO - Raw data: {'name': 'BTC Diamond', 'price': 1468928, 'side': 'long', 'ticker': 'BTCUSDT', 'time': '2026-04-09T12:00:00Z'}
+2026-04-09 11:52:28,533 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-09 11:52:28,533 - webhook - INFO - From: 127.0.0.1
+2026-04-09 11:52:28,533 - webhook - INFO - Headers: {'host': 'localhost:8000', 'user-agent': 'curl/8.7.1', 'accept': '*/*', 'content-type': 'application/json', 'content-length': '101'}
+2026-04-09 11:52:28,533 - webhook - INFO - Raw data: {'name': 'BTC Diamond', 'price': 1468928, 'side': 'long', 'ticker': 'BTCUSDT', 'time': '2026-04-09T12:00:00Z'}
+2026-04-09 11:52:28,533 - webhook - INFO - Parsed trdr.io format: type=BTC Diamond, price=1468928, side=long, ticker=BTCUSDT
+2026-04-09 11:52:28,536 - backend.api.webhooks - INFO - Parsed: type=BTC Diamond, price=1468928.0, side=long
+2026-04-09 11:52:28,538 - backend.core.alert_processor - INFO - Parsed alert: BTC Diamond at $1468928.0, side=long
+2026-04-09 11:52:28,565 - backend.core.alert_processor - INFO - Registered alert: BTC Diamond
+2026-04-09 11:52:28,566 - webhook - INFO - [BG] Alert 1 | type=BTC Diamond | side=long | price=1468928
+2026-04-09 11:52:28,566 - backend.api.webhooks - INFO - Alert 1 [BTC Diamond]: передаю в пайплайн (range → sweep → confirmation → trade)
+2026-04-09 11:52:28,566 - webhook - INFO - [PIPELINE] Alert 1 | type=BTC Diamond | запуск пайплайна
+2026-04-09 11:52:28,567 - backend.core.trading_engine - INFO - Alert 1 (BTC Diamond) entered pipeline (range → sweep → confirmation → trade)
+2026-04-09 11:52:28,567 - backend.api.webhooks - INFO - Alert 1: пайплайн запущен успешно
+2026-04-09 11:52:28,567 - webhook - INFO - [PIPELINE OK] Alert 1 | пайплайн активен
+2026-04-09 11:52:28,567 - backend.core.trading_engine - INFO - Starting range detection for alert 1
+2026-04-09 11:52:29,241 - backend.core.range_detector - INFO - Range too wide: 70.64%
+2026-04-09 11:52:29,241 - backend.core.range_detector - INFO - Range detected: High=1595254.30, Low=934863.10, Width=70.64%, Valid=False
+2026-04-09 11:52:49,050 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 11:53:19,610 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 11:53:19,937 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 11:53:29,904 - backend.core.range_detector - INFO - Range too wide: 70.64%
+2026-04-09 11:53:29,904 - backend.core.range_detector - INFO - Range detected: High=1595254.30, Low=934863.10, Width=70.64%, Valid=False
+2026-04-09 11:53:55,914 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 11:53:56,581 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 11:54:30,685 - backend.core.range_detector - INFO - Range too wide: 70.64%
+2026-04-09 11:54:30,686 - backend.core.range_detector - INFO - Range detected: High=1595254.30, Low=934863.10, Width=70.64%, Valid=False
+2026-04-09 11:55:31,379 - backend.core.range_detector - INFO - Range too wide: 70.64%
+2026-04-09 11:55:31,380 - backend.core.range_detector - INFO - Range detected: High=1595254.30, Low=934863.10, Width=70.64%, Valid=False
+2026-04-09 11:55:32,408 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 11:55:32,974 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 11:56:32,186 - backend.core.range_detector - INFO - Range too wide: 70.64%
+2026-04-09 11:56:32,186 - backend.core.range_detector - INFO - Range detected: High=1595254.30, Low=934863.10, Width=70.64%, Valid=False
+2026-04-09 11:57:20,712 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 11:57:20,814 - backend.main - INFO - Shutting down...
+2026-04-09 11:57:20,814 - backend.core.trading_engine - INFO - Trading engine stopped
+2026-04-09 11:57:20,814 - backend.services.market_data - INFO - Market data service stopped
+2026-04-09 11:57:22,931 - backend.main - INFO - Starting BTC Trading Bot...
+2026-04-09 11:57:22,934 - backend.database.db - INFO - Database initialized
+2026-04-09 11:57:23,043 - backend.trading.bybit_client - INFO - BybitClient initialized (testnet=True)
+2026-04-09 11:57:23,043 - backend.services.market_data - INFO - Market data service started
+2026-04-09 11:57:23,043 - backend.core.trading_engine - INFO - Trading engine started
+2026-04-09 11:57:23,043 - backend.api.webhooks - INFO - Trading components wired to webhook handler (engine=True)
+2026-04-09 11:57:23,043 - backend.main - INFO - Bot initialized (testnet=True)
+2026-04-09 11:57:34,892 - backend.api.webhooks - INFO - === WEBHOOK RECEIVED ===
+2026-04-09 11:57:34,892 - backend.api.webhooks - INFO - From: 127.0.0.1
+2026-04-09 11:57:34,893 - backend.api.webhooks - INFO - Raw data: {'name': 'BTC Diamond', 'price': 1468928, 'side': 'long', 'ticker': 'BTCUSDT', 'time': '2026-04-09T12:00:00Z'}
+2026-04-09 11:57:34,893 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-09 11:57:34,896 - webhook - INFO - From: 127.0.0.1
+2026-04-09 11:57:34,897 - webhook - INFO - Headers: {'host': 'localhost:8000', 'user-agent': 'curl/8.7.1', 'accept': '*/*', 'content-type': 'application/json', 'content-length': '101'}
+2026-04-09 11:57:34,897 - webhook - INFO - Raw data: {'name': 'BTC Diamond', 'price': 1468928, 'side': 'long', 'ticker': 'BTCUSDT', 'time': '2026-04-09T12:00:00Z'}
+2026-04-09 11:57:34,897 - webhook - INFO - Parsed trdr.io format: type=BTC Diamond, price=1468928, side=long, ticker=BTCUSDT
+2026-04-09 11:57:34,897 - backend.api.webhooks - INFO - Parsed: type=BTC Diamond, price=1468928.0, side=long
+2026-04-09 11:57:34,898 - backend.core.alert_processor - INFO - Parsed alert: BTC Diamond at $1468928.0, side=long
+2026-04-09 11:57:34,911 - backend.core.alert_processor - INFO - Registered alert: BTC Diamond
+2026-04-09 11:57:34,912 - webhook - INFO - [BG] Alert 2 | type=BTC Diamond | side=long | price=1468928
+2026-04-09 11:57:34,912 - backend.api.webhooks - INFO - Alert 2 [BTC Diamond]: передаю в пайплайн (range → sweep → confirmation → trade)
+2026-04-09 11:57:34,912 - webhook - INFO - [PIPELINE] Alert 2 | type=BTC Diamond | запуск пайплайна
+2026-04-09 11:57:34,913 - backend.core.trading_engine - INFO - Alert 2 (BTC Diamond) entered pipeline (range → sweep → confirmation → trade)
+2026-04-09 11:57:34,913 - backend.api.webhooks - INFO - Alert 2: пайплайн запущен успешно
+2026-04-09 11:57:34,913 - webhook - INFO - [PIPELINE OK] Alert 2 | пайплайн активен
+2026-04-09 11:57:34,913 - backend.core.trading_engine - INFO - Starting range detection for alert 2
+2026-04-09 11:57:35,572 - backend.core.range_detector - INFO - Range detected: High=1595254.30, Low=934863.10, Width=70.64%, Valid=True
+2026-04-09 11:57:35,572 - backend.core.trading_engine - INFO - Range detected for alert 2: H=1595254.3, L=934863.1, Width=70.64%
+2026-04-09 11:57:40,575 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 11:58:32,771 - backend.api.webhooks - INFO - === WEBHOOK RECEIVED ===
+2026-04-09 11:58:32,772 - backend.api.webhooks - INFO - From: 127.0.0.1
+2026-04-09 11:58:32,773 - backend.api.webhooks - INFO - Raw data: {'name': 'BTC Diamond', 'price': 900000, 'side': 'long', 'ticker': 'BTCUSDT', 'time': '2026-04-09T12:01:00Z'}
+2026-04-09 11:58:32,773 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-09 11:58:32,773 - webhook - INFO - From: 127.0.0.1
+2026-04-09 11:58:32,773 - webhook - INFO - Headers: {'host': 'localhost:8000', 'user-agent': 'curl/8.7.1', 'accept': '*/*', 'content-type': 'application/json', 'content-length': '100'}
+2026-04-09 11:58:32,773 - webhook - INFO - Raw data: {'name': 'BTC Diamond', 'price': 900000, 'side': 'long', 'ticker': 'BTCUSDT', 'time': '2026-04-09T12:01:00Z'}
+2026-04-09 11:58:32,773 - webhook - INFO - Parsed trdr.io format: type=BTC Diamond, price=900000, side=long, ticker=BTCUSDT
+2026-04-09 11:58:32,774 - backend.api.webhooks - INFO - Parsed: type=BTC Diamond, price=900000.0, side=long
+2026-04-09 11:58:32,775 - backend.core.alert_processor - INFO - Parsed alert: BTC Diamond at $900000.0, side=long
+2026-04-09 11:58:32,775 - backend.core.alert_processor - INFO - Alert BTC Diamond in cooldown, 1742s remaining
+2026-04-09 11:58:50,626 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 11:58:51,260 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 11:59:45,071 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 11:59:45,171 - backend.main - INFO - Shutting down...
+2026-04-09 11:59:45,171 - backend.core.trading_engine - INFO - Trading engine stopped
+2026-04-09 11:59:45,171 - backend.services.market_data - INFO - Market data service stopped
+2026-04-09 11:59:47,597 - backend.main - INFO - Starting BTC Trading Bot...
+2026-04-09 11:59:47,600 - backend.database.db - INFO - Database initialized
+2026-04-09 11:59:47,722 - backend.trading.bybit_client - INFO - BybitClient initialized (testnet=True)
+2026-04-09 11:59:47,722 - backend.services.market_data - INFO - Market data service started
+2026-04-09 11:59:47,722 - backend.core.trading_engine - INFO - Trading engine started
+2026-04-09 11:59:47,722 - backend.api.webhooks - INFO - Trading components wired to webhook handler (engine=True)
+2026-04-09 11:59:47,722 - backend.main - INFO - Bot initialized (testnet=True)
+2026-04-09 11:59:59,203 - backend.api.webhooks - INFO - === WEBHOOK RECEIVED ===
+2026-04-09 11:59:59,203 - backend.api.webhooks - INFO - From: 127.0.0.1
+2026-04-09 11:59:59,203 - backend.api.webhooks - INFO - Raw data: {'name': 'BTC Diamond', 'price': 1468928, 'side': 'long', 'ticker': 'BTCUSDT', 'time': '2026-04-09T12:00:00Z'}
+2026-04-09 11:59:59,203 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-09 11:59:59,204 - webhook - INFO - From: 127.0.0.1
+2026-04-09 11:59:59,204 - webhook - INFO - Headers: {'host': 'localhost:8000', 'user-agent': 'curl/8.7.1', 'accept': '*/*', 'content-type': 'application/json', 'content-length': '101'}
+2026-04-09 11:59:59,204 - webhook - INFO - Raw data: {'name': 'BTC Diamond', 'price': 1468928, 'side': 'long', 'ticker': 'BTCUSDT', 'time': '2026-04-09T12:00:00Z'}
+2026-04-09 11:59:59,204 - webhook - INFO - Parsed trdr.io format: type=BTC Diamond, price=1468928, side=long, ticker=BTCUSDT
+2026-04-09 11:59:59,205 - backend.api.webhooks - INFO - Parsed: type=BTC Diamond, price=1468928.0, side=long
+2026-04-09 11:59:59,206 - backend.core.alert_processor - INFO - Parsed alert: BTC Diamond at $1468928.0, side=long
+2026-04-09 11:59:59,219 - backend.core.alert_processor - INFO - Registered alert: BTC Diamond
+2026-04-09 11:59:59,220 - webhook - INFO - [BG] Alert 3 | type=BTC Diamond | side=long | price=1468928
+2026-04-09 11:59:59,221 - backend.api.webhooks - INFO - Alert 3 [BTC Diamond]: передаю в пайплайн (range → sweep → confirmation → trade)
+2026-04-09 11:59:59,221 - webhook - INFO - [PIPELINE] Alert 3 | type=BTC Diamond | запуск пайплайна
+2026-04-09 11:59:59,221 - backend.core.trading_engine - INFO - Alert 3 (BTC Diamond) entered pipeline (range → sweep → confirmation → trade)
+2026-04-09 11:59:59,221 - backend.api.webhooks - INFO - Alert 3: пайплайн запущен успешно
+2026-04-09 11:59:59,221 - webhook - INFO - [PIPELINE OK] Alert 3 | пайплайн активен
+2026-04-09 11:59:59,221 - backend.core.trading_engine - INFO - Starting range detection for alert 3
+2026-04-09 11:59:59,933 - backend.core.range_detector - INFO - Range detected: High=1595254.30, Low=934863.10, Width=70.64%, Valid=True
+2026-04-09 11:59:59,933 - backend.core.trading_engine - INFO - Range detected for alert 3: H=1595254.3, L=934863.1, Width=70.64%
+2026-04-09 12:00:18,799 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 12:01:44,456 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 12:01:44,554 - backend.main - INFO - Shutting down...
+2026-04-09 12:01:44,554 - backend.core.trading_engine - INFO - Trading engine stopped
+2026-04-09 12:01:44,554 - backend.services.market_data - INFO - Market data service stopped
+2026-04-09 12:01:46,658 - backend.main - INFO - Starting BTC Trading Bot...
+2026-04-09 12:01:46,661 - backend.database.db - INFO - Database initialized
+2026-04-09 12:01:46,772 - backend.trading.bybit_client - INFO - BybitClient initialized (testnet=True)
+2026-04-09 12:01:46,772 - backend.services.market_data - INFO - Market data service started
+2026-04-09 12:01:46,772 - backend.core.trading_engine - INFO - Trading engine started
+2026-04-09 12:01:46,772 - backend.api.webhooks - INFO - Trading components wired to webhook handler (engine=True)
+2026-04-09 12:01:46,772 - backend.main - INFO - Bot initialized (testnet=True)
+2026-04-09 12:01:52,506 - backend.api.webhooks - INFO - === WEBHOOK RECEIVED ===
+2026-04-09 12:01:52,507 - backend.api.webhooks - INFO - From: 127.0.0.1
+2026-04-09 12:01:52,507 - backend.api.webhooks - INFO - Raw data: {'name': 'BTC Diamond', 'price': 1468928, 'side': 'long', 'ticker': 'BTCUSDT', 'time': '2026-04-09T12:00:00Z'}
+2026-04-09 12:01:52,507 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-09 12:01:52,507 - webhook - INFO - From: 127.0.0.1
+2026-04-09 12:01:52,507 - webhook - INFO - Headers: {'host': 'localhost:8000', 'user-agent': 'curl/8.7.1', 'accept': '*/*', 'content-type': 'application/json', 'content-length': '101'}
+2026-04-09 12:01:52,507 - webhook - INFO - Raw data: {'name': 'BTC Diamond', 'price': 1468928, 'side': 'long', 'ticker': 'BTCUSDT', 'time': '2026-04-09T12:00:00Z'}
+2026-04-09 12:01:52,508 - webhook - INFO - Parsed trdr.io format: type=BTC Diamond, price=1468928, side=long, ticker=BTCUSDT
+2026-04-09 12:01:52,508 - backend.api.webhooks - INFO - Parsed: type=BTC Diamond, price=1468928.0, side=long
+2026-04-09 12:01:52,509 - backend.core.alert_processor - INFO - Parsed alert: BTC Diamond at $1468928.0, side=long
+2026-04-09 12:01:52,521 - backend.core.alert_processor - INFO - Registered alert: BTC Diamond
+2026-04-09 12:01:52,522 - webhook - INFO - [BG] Alert 4 | type=BTC Diamond | side=long | price=1468928
+2026-04-09 12:01:52,522 - backend.api.webhooks - INFO - Alert 4 [BTC Diamond]: передаю в пайплайн (range → sweep → confirmation → trade)
+2026-04-09 12:01:52,522 - webhook - INFO - [PIPELINE] Alert 4 | type=BTC Diamond | запуск пайплайна
+2026-04-09 12:01:52,522 - backend.core.trading_engine - INFO - Alert 4 (BTC Diamond) entered pipeline (range → sweep → confirmation → trade)
+2026-04-09 12:01:52,522 - backend.api.webhooks - INFO - Alert 4: пайплайн запущен успешно
+2026-04-09 12:01:52,522 - webhook - INFO - [PIPELINE OK] Alert 4 | пайплайн активен
+2026-04-09 12:01:52,522 - backend.core.trading_engine - INFO - Starting range detection for alert 4
+2026-04-09 12:01:52,870 - backend.core.range_detector - INFO - Range detected: High=1595254.30, Low=971316.60, Width=64.24%, Valid=True
+2026-04-09 12:01:52,870 - backend.core.trading_engine - INFO - Range detected for alert 4: H=1595254.3, L=971316.6, Width=64.24%
+2026-04-09 12:02:01,939 - backend.api.webhooks - ERROR - [TEST] force_sweep error: 1 validation error for SweepEvent
+range_id
+  Field required [type=missing, input_value={'alert_id': 4, 'directio...4, 9, 10, 2, 1, 936861)}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.5/v/missing
+Traceback (most recent call last):
+  File "/Users/alex/PycharmProjects/PythonProject1/btc_trading_bot/backend/api/webhooks.py", line 436, in force_sweep
+    sweep = SweepEvent(
+            ^^^^^^^^^^^
+  File "/Users/alex/PycharmProjects/PythonProject1/btc_trading_bot/venv/lib/python3.12/site-packages/pydantic/main.py", line 164, in __init__
+    __pydantic_self__.__pydantic_validator__.validate_python(data, self_instance=__pydantic_self__)
+pydantic_core._pydantic_core.ValidationError: 1 validation error for SweepEvent
+range_id
+  Field required [type=missing, input_value={'alert_id': 4, 'directio...4, 9, 10, 2, 1, 936861)}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.5/v/missing
+2026-04-09 12:02:09,680 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 12:02:21,797 - backend.api.webhooks - INFO - === WEBHOOK RECEIVED ===
+2026-04-09 12:02:21,797 - backend.api.webhooks - INFO - From: 127.0.0.1
+2026-04-09 12:02:21,797 - backend.api.webhooks - INFO - Raw data: {'name': 'BTC Diamond', 'price': 1468928, 'side': 'long', 'ticker': 'BTCUSDT', 'time': '2026-04-09T12:00:00Z'}
+2026-04-09 12:02:21,797 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-09 12:02:21,798 - webhook - INFO - From: 127.0.0.1
+2026-04-09 12:02:21,798 - webhook - INFO - Headers: {'host': 'localhost:8000', 'user-agent': 'curl/8.7.1', 'accept': '*/*', 'content-type': 'application/json', 'content-length': '101'}
+2026-04-09 12:02:21,798 - webhook - INFO - Raw data: {'name': 'BTC Diamond', 'price': 1468928, 'side': 'long', 'ticker': 'BTCUSDT', 'time': '2026-04-09T12:00:00Z'}
+2026-04-09 12:02:21,798 - webhook - INFO - Parsed trdr.io format: type=BTC Diamond, price=1468928, side=long, ticker=BTCUSDT
+2026-04-09 12:02:21,798 - backend.api.webhooks - INFO - Parsed: type=BTC Diamond, price=1468928.0, side=long
+2026-04-09 12:02:21,799 - backend.core.alert_processor - INFO - Parsed alert: BTC Diamond at $1468928.0, side=long
+2026-04-09 12:02:21,799 - backend.core.alert_processor - INFO - Alert BTC Diamond in cooldown, 1770s remaining
+2026-04-09 12:02:25,624 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 12:02:26,294 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 12:02:47,148 - backend.api.webhooks - ERROR - [TEST] force_sweep error: 1 validation error for SweepEvent
+range_id
+  Field required [type=missing, input_value={'alert_id': 4, 'directio..., 9, 10, 2, 47, 147195)}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.5/v/missing
+Traceback (most recent call last):
+  File "/Users/alex/PycharmProjects/PythonProject1/btc_trading_bot/backend/api/webhooks.py", line 436, in force_sweep
+    sweep = SweepEvent(
+            ^^^^^^^^^^^
+  File "/Users/alex/PycharmProjects/PythonProject1/btc_trading_bot/venv/lib/python3.12/site-packages/pydantic/main.py", line 164, in __init__
+    __pydantic_self__.__pydantic_validator__.validate_python(data, self_instance=__pydantic_self__)
+pydantic_core._pydantic_core.ValidationError: 1 validation error for SweepEvent
+range_id
+  Field required [type=missing, input_value={'alert_id': 4, 'directio..., 9, 10, 2, 47, 147195)}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.5/v/missing
+2026-04-09 12:03:12,083 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 12:03:12,493 - backend.main - INFO - Shutting down...
+2026-04-09 12:03:12,493 - backend.core.trading_engine - INFO - Trading engine stopped
+2026-04-09 12:03:12,493 - backend.services.market_data - INFO - Market data service stopped
+2026-04-09 12:03:14,069 - backend.main - INFO - Starting BTC Trading Bot...
+2026-04-09 12:03:14,072 - backend.database.db - INFO - Database initialized
+2026-04-09 12:03:14,180 - backend.trading.bybit_client - INFO - BybitClient initialized (testnet=True)
+2026-04-09 12:03:14,180 - backend.services.market_data - INFO - Market data service started
+2026-04-09 12:03:14,180 - backend.core.trading_engine - INFO - Trading engine started
+2026-04-09 12:03:14,180 - backend.api.webhooks - INFO - Trading components wired to webhook handler (engine=True)
+2026-04-09 12:03:14,181 - backend.main - INFO - Bot initialized (testnet=True)
+2026-04-09 12:03:32,069 - backend.api.webhooks - INFO - === WEBHOOK RECEIVED ===
+2026-04-09 12:03:32,069 - backend.api.webhooks - INFO - From: 127.0.0.1
+2026-04-09 12:03:32,069 - backend.api.webhooks - INFO - Raw data: {'name': 'BTC Diamond', 'price': 1468928, 'side': 'long', 'ticker': 'BTCUSDT', 'time': '2026-04-09T12:00:00Z'}
+2026-04-09 12:03:32,069 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-09 12:03:32,069 - webhook - INFO - From: 127.0.0.1
+2026-04-09 12:03:32,069 - webhook - INFO - Headers: {'host': 'localhost:8000', 'user-agent': 'curl/8.7.1', 'accept': '*/*', 'content-type': 'application/json', 'content-length': '101'}
+2026-04-09 12:03:32,069 - webhook - INFO - Raw data: {'name': 'BTC Diamond', 'price': 1468928, 'side': 'long', 'ticker': 'BTCUSDT', 'time': '2026-04-09T12:00:00Z'}
+2026-04-09 12:03:32,069 - webhook - INFO - Parsed trdr.io format: type=BTC Diamond, price=1468928, side=long, ticker=BTCUSDT
+2026-04-09 12:03:32,070 - backend.api.webhooks - INFO - Parsed: type=BTC Diamond, price=1468928.0, side=long
+2026-04-09 12:03:32,071 - backend.core.alert_processor - INFO - Parsed alert: BTC Diamond at $1468928.0, side=long
+2026-04-09 12:03:32,079 - backend.core.alert_processor - INFO - Registered alert: BTC Diamond
+2026-04-09 12:03:32,080 - webhook - INFO - [BG] Alert 5 | type=BTC Diamond | side=long | price=1468928
+2026-04-09 12:03:32,080 - backend.api.webhooks - INFO - Alert 5 [BTC Diamond]: передаю в пайплайн (range → sweep → confirmation → trade)
+2026-04-09 12:03:32,080 - webhook - INFO - [PIPELINE] Alert 5 | type=BTC Diamond | запуск пайплайна
+2026-04-09 12:03:32,080 - backend.core.trading_engine - INFO - Alert 5 (BTC Diamond) entered pipeline (range → sweep → confirmation → trade)
+2026-04-09 12:03:32,081 - backend.api.webhooks - INFO - Alert 5: пайплайн запущен успешно
+2026-04-09 12:03:32,081 - webhook - INFO - [PIPELINE OK] Alert 5 | пайплайн активен
+2026-04-09 12:03:32,081 - backend.core.trading_engine - INFO - Starting range detection for alert 5
+2026-04-09 12:03:32,413 - backend.core.range_detector - INFO - Range detected: High=1595254.30, Low=971316.60, Width=64.24%, Valid=True
+2026-04-09 12:03:32,413 - backend.core.trading_engine - INFO - Range detected for alert 5: H=1595254.3, L=971316.6, Width=64.24%
+2026-04-09 12:03:38,737 - backend.api.webhooks - ERROR - [TEST] force_sweep error: 1 validation error for SweepEvent
+range_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.5/v/int_type
+Traceback (most recent call last):
+  File "/Users/alex/PycharmProjects/PythonProject1/btc_trading_bot/backend/api/webhooks.py", line 436, in force_sweep
+    sweep = SweepEvent(
+            ^^^^^^^^^^^
+  File "/Users/alex/PycharmProjects/PythonProject1/btc_trading_bot/venv/lib/python3.12/site-packages/pydantic/main.py", line 164, in __init__
+    __pydantic_self__.__pydantic_validator__.validate_python(data, self_instance=__pydantic_self__)
+pydantic_core._pydantic_core.ValidationError: 1 validation error for SweepEvent
+range_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.5/v/int_type
+2026-04-09 12:03:51,699 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 12:04:00,607 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 12:04:00,707 - backend.main - INFO - Shutting down...
+2026-04-09 12:04:00,707 - backend.core.trading_engine - INFO - Trading engine stopped
+2026-04-09 12:04:00,707 - backend.services.market_data - INFO - Market data service stopped
+2026-04-09 12:04:02,520 - backend.main - INFO - Starting BTC Trading Bot...
+2026-04-09 12:04:02,523 - backend.database.db - INFO - Database initialized
+2026-04-09 12:04:02,628 - backend.trading.bybit_client - INFO - BybitClient initialized (testnet=True)
+2026-04-09 12:04:02,628 - backend.services.market_data - INFO - Market data service started
+2026-04-09 12:04:02,628 - backend.core.trading_engine - INFO - Trading engine started
+2026-04-09 12:04:02,628 - backend.api.webhooks - INFO - Trading components wired to webhook handler (engine=True)
+2026-04-09 12:04:02,629 - backend.main - INFO - Bot initialized (testnet=True)
+2026-04-09 12:04:06,612 - backend.api.webhooks - INFO - === WEBHOOK RECEIVED ===
+2026-04-09 12:04:06,612 - backend.api.webhooks - INFO - From: 127.0.0.1
+2026-04-09 12:04:06,612 - backend.api.webhooks - INFO - Raw data: {'name': 'BTC Diamond', 'price': 1468928, 'side': 'long', 'ticker': 'BTCUSDT', 'time': '2026-04-09T12:00:00Z'}
+2026-04-09 12:04:06,612 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-09 12:04:06,613 - webhook - INFO - From: 127.0.0.1
+2026-04-09 12:04:06,613 - webhook - INFO - Headers: {'host': 'localhost:8000', 'user-agent': 'curl/8.7.1', 'accept': '*/*', 'content-type': 'application/json', 'content-length': '101'}
+2026-04-09 12:04:06,613 - webhook - INFO - Raw data: {'name': 'BTC Diamond', 'price': 1468928, 'side': 'long', 'ticker': 'BTCUSDT', 'time': '2026-04-09T12:00:00Z'}
+2026-04-09 12:04:06,613 - webhook - INFO - Parsed trdr.io format: type=BTC Diamond, price=1468928, side=long, ticker=BTCUSDT
+2026-04-09 12:04:06,614 - backend.api.webhooks - INFO - Parsed: type=BTC Diamond, price=1468928.0, side=long
+2026-04-09 12:04:06,615 - backend.core.alert_processor - INFO - Parsed alert: BTC Diamond at $1468928.0, side=long
+2026-04-09 12:04:06,642 - backend.core.alert_processor - INFO - Registered alert: BTC Diamond
+2026-04-09 12:04:06,644 - webhook - INFO - [BG] Alert 6 | type=BTC Diamond | side=long | price=1468928
+2026-04-09 12:04:06,644 - backend.api.webhooks - INFO - Alert 6 [BTC Diamond]: передаю в пайплайн (range → sweep → confirmation → trade)
+2026-04-09 12:04:06,644 - webhook - INFO - [PIPELINE] Alert 6 | type=BTC Diamond | запуск пайплайна
+2026-04-09 12:04:06,644 - backend.core.trading_engine - INFO - Alert 6 (BTC Diamond) entered pipeline (range → sweep → confirmation → trade)
+2026-04-09 12:04:06,644 - backend.api.webhooks - INFO - Alert 6: пайплайн запущен успешно
+2026-04-09 12:04:06,644 - webhook - INFO - [PIPELINE OK] Alert 6 | пайплайн активен
+2026-04-09 12:04:06,644 - backend.core.trading_engine - INFO - Starting range detection for alert 6
+2026-04-09 12:04:07,007 - backend.core.range_detector - INFO - Range detected: High=1595254.30, Low=971316.60, Width=64.24%, Valid=True
+2026-04-09 12:04:07,007 - backend.core.trading_engine - INFO - Range detected for alert 6: H=1595254.3, L=971316.6, Width=64.24%
+2026-04-09 12:04:14,643 - backend.api.webhooks - INFO - [TEST] Force sweep injected for alert 6: LOW at 966460.02
+2026-04-09 12:04:15,004 - backend.core.confirmation - INFO - Confirmation achieved: 2/2 conditions met. Direction: long
+2026-04-09 12:04:15,004 - backend.core.trading_engine - INFO - Entry confirmed for alert 6: direction=long, confirmations=2
+2026-04-09 12:04:15,689 - backend.trading.bybit_client - INFO - USDT fields from Bybit: {'spotBorrow': '0', 'availableToBorrow': '', 'bonus': '0', 'accruedInterest': '0', 'availableToWithdraw': '', 'totalOrderIM': '0', 'equity': '35235.3567', 'totalPositionMM': '0', 'usdValue': '35238.38694067', 'unrealisedPnl': '0', 'collateralSwitch': True, 'spotHedgingQty': '0', 'borrowAmount': '0.000000000000000000', 'totalPositionIM': '0', 'walletBalance': '35235.3567', 'cumRealisedPnl': '0', 'locked': '0', 'marginCollateral': True, 'coin': 'USDT'}
+2026-04-09 12:04:15,690 - backend.trading.risk_manager - INFO - Position size calculated: 0.001 BTC (risk: $352.35, stop distance: $488890.94)
+2026-04-09 12:04:16,324 - backend.trading.bybit_client - ERROR - Error placing order: Failed to submit order(s). The order price is higher than the maximum buying price. (ErrCode: 30208) (ErrTime: 10:04:16).
+Request → POST https://api-testnet.bybit.com/v5/order/create: {"category": "linear", "symbol": "BTCUSDT", "side": "Buy", "orderType": "Market", "qty": "0.001", "reduceOnly": false, "stopLoss": "965493.556983"}.
+2026-04-09 12:04:16,325 - backend.trading.trade_executor - ERROR - Failed to place order
+2026-04-09 12:04:16,325 - backend.core.trading_engine - ERROR - Failed to execute trade for alert 6
+2026-04-09 12:04:24,965 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 12:06:26,219 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 12:06:26,320 - backend.main - INFO - Shutting down...
+2026-04-09 12:06:26,321 - backend.core.trading_engine - INFO - Trading engine stopped
+2026-04-09 12:06:26,321 - backend.services.market_data - INFO - Market data service stopped
+2026-04-09 12:06:28,142 - backend.main - INFO - Starting BTC Trading Bot...
+2026-04-09 12:06:28,148 - backend.database.db - INFO - Database initialized
+2026-04-09 12:06:28,257 - backend.trading.bybit_client - INFO - BybitClient initialized (testnet=True)
+2026-04-09 12:06:28,257 - backend.services.market_data - INFO - Market data service started
+2026-04-09 12:06:28,257 - backend.core.trading_engine - INFO - Trading engine started
+2026-04-09 12:06:28,257 - backend.api.webhooks - INFO - Trading components wired to webhook handler (engine=True)
+2026-04-09 12:06:28,257 - backend.main - INFO - Bot initialized (testnet=True)
+2026-04-09 12:06:37,609 - backend.api.webhooks - INFO - === WEBHOOK RECEIVED ===
+2026-04-09 12:06:37,609 - backend.api.webhooks - INFO - From: 127.0.0.1
+2026-04-09 12:06:37,609 - backend.api.webhooks - INFO - Raw data: {'name': 'BTC Diamond', 'price': 1468928, 'side': 'long', 'ticker': 'BTCUSDT', 'time': '2026-04-09T12:00:00Z'}
+2026-04-09 12:06:37,609 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-09 12:06:37,610 - webhook - INFO - From: 127.0.0.1
+2026-04-09 12:06:37,610 - webhook - INFO - Headers: {'host': 'localhost:8000', 'user-agent': 'curl/8.7.1', 'accept': '*/*', 'content-type': 'application/json', 'content-length': '101'}
+2026-04-09 12:06:37,610 - webhook - INFO - Raw data: {'name': 'BTC Diamond', 'price': 1468928, 'side': 'long', 'ticker': 'BTCUSDT', 'time': '2026-04-09T12:00:00Z'}
+2026-04-09 12:06:37,610 - webhook - INFO - Parsed trdr.io format: type=BTC Diamond, price=1468928, side=long, ticker=BTCUSDT
+2026-04-09 12:06:37,611 - backend.api.webhooks - INFO - Parsed: type=BTC Diamond, price=1468928.0, side=long
+2026-04-09 12:06:37,612 - backend.core.alert_processor - INFO - Parsed alert: BTC Diamond at $1468928.0, side=long
+2026-04-09 12:06:37,636 - backend.core.alert_processor - INFO - Registered alert: BTC Diamond
+2026-04-09 12:06:37,637 - webhook - INFO - [BG] Alert 7 | type=BTC Diamond | side=long | price=1468928
+2026-04-09 12:06:37,637 - backend.api.webhooks - INFO - Alert 7 [BTC Diamond]: передаю в пайплайн (range → sweep → confirmation → trade)
+2026-04-09 12:06:37,637 - webhook - INFO - [PIPELINE] Alert 7 | type=BTC Diamond | запуск пайплайна
+2026-04-09 12:06:37,637 - backend.core.trading_engine - INFO - Alert 7 (BTC Diamond) entered pipeline (range → sweep → confirmation → trade)
+2026-04-09 12:06:37,637 - backend.api.webhooks - INFO - Alert 7: пайплайн запущен успешно
+2026-04-09 12:06:37,637 - webhook - INFO - [PIPELINE OK] Alert 7 | пайплайн активен
+2026-04-09 12:06:37,637 - backend.core.trading_engine - INFO - Starting range detection for alert 7
+2026-04-09 12:06:38,340 - backend.core.range_detector - INFO - Range detected: High=1595254.30, Low=971316.60, Width=64.24%, Valid=True
+2026-04-09 12:06:38,340 - backend.core.trading_engine - INFO - Range detected for alert 7: H=1595254.3, L=971316.6, Width=64.24%
+2026-04-09 12:06:47,285 - backend.api.webhooks - INFO - [TEST] Force sweep injected for alert 7: LOW at 966460.02
+2026-04-09 12:06:47,977 - backend.core.confirmation - INFO - Confirmation achieved: 2/2 conditions met. Direction: long
+2026-04-09 12:06:47,978 - backend.core.trading_engine - INFO - Entry confirmed for alert 7: direction=long, confirmations=2
+2026-04-09 12:06:48,663 - backend.trading.bybit_client - INFO - USDT fields from Bybit: {'spotBorrow': '0', 'availableToBorrow': '', 'bonus': '0', 'accruedInterest': '0', 'availableToWithdraw': '', 'totalOrderIM': '0', 'equity': '35235.3567', 'totalPositionMM': '0', 'usdValue': '35238.42217603', 'unrealisedPnl': '0', 'collateralSwitch': True, 'spotHedgingQty': '0', 'borrowAmount': '0.000000000000000000', 'totalPositionIM': '0', 'walletBalance': '35235.3567', 'cumRealisedPnl': '0', 'locked': '0', 'marginCollateral': True, 'coin': 'USDT'}
+2026-04-09 12:06:48,664 - backend.trading.risk_manager - INFO - Position size calculated: 0.001 BTC (risk: $352.35, stop distance: $503434.74)
+2026-04-09 12:06:48,984 - backend.trading.bybit_client - ERROR - Error placing order: Failed to submit order(s). The order price is higher than the maximum buying price. (ErrCode: 30208) (ErrTime: 10:06:48).
+Request → POST https://api-testnet.bybit.com/v5/order/create: {"category": "linear", "symbol": "BTCUSDT", "side": "Buy", "orderType": "Market", "qty": "0.001", "reduceOnly": false}.
+2026-04-09 12:06:48,984 - backend.trading.trade_executor - ERROR - Failed to place order
+2026-04-09 12:06:48,984 - backend.core.trading_engine - ERROR - Failed to execute trade for alert 7
+2026-04-09 12:08:07,950 - backend.main - INFO - Shutting down...
+2026-04-09 12:08:07,951 - backend.core.trading_engine - INFO - Trading engine stopped
+2026-04-09 12:08:07,951 - backend.services.market_data - INFO - Market data service stopped
+2026-04-09 12:08:10,421 - backend.main - INFO - Starting BTC Trading Bot...
+2026-04-09 12:08:10,424 - backend.database.db - INFO - Database initialized
+2026-04-09 12:08:10,541 - backend.trading.bybit_client - INFO - BybitClient initialized (testnet=True)
+2026-04-09 12:08:10,541 - backend.services.market_data - INFO - Market data service started
+2026-04-09 12:08:10,541 - backend.core.trading_engine - INFO - Trading engine started
+2026-04-09 12:08:10,541 - backend.api.webhooks - INFO - Trading components wired to webhook handler (engine=True)
+2026-04-09 12:08:10,541 - backend.main - INFO - Bot initialized (testnet=True)
+2026-04-09 12:08:15,116 - backend.api.webhooks - INFO - === WEBHOOK RECEIVED ===
+2026-04-09 12:08:15,116 - backend.api.webhooks - INFO - From: 127.0.0.1
+2026-04-09 12:08:15,116 - backend.api.webhooks - INFO - Raw data: {'name': 'BTC Diamond', 'price': 1468928, 'side': 'long', 'ticker': 'BTCUSDT', 'time': '2026-04-09T12:00:00Z'}
+2026-04-09 12:08:15,116 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-09 12:08:15,116 - webhook - INFO - From: 127.0.0.1
+2026-04-09 12:08:15,116 - webhook - INFO - Headers: {'host': 'localhost:8000', 'user-agent': 'curl/8.7.1', 'accept': '*/*', 'content-type': 'application/json', 'content-length': '101'}
+2026-04-09 12:08:15,116 - webhook - INFO - Raw data: {'name': 'BTC Diamond', 'price': 1468928, 'side': 'long', 'ticker': 'BTCUSDT', 'time': '2026-04-09T12:00:00Z'}
+2026-04-09 12:08:15,116 - webhook - INFO - Parsed trdr.io format: type=BTC Diamond, price=1468928, side=long, ticker=BTCUSDT
+2026-04-09 12:08:15,117 - backend.api.webhooks - INFO - Parsed: type=BTC Diamond, price=1468928.0, side=long
+2026-04-09 12:08:15,169 - backend.core.alert_processor - INFO - Parsed alert: BTC Diamond at $1468928.0, side=long
+2026-04-09 12:08:15,184 - backend.core.alert_processor - INFO - Registered alert: BTC Diamond
+2026-04-09 12:08:15,186 - webhook - INFO - [BG] Alert 8 | type=BTC Diamond | side=long | price=1468928
+2026-04-09 12:08:15,186 - backend.api.webhooks - INFO - Alert 8 [BTC Diamond]: передаю в пайплайн (range → sweep → confirmation → trade)
+2026-04-09 12:08:15,186 - webhook - INFO - [PIPELINE] Alert 8 | type=BTC Diamond | запуск пайплайна
+2026-04-09 12:08:15,187 - backend.core.trading_engine - INFO - Alert 8 (BTC Diamond) entered pipeline (range → sweep → confirmation → trade)
+2026-04-09 12:08:15,187 - backend.api.webhooks - INFO - Alert 8: пайплайн запущен успешно
+2026-04-09 12:08:15,187 - webhook - INFO - [PIPELINE OK] Alert 8 | пайплайн активен
+2026-04-09 12:08:15,187 - backend.core.trading_engine - INFO - Starting range detection for alert 8
+2026-04-09 12:08:15,585 - backend.core.range_detector - INFO - Range detected: High=1595254.30, Low=971316.60, Width=64.24%, Valid=True
+2026-04-09 12:08:15,586 - backend.core.trading_engine - INFO - Range detected for alert 8: H=1595254.3, L=971316.6, Width=64.24%
+2026-04-09 12:08:23,180 - backend.api.webhooks - INFO - [TEST] Force sweep injected for alert 8: LOW at 966460.02
+2026-04-09 12:08:23,497 - backend.core.confirmation - INFO - Confirmation achieved: 2/2 conditions met. Direction: long
+2026-04-09 12:08:23,498 - backend.core.trading_engine - INFO - Entry confirmed for alert 8: direction=long, confirmations=2
+2026-04-09 12:08:24,146 - backend.trading.bybit_client - INFO - USDT fields from Bybit: {'spotBorrow': '0', 'availableToBorrow': '', 'bonus': '0', 'accruedInterest': '0', 'availableToWithdraw': '', 'totalOrderIM': '0', 'equity': '35235.3567', 'totalPositionMM': '0', 'usdValue': '35238.0345871', 'unrealisedPnl': '0', 'collateralSwitch': True, 'spotHedgingQty': '0', 'borrowAmount': '0.000000000000000000', 'totalPositionIM': '0', 'walletBalance': '35235.3567', 'cumRealisedPnl': '0', 'locked': '0', 'marginCollateral': True, 'coin': 'USDT'}
+2026-04-09 12:08:24,147 - backend.trading.risk_manager - INFO - Position size calculated: 0.001 BTC (risk: $352.35, stop distance: $503434.74)
+2026-04-09 12:08:24,739 - backend.trading.bybit_client - INFO - Order placed: Buy 0.001 BTCUSDT @ Limit
+2026-04-09 12:08:25,068 - backend.trading.bybit_client - ERROR - Error setting SL/TP: can not set tp/sl/ts for zero position (ErrCode: 10001) (ErrTime: 10:08:25).
+Request → POST https://api-testnet.bybit.com/v5/position/trading-stop: {"category": "linear", "symbol": "BTCUSDT", "positionIdx": 0, "stopLoss": "965493.56"}.
+2026-04-09 12:08:25,069 - backend.trading.trade_executor - INFO - Position opened: long 0.001 BTC @ 1468928.3, SL: 965493.556983, TP1: 2475797.79, TP2: 2979232.53, RR: 2.0
+2026-04-09 12:08:25,069 - backend.trading.risk_manager - INFO - Trade registered: long, active longs: 1, active shorts: 0
+2026-04-09 12:08:25,069 - backend.trading.position_manager - INFO - Position created for trade None
+2026-04-09 12:08:25,460 - backend.core.trading_engine - INFO - Trade executed for alert 8: long 0.001 BTC @ 1468928.3
+2026-04-09 12:11:09,336 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 12:17:09,519 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 12:17:10,400 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 12:19:41,911 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 12:19:42,665 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 12:19:55,696 - backend.api.settings - INFO - Settings updated: max_positions=3 risk_per_trade=2.0 min_rr=2.0 range_timeframe='1h' range_candles=24 min_confirmations=2 sweep_threshold_percent=0.1 tp1_rr=2.0 tp1_close_percent=50 tp2_rr=3.0 tp2_close_percent=30 trailing_activation_rr=2.5 trailing_step_percent=0.5
+2026-04-09 12:30:29,677 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 12:30:30,643 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 12:31:22,522 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 12:39:07,519 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 12:41:59,076 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 12:41:59,737 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-09 12:43:02,908 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-09 12:43:03,011 - backend.main - INFO - Shutting down...
+2026-04-09 12:43:03,011 - backend.core.trading_engine - INFO - Trading engine stopped
+2026-04-09 12:43:03,011 - backend.services.market_data - INFO - Market data service stopped
+2026-04-09 12:56:50,970 - backend.main - INFO - Starting BTC Trading Bot...
+2026-04-09 12:56:50,976 - backend.database.db - INFO - Database initialized
+2026-04-09 12:56:51,083 - backend.trading.bybit_client - INFO - BybitClient initialized (testnet=True)
+2026-04-09 12:56:51,083 - backend.services.market_data - INFO - Market data service started
+2026-04-09 12:56:51,083 - backend.core.trading_engine - INFO - Trading engine started
+2026-04-09 12:56:51,083 - backend.api.webhooks - INFO - Trading components wired to webhook handler (engine=True)
+2026-04-09 12:56:51,083 - backend.main - INFO - Bot initialized (testnet=True)
+2026-04-09 12:56:54,577 - backend.main - INFO - Shutting down...
+2026-04-09 12:56:54,577 - backend.core.trading_engine - INFO - Trading engine stopped
+2026-04-09 12:56:54,577 - backend.services.market_data - INFO - Market data service stopped

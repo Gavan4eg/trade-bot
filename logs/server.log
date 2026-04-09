@@ -1,0 +1,91 @@
+INFO:     Will watch for changes in these directories: ['/Users/alex/PycharmProjects/PythonProject1/btc_trading_bot']
+INFO:     Uvicorn running on http://0.0.0.0:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [5856] using StatReload
+INFO:     Started server process [5864]
+INFO:     Waiting for application startup.
+2026-04-08 15:34:02,880 - backend.main - INFO - Starting BTC Trading Bot...
+2026-04-08 15:34:02,886 - backend.database.db - INFO - Database initialized
+2026-04-08 15:34:02,886 - backend.trading.bybit_client - INFO - BybitClient initialized in PAPER TRADING mode
+2026-04-08 15:34:02,886 - backend.services.market_data - INFO - Market data service started
+2026-04-08 15:34:02,886 - backend.main - INFO - Bot initialized (testnet=True)
+INFO:     Application startup complete.
+INFO:     127.0.0.1:53623 - "GET /health HTTP/1.1" 200 OK
+INFO:     79.117.193.147:0 - "GET /api/alerts HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53748 - "GET / HTTP/1.1" 200 OK
+INFO:     ('127.0.0.1', 53751) - "WebSocket /ws" [accepted]
+2026-04-08 15:34:58,518 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+INFO:     connection open
+INFO:     127.0.0.1:53754 - "GET /api/settings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53755 - "GET /api/settings/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53755 - "GET /favicon.ico HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:53748 - "GET /api/alerts HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53753 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53752 - "GET /api/positions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53827 - "GET / HTTP/1.1" 200 OK
+2026-04-08 15:36:15,466 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+INFO:     connection closed
+INFO:     127.0.0.1:53831 - "GET /api/settings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53832 - "GET /api/settings/status HTTP/1.1" 200 OK
+INFO:     ('127.0.0.1', 53833) - "WebSocket /ws" [accepted]
+2026-04-08 15:36:16,073 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+INFO:     connection open
+INFO:     127.0.0.1:53827 - "GET /api/alerts HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53830 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53828 - "GET /api/positions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53841 - "GET / HTTP/1.1" 200 OK
+2026-04-08 15:36:29,023 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+INFO:     connection closed
+INFO:     ('127.0.0.1', 53843) - "WebSocket /ws" [accepted]
+2026-04-08 15:36:29,307 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+INFO:     connection open
+INFO:     127.0.0.1:53845 - "GET /api/settings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53846 - "GET /api/settings/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53841 - "GET /api/alerts HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53842 - "GET /api/positions HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53844 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53853 - "GET / HTTP/1.1" 200 OK
+2026-04-08 15:36:41,988 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+INFO:     connection closed
+INFO:     ('127.0.0.1', 53855) - "WebSocket /ws" [accepted]
+2026-04-08 15:36:42,230 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+INFO:     connection open
+INFO:     127.0.0.1:53857 - "GET /api/settings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53858 - "GET /api/settings/status HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53856 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53853 - "GET /api/alerts HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53854 - "GET /api/positions HTTP/1.1" 200 OK
+2026-04-08 15:37:05,482 - backend.api.webhooks - INFO - === WEBHOOK RECEIVED ===
+2026-04-08 15:37:05,483 - backend.api.webhooks - INFO - From: 37.97.190.248
+2026-04-08 15:37:05,483 - backend.api.webhooks - INFO - Raw data: {'name': 'Aggregated Liquidation', 'time': '2026-04-08T13:37:05.300Z', 'unixtime': 1775655425, 'cooldown': 300, 'timeframe': '1 hour', 'side': 'long', 'continuation': 0, 'message': 'Alert: Aggregated Liquidation\\nSide: Long 🟢\\n\\nBTC/USD on Binance COIN-M\\nPrice: 72002\\n • Liquidations (aggregation) (1 hour, Any Size)\\n Longs: 2862100 > 1000000', 'base': 'BTC', 'exchange': 'Binance COIN-M', 'symbol': 'BTC/USD', 'ticker': 'BTCUSD_PERP', 'price': 72002, 'quote': 'USD'}
+2026-04-08 15:37:05,483 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-08 15:37:05,484 - webhook - INFO - From: 37.97.190.248
+2026-04-08 15:37:05,484 - webhook - INFO - Headers: {'host': 'metals-baghdad-telescope-aberdeen.trycloudflare.com', 'user-agent': 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)', 'content-length': '454', 'accept': '*/*', 'accept-encoding': 'gzip', 'cdn-loop': 'cloudflare; loops=1; subreqs=1', 'cf-connecting-ip': '37.97.190.248', 'cf-ew-via': '15', 'cf-ipcountry': 'NL', 'cf-ray': '9e91aa2890d2b8c4-AMS', 'cf-visitor': '{"scheme":"https"}', 'cf-warp-tag-id': '64315a4b-edf5-4071-8ac3-31eb90093b8c', 'cf-worker': 'trycloudflare.com', 'connection': 'keep-alive', 'content-type': 'application/json', 'origin': 'https://trdr.io', 'x-forwarded-for': '37.97.190.248', 'x-forwarded-proto': 'https'}
+2026-04-08 15:37:05,484 - webhook - INFO - Raw data: {'name': 'Aggregated Liquidation', 'time': '2026-04-08T13:37:05.300Z', 'unixtime': 1775655425, 'cooldown': 300, 'timeframe': '1 hour', 'side': 'long', 'continuation': 0, 'message': 'Alert: Aggregated Liquidation\\nSide: Long 🟢\\n\\nBTC/USD on Binance COIN-M\\nPrice: 72002\\n • Liquidations (aggregation) (1 hour, Any Size)\\n Longs: 2862100 > 1000000', 'base': 'BTC', 'exchange': 'Binance COIN-M', 'symbol': 'BTC/USD', 'ticker': 'BTCUSD_PERP', 'price': 72002, 'quote': 'USD'}
+2026-04-08 15:37:05,485 - webhook - INFO - Parsed trdr.io format: type=Aggregated Liquidation, price=72002, side=long
+2026-04-08 15:37:05,487 - backend.api.webhooks - INFO - Parsed: type=Aggregated Liquidation, price=72002.0, side=long
+2026-04-08 15:37:05,491 - backend.core.alert_processor - INFO - Parsed alert: Aggregated Liquidation at $72002.0
+2026-04-08 15:37:05,505 - backend.api.webhooks - INFO - === WEBHOOK RECEIVED ===
+2026-04-08 15:37:05,505 - backend.api.webhooks - INFO - From: 37.97.190.248
+2026-04-08 15:37:05,505 - backend.api.webhooks - INFO - Raw data: {'name': 'Aggregated Liquidation', 'time': '2026-04-08T13:37:05.287Z', 'unixtime': 1775655425, 'cooldown': 300, 'timeframe': '1 hour', 'side': 'long', 'continuation': 0, 'message': 'Alert: Aggregated Liquidation\\nSide: Long 🟢\\n\\nBTC/USDT on Binance USDⓈ-M\\nPrice: 72007\\n • Liquidations (aggregation) (1 hour, Any Size)\\n Longs: 2862100 > 1000000', 'base': 'BTC', 'exchange': 'Binance USDⓈ-M', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 72007, 'quote': 'USDT'}
+2026-04-08 15:37:05,505 - webhook - INFO - === WEBHOOK [POST] ===
+2026-04-08 15:37:05,505 - webhook - INFO - From: 37.97.190.248
+2026-04-08 15:37:05,505 - webhook - INFO - Headers: {'host': 'metals-baghdad-telescope-aberdeen.trycloudflare.com', 'user-agent': 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)', 'content-length': '457', 'accept': '*/*', 'accept-encoding': 'gzip', 'cdn-loop': 'cloudflare; loops=1; subreqs=1', 'cf-connecting-ip': '37.97.190.248', 'cf-ew-via': '15', 'cf-ipcountry': 'NL', 'cf-ray': '9e91aa289045b91e-AMS', 'cf-visitor': '{"scheme":"https"}', 'cf-warp-tag-id': '64315a4b-edf5-4071-8ac3-31eb90093b8c', 'cf-worker': 'trycloudflare.com', 'connection': 'keep-alive', 'content-type': 'application/json', 'origin': 'https://trdr.io', 'x-forwarded-for': '37.97.190.248', 'x-forwarded-proto': 'https'}
+2026-04-08 15:37:05,505 - webhook - INFO - Raw data: {'name': 'Aggregated Liquidation', 'time': '2026-04-08T13:37:05.287Z', 'unixtime': 1775655425, 'cooldown': 300, 'timeframe': '1 hour', 'side': 'long', 'continuation': 0, 'message': 'Alert: Aggregated Liquidation\\nSide: Long 🟢\\n\\nBTC/USDT on Binance USDⓈ-M\\nPrice: 72007\\n • Liquidations (aggregation) (1 hour, Any Size)\\n Longs: 2862100 > 1000000', 'base': 'BTC', 'exchange': 'Binance USDⓈ-M', 'symbol': 'BTC/USDT', 'ticker': 'BTCUSDT', 'price': 72007, 'quote': 'USDT'}
+2026-04-08 15:37:05,505 - webhook - INFO - Parsed trdr.io format: type=Aggregated Liquidation, price=72007, side=long
+2026-04-08 15:37:05,505 - backend.api.webhooks - INFO - Parsed: type=Aggregated Liquidation, price=72007.0, side=long
+2026-04-08 15:37:05,506 - backend.core.alert_processor - INFO - Parsed alert: Aggregated Liquidation at $72007.0
+2026-04-08 15:37:05,532 - backend.core.alert_processor - INFO - Registered alert: Aggregated Liquidation
+INFO:     37.97.190.248:0 - "POST /webhook/trdr?token=mySecretToken123 HTTP/1.1" 200 OK
+2026-04-08 15:37:05,533 - backend.api.webhooks - INFO - Background processing for alert 9
+2026-04-08 15:37:05,533 - backend.core.alert_processor - INFO - Registered alert: Aggregated Liquidation
+INFO:     37.97.190.248:0 - "POST /webhook/trdr?token=mySecretToken123 HTTP/1.1" 200 OK
+2026-04-08 15:37:05,534 - backend.api.webhooks - INFO - Background processing for alert 10
+INFO:     127.0.0.1:53881 - "GET / HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53891 - "GET /api/settings HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53892 - "GET /api/settings/status HTTP/1.1" 200 OK
+INFO:     ('127.0.0.1', 53886) - "WebSocket /ws" [accepted]
+2026-04-08 15:37:32,056 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 2
+INFO:     connection open
+INFO:     127.0.0.1:53890 - "GET /api/stats HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53881 - "GET /api/alerts HTTP/1.1" 200 OK
+INFO:     127.0.0.1:53882 - "GET /api/positions HTTP/1.1" 200 OK
