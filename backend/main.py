@@ -1,10 +1,11 @@
 import logging
 import asyncio
+import secrets
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, WebSocket, WebSocketDisconnect
+from fastapi import FastAPI, WebSocket, WebSocketDisconnect, Request, Response, Form
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, RedirectResponse, HTMLResponse
 import os
 
 from .config import settings
@@ -46,6 +47,16 @@ webhook_handler.setFormatter(logging.Formatter(log_format))
 webhook_logger.addHandler(webhook_handler)
 
 logger = logging.getLogger(__name__)
+
+# Auth sessions (in-memory, resets on restart)
+_sessions: set = set()
+
+# Public routes — no auth required
+PUBLIC_PATHS = {"/login", "/logout", "/health", "/webhook/trdr", "/webhook/test"}
+
+def is_authenticated(request: Request) -> bool:
+    token = request.cookies.get("session")
+    return token in _sessions
 
 # Global services
 bybit_client: BybitClient = None
@@ -195,6 +206,73 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+@app.middleware("http")
+async def auth_middleware(request: Request, call_next):
+    path = request.url.path
+    # Only protect the dashboard HTML page (/)
+    # API, webhooks, WebSocket — all open
+    if path == "/" and not is_authenticated(request):
+        return RedirectResponse(url="/login")
+    return await call_next(request)
+
+
+@app.get("/login", response_class=HTMLResponse)
+async def login_page(error: str = ""):
+    return f"""<!DOCTYPE html>
+<html><head>
+<meta charset="UTF-8">
+<title>BTC Bot — Login</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-950 min-h-screen flex items-center justify-center">
+<div class="bg-gray-900 rounded-2xl p-8 w-full max-w-sm shadow-2xl border border-gray-800">
+    <div class="text-center mb-6">
+        <div class="text-4xl mb-2">₿</div>
+        <h1 class="text-xl font-bold text-white">BTC Trading Bot</h1>
+        <p class="text-gray-500 text-sm mt-1">Dashboard Login</p>
+    </div>
+    {'<div class="bg-red-900/50 text-red-300 text-sm rounded-lg px-4 py-2 mb-4">Invalid username or password</div>' if error else ''}
+    <form method="POST" action="/login" class="space-y-4">
+        <div>
+            <label class="block text-xs text-gray-400 mb-1">Username</label>
+            <input name="username" type="text" autocomplete="username"
+                class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-blue-500"
+                placeholder="admin"/>
+        </div>
+        <div>
+            <label class="block text-xs text-gray-400 mb-1">Password</label>
+            <input name="password" type="password" autocomplete="current-password"
+                class="w-full bg-gray-800 border border-gray-700 rounded-lg px-4 py-2.5 text-white focus:outline-none focus:border-blue-500"
+                placeholder="••••••••"/>
+        </div>
+        <button type="submit"
+            class="w-full bg-blue-600 hover:bg-blue-500 text-white font-semibold py-2.5 rounded-lg transition-colors">
+            Login
+        </button>
+    </form>
+</div>
+</body></html>"""
+
+
+@app.post("/login")
+async def login(response: Response, username: str = Form(...), password: str = Form(...)):
+    if username == settings.dashboard_username and password == settings.dashboard_password:
+        token = secrets.token_urlsafe(32)
+        _sessions.add(token)
+        resp = RedirectResponse(url="/", status_code=303)
+        resp.set_cookie("session", token, httponly=True, samesite="lax", max_age=86400*30)
+        return resp
+    return RedirectResponse(url="/login?error=1", status_code=303)
+
+
+@app.get("/logout")
+async def logout(request: Request):
+    token = request.cookies.get("session")
+    _sessions.discard(token)
+    resp = RedirectResponse(url="/login")
+    resp.delete_cookie("session")
+    return resp
 
 # Include routers
 app.include_router(webhooks_router)

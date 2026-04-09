@@ -37,6 +37,8 @@ class Settings(BaseSettings):
 
     # Security
     webhook_token: str = ""  # Secret token for webhook authentication
+    dashboard_username: str = "admin"
+    dashboard_password: str = "admin123"
 
     # Database
     database_url: str = "sqlite+aiosqlite:///./trading_bot.db"
