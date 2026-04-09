@@ -407,9 +407,10 @@ class TradingEngine:
         # Если есть кластер ликвидаций — стоп за зону дисбаланса
         stop_loss = confirmation.stop_loss
         if state.liquidation_cluster:
+            cluster_copy = list(state.liquidation_cluster)  # защита от race condition
             prices = [
                 liq.get("price_at_spike") or liq.get("price")
-                for liq in state.liquidation_cluster
+                for liq in cluster_copy
                 if liq.get("price_at_spike") or liq.get("price")
             ]
             if prices:

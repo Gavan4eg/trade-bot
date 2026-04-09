@@ -283,7 +283,8 @@ class PositionManager:
         position.closed_at = datetime.utcnow()
 
         # ✅ Уведомляем risk manager что позиция закрыта
-        self.risk_manager.register_trade_close(position.direction.value, pnl)
+        if self.risk_manager:
+            self.risk_manager.register_trade_close(position.direction.value, pnl)
 
         logger.info(
             f"Position closed by {reason} at {current_price:.2f} | "
