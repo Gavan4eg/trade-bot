@@ -173,42 +173,97 @@ async def get_stats(db: AsyncSession = Depends(get_db)):
     return stats
 
 
+def _format_alert(a, pipeline_state=None) -> dict:
+    """Format alert with full pipeline details."""
+    data = {
+        "id": a.id,
+        "type": a.alert_type,
+        "price": a.price,
+        "levels": a.levels,
+        "status": a.status,
+        "priority": a.priority,
+        "timestamp": a.timestamp.isoformat(),
+        "raw_data": a.raw_data,
+        # Pipeline stages
+        "pipeline": {
+            "range": None,
+            "sweep": None,
+            "confirmation": None,
+            "liquidation_cluster": [],
+        }
+    }
+
+    if pipeline_state:
+        if pipeline_state.range:
+            data["pipeline"]["range"] = {
+                "local_high": pipeline_state.range.local_high,
+                "local_low": pipeline_state.range.local_low,
+                "mid": pipeline_state.range.mid_range,
+                "width_percent": round(pipeline_state.range.width_percent, 2),
+                "timeframe": pipeline_state.range.timeframe,
+                "candles": pipeline_state.range.candles_used,
+            }
+        if pipeline_state.sweep:
+            data["pipeline"]["sweep"] = {
+                "direction": pipeline_state.sweep.direction.value,
+                "sweep_price": pipeline_state.sweep.sweep_price,
+                "level_swept": pipeline_state.sweep.level_swept,
+                "wick_percent": round(pipeline_state.sweep.wick_percent, 3),
+                "quick_reversal": pipeline_state.sweep.quick_reversal,
+            }
+        if pipeline_state.confirmation:
+            data["pipeline"]["confirmation"] = {
+                "confirmed": pipeline_state.confirmation.is_confirmed,
+                "conditions_met": pipeline_state.confirmation.confirmations_met,
+                "required": pipeline_state.confirmation.required_confirmations,
+                "details": pipeline_state.confirmation.details,
+                "direction": pipeline_state.confirmation.trade_direction,
+                "entry_price": pipeline_state.confirmation.entry_price,
+                "stop_loss": pipeline_state.confirmation.stop_loss,
+            }
+        if pipeline_state.liquidation_cluster:
+            data["pipeline"]["liquidation_cluster"] = [
+                {
+                    "side": liq.get("side"),
+                    "price": liq.get("price"),
+                    "volume": liq.get("volume"),
+                }
+                for liq in pipeline_state.liquidation_cluster
+            ]
+
+    return data
+
+
 @router.get("/alerts")
 async def get_alerts(
     limit: int = 50,
     db: AsyncSession = Depends(get_db)
 ):
-    """Get alert history"""
+    """Get alert history with full pipeline details."""
+    from ..main import trading_engine
     repo = AlertRepository(db)
     alerts = await repo.get_recent(limit)
-    return [
-        {
-            "id": a.id,
-            "type": a.alert_type,
-            "price": a.price,
-            "levels": a.levels,
-            "status": a.status,
-            "priority": a.priority,
-            "timestamp": a.timestamp.isoformat()
-        }
-        for a in alerts
-    ]
+
+    result = []
+    for a in alerts:
+        state = None
+        if trading_engine and a.id in trading_engine.active_states:
+            state = trading_engine.active_states[a.id]
+        result.append(_format_alert(a, state))
+    return result
 
 
 @router.get("/alerts/active")
 async def get_active_alerts(db: AsyncSession = Depends(get_db)):
-    """Get active alerts"""
+    """Get active alerts with live pipeline state."""
+    from ..main import trading_engine
     repo = AlertRepository(db)
     alerts = await repo.get_active()
-    return [
-        {
-            "id": a.id,
-            "type": a.alert_type,
-            "price": a.price,
-            "levels": a.levels,
-            "status": a.status,
-            "priority": a.priority,
-            "timestamp": a.timestamp.isoformat()
-        }
-        for a in alerts
-    ]
+
+    result = []
+    for a in alerts:
+        state = None
+        if trading_engine and a.id in trading_engine.active_states:
+            state = trading_engine.active_states[a.id]
+        result.append(_format_alert(a, state))
+    return result

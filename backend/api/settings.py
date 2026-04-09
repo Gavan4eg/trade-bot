@@ -111,6 +111,69 @@ async def stop_bot():
     return {"status": "stopped"}
 
 
+@router.post("/close-all")
+async def close_all_positions(db: AsyncSession = Depends(get_db)):
+    """Close all open positions on exchange and in DB"""
+    from ..main import bybit_client, position_manager
+    from ..database.repositories import PositionRepository, TradeRepository
+    from datetime import datetime
+
+    if bybit_client is None:
+        raise HTTPException(status_code=503, detail="bybit_client not initialized")
+
+    closed = 0
+    errors = []
+
+    # Close all positions on exchange
+    if not bybit_client.paper_trading:
+        try:
+            positions = bybit_client.get_positions(symbol="BTCUSDT")
+            for pos in positions:
+                side = "Sell" if pos["side"] == "Buy" else "Buy"
+                qty = pos["size"]
+                order = bybit_client.place_order(
+                    side=side, qty=qty, order_type="Market", reduce_only=True
+                )
+                if order:
+                    closed += 1
+                    logger.info(f"Closed exchange position: {pos['side']} {qty} BTCUSDT")
+                else:
+                    errors.append(f"Failed to close {pos['side']} {qty}")
+        except Exception as e:
+            errors.append(str(e))
+    else:
+        bybit_client._paper_positions.clear()
+        closed += 1
+
+    # Close all in-memory positions
+    if position_manager:
+        from ..models.position import PositionStatus
+        from datetime import datetime
+        for pos in list(position_manager.get_active_positions()):
+            pos.status = PositionStatus.CLOSED
+            pos.closed_at = datetime.utcnow()
+        position_manager.positions.clear()
+
+    # Close all in DB
+    try:
+        pos_repo = PositionRepository(db)
+        trade_repo = TradeRepository(db)
+        open_positions = await pos_repo.get_active()
+        for p in open_positions:
+            await pos_repo.close_position(p.id, p.unrealized_pnl or 0.0, "closed")
+            if p.trade_id:
+                await trade_repo.update(p.trade_id,
+                    status="closed",
+                    closed_at=datetime.utcnow(),
+                    realized_pnl=p.unrealized_pnl or 0.0
+                )
+    except Exception as e:
+        errors.append(f"DB close error: {e}")
+
+    logger.info(f"Close all: closed={closed}, errors={errors}")
+    return {"status": "ok", "closed": closed, "errors": errors}
+
+
 @router.get("/balance")
 async def get_balance():
     """Get exchange balance"""

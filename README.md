@@ -2,219 +2,318 @@
 
 Automated BTC trading bot with trdr.io signal integration and Bybit exchange connectivity.
 
-## Features
+## How It Works
 
-- **Signal Integration**: Receives webhooks from trdr.io
-  - BTC Double Diamond (highest priority)
-  - BTC Diamond
-  - Diamond Top Levels
-  - Aggregated Liquidation
+The bot receives signals from trdr.io and executes trades only after full pipeline confirmation:
 
-- **Smart Entry Logic**:
-  - Local range detection (1-4h after alert)
-  - Liquidity sweep detection
-  - Multi-factor confirmation
-  - Risk/Reward validation
+```
+trdr.io webhook → Range Detection → Liquidity Sweep → Confirmation → Trade
+```
 
-- **Risk Management**:
-  - Position size based on risk percentage
-  - Maximum positions limit
-  - No averaging, no duplicate positions
+1. **Signal received** — BTC Diamond, Double Diamond, Diamond Top Levels, or Aggregated Liquidation
+2. **Range detection** — bot maps the local High/Low/Mid over last 24×1h candles
+3. **Sweep detection** — waits for price to break above high (SHORT setup) or below low (LONG setup)
+4. **Confirmation** — requires 2+ of: candle closed back in range, impulse reversal candle, liquidation spike, volume confirmation
+5. **Trade execution** — entry at range boundary, SL behind sweep low/high (or behind liquidation cluster if available), TP1=1:2, TP2=1:3, trailing on remainder
 
-- **Position Management**:
-  - TP1: 1:2 RR (close 50%)
-  - TP2: 1:3 RR (close 30%)
-  - Trailing stop on remaining 20%
+## Alert Priority
 
-- **Web Dashboard**:
-  - Real-time price updates
-  - Active alerts monitoring
-  - Position tracking
-  - Trade history
-  - Settings configuration
+| Priority | Signal | Role |
+|----------|--------|------|
+| 1 | BTC Double Diamond | Strongest entry signal |
+| 2 | BTC Diamond | Standard entry signal |
+| 3 | Diamond Top Levels | Weaker entry signal |
+| 4 | Aggregated Liquidation | Confirming factor only — never opens trades standalone |
+
+## Position Management
+
+- **TP1** — 1:2 RR, close 50% of position
+- **TP2** — 1:3 RR, close 30% of remaining
+- **Trailing stop** — activates after TP2, trails remaining 20%
+- **Breakeven** — stop moved to entry after TP1
+- **Liquidation cluster stop** — if Aggregated Liquidation data is available, stop is placed behind the cluster zone instead of the local extremum
+
+## Risk Rules
+
+- Max 1 long + 1 short at a time
+- No averaging, no duplicate entries
+- Position size = 1% account risk per trade (configurable)
+- Minimum RR = 2.0 (configurable)
+
+---
 
 ## Installation
 
 ```bash
-# Clone repository
 cd btc_trading_bot
-
-# Create virtual environment
 python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-
-# Install dependencies
+source venv/bin/activate   # Windows: venv\Scripts\activate
 pip install -r requirements.txt
-
-# Copy environment file
 cp .env.example .env
-
-# Edit .env with your Bybit API keys
+# Edit .env with your API keys
 ```
 
 ## Configuration
 
-Edit `.env` file:
+Edit `.env`:
 
 ```env
-# Bybit API (get from https://testnet.bybit.com for testnet)
-BYBIT_API_KEY=your_api_key
-BYBIT_API_SECRET=your_api_secret
-BYBIT_TESTNET=true  # Set to false for mainnet
+# Bybit API
+BYBIT_API_KEY=your_key
+BYBIT_API_SECRET=your_secret
+BYBIT_TESTNET=true          # false for mainnet
 
-# Risk settings
+# Trading
+PAPER_TRADING=false
+RISK_PER_TRADE=1.0          # % of balance per trade
 MAX_POSITIONS=3
-RISK_PER_TRADE=1.0  # % of balance
 MIN_RR=2.0
 
-# Take profit settings
-TP1_RR=2.0
-TP1_CLOSE_PERCENT=50
-TP2_RR=3.0
-TP2_CLOSE_PERCENT=30
+# Range detection
+RANGE_MAX_WIDTH_PERCENT=5   # max allowed range width
+
+# Liquidation zone stop buffer
+LIQUIDATION_BUFFER_PERCENT=0.2
+
+# Webhook security
+WEBHOOK_TOKEN=yourSecretToken
 ```
 
 ## Running
 
 ```bash
-# Start the bot
 python run.py
-
-# Or with uvicorn directly
-uvicorn backend.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-Access:
-- Dashboard: http://localhost:8000
-- API Docs: http://localhost:8000/docs
+Dashboard: `http://localhost:8000`
 
-## Webhook Setup
+---
 
-Configure trdr.io to send webhooks to:
+## Webhook Setup (trdr.io)
 
+Send alerts to:
 ```
-POST http://your-server:8000/webhook/trdr
+POST https://your-server/webhook/trdr?token=yourSecretToken
 ```
 
-Expected payload format:
+trdr.io payload format (handled automatically):
 ```json
 {
-    "type": "BTC Diamond",
-    "symbol": "BTCUSDT",
-    "price": 65000.00,
-    "levels": [64500, 65500],
-    "message": "Alert message",
-    "timestamp": "2024-01-15T12:00:00Z"
+  "name": "BTC Diamond",
+  "time": "2024-01-15T12:00:00Z",
+  "price": 84000,
+  "side": "long",
+  "ticker": "BTCUSDT",
+  "base": "BTC",
+  "message": "...",
+  "cooldown": 300
 }
 ```
 
-## Trading Logic
+---
 
-### Entry Conditions (LONG)
-1. Valid alert received
-2. Local range formed
-3. Price sweeps below local low
-4. Price returns to range
-5. 2+ confirmation conditions met
-6. RR >= 2.0
+## Testing Webhooks Locally
 
-### Entry Conditions (SHORT)
-1. Valid alert received
-2. Local range formed
-3. Price sweeps above local high
-4. Price returns to range
-5. 2+ confirmation conditions met
-6. RR >= 2.0
+> Replace `mySecretToken123` with your `WEBHOOK_TOKEN` from `.env`
 
-### Confirmation Factors
-- Price back in range
-- Impulse reversal candle
-- Liquidation spike
-- Volume confirmation
+### BTC Diamond (LONG setup)
+```bash
+curl -X POST "http://localhost:8000/webhook/trdr?token=mySecretToken123" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "BTC Diamond",
+    "time": "2024-01-15T12:00:00Z",
+    "price": 84000,
+    "side": "long",
+    "ticker": "BTCUSDT",
+    "base": "BTC",
+    "cooldown": 300
+  }'
+```
+
+### BTC Double Diamond (LONG setup — highest priority)
+```bash
+curl -X POST "http://localhost:8000/webhook/trdr?token=mySecretToken123" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "BTC Double Diamond",
+    "time": "2024-01-15T12:00:00Z",
+    "price": 84000,
+    "side": "long",
+    "ticker": "BTCUSDT",
+    "base": "BTC",
+    "cooldown": 300
+  }'
+```
+
+### Diamond Top Levels (SHORT setup)
+```bash
+curl -X POST "http://localhost:8000/webhook/trdr?token=mySecretToken123" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Diamond Top Levels",
+    "time": "2024-01-15T12:00:00Z",
+    "price": 84000,
+    "side": "short",
+    "ticker": "BTCUSDT",
+    "base": "BTC",
+    "cooldown": 300
+  }'
+```
+
+### Aggregated Liquidation (confirming factor for active Diamond)
+```bash
+curl -X POST "http://localhost:8000/webhook/trdr?token=mySecretToken123" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Aggregated Liquidation",
+    "time": "2024-01-15T12:01:00Z",
+    "price": 83500,
+    "side": "long",
+    "ticker": "BTCUSDT",
+    "base": "BTC",
+    "exchange": "Binance USDⓈ-M",
+    "message": "Alert: Aggregated Liquidation\nSide: Long\nBTC/USDT\nLongs: 5000000 > 2000000",
+    "cooldown": 300
+  }'
+```
+
+### Force sweep (skip waiting, for testing pipeline)
+```bash
+curl -X POST "http://localhost:8000/webhook/test-force-sweep"
+```
+
+### Check pipeline state
+```bash
+curl http://localhost:8000/webhook/test-engine-state
+```
+
+### Check open positions (in-memory)
+```bash
+curl http://localhost:8000/webhook/test-positions
+```
+
+### Check balance
+```bash
+curl http://localhost:8000/api/settings/balance
+```
+
+---
 
 ## API Endpoints
 
 ### Webhooks
-- `POST /webhook/trdr` - Receive trdr.io alerts
-- `GET /webhook/test` - Test webhook endpoint
-- `POST /webhook/test-alert` - Send test alert
+| Method | Path | Description |
+|--------|------|-------------|
+| POST | `/webhook/trdr` | Receive trdr.io alert |
+| GET  | `/webhook/test` | Health check |
+| GET  | `/webhook/test-engine-state` | Live pipeline state |
+| GET  | `/webhook/test-positions` | In-memory positions |
+| POST | `/webhook/test-force-sweep` | Force sweep for testing |
 
 ### Trading
-- `GET /api/positions` - Active positions
-- `GET /api/trades` - Trade history
-- `POST /api/positions/{id}/close` - Close position
+| Method | Path | Description |
+|--------|------|-------------|
+| GET  | `/api/positions` | Active positions |
+| GET  | `/api/trades` | Trade history |
+| POST | `/api/positions/{id}/close` | Close position manually |
 
 ### Alerts
-- `GET /api/alerts` - Alert history
-- `GET /api/alerts/active` - Active alerts
+| Method | Path | Description |
+|--------|------|-------------|
+| GET | `/api/alerts` | Alert history with full pipeline state |
+| GET | `/api/alerts/active` | Active alerts with live pipeline |
 
 ### Settings
-- `GET /api/settings` - Get settings
-- `PUT /api/settings` - Update settings
-- `POST /api/settings/start` - Start bot
-- `POST /api/settings/stop` - Stop bot
+| Method | Path | Description |
+|--------|------|-------------|
+| GET  | `/api/settings` | Get settings |
+| PUT  | `/api/settings` | Update settings |
+| POST | `/api/settings/start` | Start bot |
+| POST | `/api/settings/stop` | Stop bot |
+| GET  | `/api/settings/balance` | Exchange balance |
+| GET  | `/api/settings/status` | Bot status |
 
 ### WebSocket
-- `WS /ws` - Real-time updates
+`WS /ws` — real-time price, alert, position updates
 
-## Project Structure
+---
 
-```
-btc_trading_bot/
-├── backend/
-│   ├── main.py              # FastAPI application
-│   ├── config.py            # Configuration
-│   ├── core/
-│   │   ├── alert_processor.py
-│   │   ├── range_detector.py
-│   │   ├── liquidity_tracker.py
-│   │   ├── confirmation.py
-│   │   └── trading_engine.py
-│   ├── trading/
-│   │   ├── bybit_client.py
-│   │   ├── trade_executor.py
-│   │   ├── position_manager.py
-│   │   └── risk_manager.py
-│   ├── api/
-│   │   ├── webhooks.py
-│   │   ├── trades.py
-│   │   └── settings.py
-│   ├── services/
-│   │   ├── market_data.py
-│   │   └── websocket_manager.py
-│   └── database/
-│       ├── db.py
-│       └── repositories.py
-├── frontend/
-│   └── index.html           # Web dashboard
-├── requirements.txt
-├── .env.example
-├── run.py
-└── README.md
-```
+## Deploying to VPS
 
-## Testing
+### Requirements
+- Ubuntu 22.04 VPS (2GB RAM minimum)
+- Python 3.11+
+- Domain or static IP (for trdr.io webhook)
 
-### Test Webhook
+### Setup
+
 ```bash
-curl -X POST http://localhost:8000/webhook/test-alert \
-  -H "Content-Type: application/json" \
-  -d '{"alert_type": "BTC Diamond", "price": 65000}'
+# Install dependencies
+sudo apt update && sudo apt install python3-pip python3-venv nginx -y
+
+# Clone and install
+git clone <repo> /opt/btc_bot
+cd /opt/btc_bot
+python3 -m venv venv && source venv/bin/activate
+pip install -r requirements.txt
+
+# Create systemd service
+sudo nano /etc/systemd/system/btcbot.service
 ```
 
-### Run Tests
-```bash
-pytest tests/
+Service file:
+```ini
+[Unit]
+Description=BTC Trading Bot
+After=network.target
+
+[Service]
+WorkingDirectory=/opt/btc_bot
+ExecStart=/opt/btc_bot/venv/bin/python run.py
+Restart=always
+RestartSec=5
+EnvironmentFile=/opt/btc_bot/.env
+
+[Install]
+WantedBy=multi-user.target
 ```
+
+```bash
+sudo systemctl enable btcbot
+sudo systemctl start btcbot
+```
+
+### Nginx reverse proxy (with SSL)
+
+```nginx
+server {
+    listen 443 ssl;
+    server_name yourdomain.com;
+
+    ssl_certificate     /etc/letsencrypt/live/yourdomain.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/yourdomain.com/privkey.pem;
+
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+    }
+}
+```
+
+```bash
+sudo certbot --nginx -d yourdomain.com
+```
+
+---
 
 ## Safety Notes
 
-- Always start on TESTNET first
-- Use small risk percentage initially
-- Monitor the bot closely
-- Never risk more than you can afford to lose
+- Always test on TESTNET first
+- Use small `RISK_PER_TRADE` initially (0.5–1%)
+- Monitor logs: `tail -f logs/bot.log`
 - The bot does not guarantee profits
-
-## License
-
-MIT
+- Never risk more than you can afford to lose

@@ -107,12 +107,22 @@ class ConfirmationEngine:
             # Set trade direction (opposite to sweep direction)
             if sweep.direction == SweepDirection.HIGH:
                 result.trade_direction = "short"
-                result.entry_price = current_price
-                result.stop_loss = sweep.sweep_price * 1.001  # Slightly above sweep high
+                # Entry: цена вернулась в рендж — входим у верхней границы ренджа
+                # (оптимально) или по текущей если уже внутри
+                if price_range and price_range.is_price_in_range(current_price):
+                    result.entry_price = min(current_price, price_range.local_high)
+                else:
+                    result.entry_price = current_price
+                result.stop_loss = round(sweep.sweep_price * 1.002, 2)  # За sweep high + буфер
             else:
                 result.trade_direction = "long"
-                result.entry_price = current_price
-                result.stop_loss = sweep.sweep_price * 0.999  # Slightly below sweep low
+                # Entry: цена вернулась в рендж — входим у нижней границы ренджа
+                # (оптимально) или по текущей если уже внутри
+                if price_range and price_range.is_price_in_range(current_price):
+                    result.entry_price = max(current_price, price_range.local_low)
+                else:
+                    result.entry_price = current_price
+                result.stop_loss = round(sweep.sweep_price * 0.998, 2)  # За sweep low + буфер
 
             logger.info(
                 f"Confirmation achieved: {result.confirmations_met}/{self.min_confirmations} "
