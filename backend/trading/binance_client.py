@@ -405,6 +405,8 @@ class BinanceClient:
 
             success = True
 
+            pos_size = str(round(pos["size"], 3))
+
             if stop_loss:
                 try:
                     self.client.futures_create_order(
@@ -412,13 +414,17 @@ class BinanceClient:
                         side=close_side,
                         type="STOP_MARKET",
                         stopPrice=str(round(stop_loss, 2)),
-                        closePosition="true",
-                        workingType="MARK_PRICE"
+                        quantity=pos_size,
+                        reduceOnly="true"
                     )
                     logger.info(f"Stop loss set @ {stop_loss} for {symbol}")
                 except Exception as e:
-                    logger.error(f"Failed to set stop loss: {e}")
-                    success = False
+                    # -4120 = аккаунт требует Algo API — SL мониторится внутри бота
+                    if "-4120" in str(e):
+                        logger.warning(f"Exchange-side SL not supported on this account — using software SL (bot monitors price internally)")
+                    else:
+                        logger.error(f"Failed to set stop loss: {e}")
+                        success = False
 
             if take_profit:
                 try:
@@ -427,13 +433,16 @@ class BinanceClient:
                         side=close_side,
                         type="TAKE_PROFIT_MARKET",
                         stopPrice=str(round(take_profit, 2)),
-                        closePosition="true",
-                        workingType="MARK_PRICE"
+                        quantity=pos_size,
+                        reduceOnly="true"
                     )
                     logger.info(f"Take profit set @ {take_profit} for {symbol}")
                 except Exception as e:
-                    logger.error(f"Failed to set take profit: {e}")
-                    success = False
+                    if "-4120" in str(e):
+                        logger.warning(f"Exchange-side TP not supported on this account — using software TP")
+                    else:
+                        logger.error(f"Failed to set take profit: {e}")
+                        success = False
 
             if trailing_stop:
                 try:
@@ -442,13 +451,16 @@ class BinanceClient:
                         side=close_side,
                         type="TRAILING_STOP_MARKET",
                         callbackRate=str(round(trailing_stop, 2)),
-                        closePosition="true",
-                        workingType="MARK_PRICE"
+                        quantity=pos_size,
+                        reduceOnly="true"
                     )
                     logger.info(f"Trailing stop set @ {trailing_stop}% for {symbol}")
                 except Exception as e:
-                    logger.error(f"Failed to set trailing stop: {e}")
-                    success = False
+                    if "-4120" in str(e):
+                        logger.warning(f"Exchange-side trailing stop not supported — using software trailing stop")
+                    else:
+                        logger.error(f"Failed to set trailing stop: {e}")
+                        success = False
 
             return success
 
