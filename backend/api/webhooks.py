@@ -506,6 +506,155 @@ async def force_sweep(alert_id: int = 0):
         return {"error": str(e)}
 
 
+@router.post("/test-full-trade")
+async def test_full_trade(
+    direction: str = "long",
+    close_after_seconds: int = 60
+):
+    """
+    Полная имитация торгового цикла на РЕАЛЬНЫХ ключах:
+    1. Создаёт Diamond алерт с текущей ценой
+    2. Определяет реальный range
+    3. Инжектирует sweep
+    4. Форсирует confirmation
+    5. Открывает РЕАЛЬНЫЙ ордер на Bybit
+    6. Через close_after_seconds закрывает позицию
+    """
+    if _trading_engine is None or _bybit_client is None:
+        return {"error": "Trading engine not initialized"}
+
+    from ..models.alert import Alert, AlertType, AlertStatus
+    from ..models.sweep import SweepEvent, SweepDirection
+    from ..models.range import Range
+
+    try:
+        ticker = _bybit_client.get_ticker()
+        if not ticker:
+            return {"error": "Cannot get ticker"}
+
+        current_price = ticker["last_price"]
+
+        await ws_manager.send_log(
+            f"🧪 TEST TRADE STARTED | direction={direction} | price=${current_price:,.0f} | closes in {close_after_seconds}s",
+            level="warning", source="test"
+        )
+
+        # 1. Создаём фейковый Diamond алерт
+        alert = Alert(
+            id=99999,
+            alert_type=AlertType.BTC_DIAMOND,
+            price=current_price,
+            status=AlertStatus.PROCESSING,
+            priority=2,
+            raw_data={"type": "BTC Diamond", "test": True}
+        )
+
+        # 2. Реальный range с биржи
+        candles = _bybit_client.get_klines(interval="60", limit=24)
+        if not candles:
+            return {"error": "Cannot get candles"}
+
+        highs = [c["high"] for c in candles]
+        lows  = [c["low"]  for c in candles]
+        local_high = max(highs)
+        local_low  = min(lows)
+
+        price_range = Range(
+            alert_id=99999,
+            local_high=local_high,
+            local_low=local_low,
+            timeframe="1h",
+            candles_count=24
+        )
+
+        # 3. Sweep
+        sweep_dir = SweepDirection.LOW if direction == "long" else SweepDirection.HIGH
+        if direction == "long":
+            sweep_price = local_low * 0.998
+            level_swept = local_low
+        else:
+            sweep_price = local_high * 1.002
+            level_swept = local_high
+
+        sweep = SweepEvent(
+            alert_id=99999,
+            range_id=0,
+            direction=sweep_dir,
+            sweep_price=sweep_price,
+            level_swept=level_swept,
+            timestamp=datetime.utcnow()
+        )
+
+        # 4. Форсируем confirmation напрямую
+        from ..core.confirmation import ConfirmationResult
+        entry_price = current_price
+        if direction == "long":
+            stop_loss = round(sweep_price * 0.998, 2)
+        else:
+            stop_loss = round(sweep_price * 1.002, 2)
+
+        confirmation = ConfirmationResult(
+            is_confirmed=True,
+            confirmations_met=3,
+            required_confirmations=2,
+            trade_direction=direction,
+            entry_price=entry_price,
+            stop_loss=stop_loss,
+        )
+
+        # 5. Открываем реальную позицию
+        from ..models.alert import AlertState
+        from ..core.trading_engine import AlertState as TradingAlertState
+        state = TradingAlertState(alert=alert)
+        state.range = price_range
+        state.sweep = sweep
+        state.last_price = current_price
+
+        await _trading_engine._execute_trade(state, confirmation)
+
+        await ws_manager.send_log(
+            f"🧪 TEST: Trade executed! Closing in {close_after_seconds}s...",
+            level="success", source="test"
+        )
+
+        # 6. Закрываем через N секунд
+        async def close_after_delay():
+            import asyncio
+            await asyncio.sleep(close_after_seconds)
+            positions = _bybit_client.get_positions(symbol="BTCUSDT")
+            if positions:
+                pos = positions[0]
+                side = "Sell" if pos["side"] == "Buy" else "Buy"
+                qty = pos["size"]
+                _bybit_client.place_order(side=side, qty=qty, order_type="Market", reduce_only=True)
+                await ws_manager.send_log(
+                    f"🧪 TEST: Position closed after {close_after_seconds}s | PnL will show on Bybit",
+                    level="success", source="test"
+                )
+            else:
+                await ws_manager.send_log(
+                    f"🧪 TEST: No position found to close (may have been closed by SL/TP)",
+                    level="warning", source="test"
+                )
+
+        import asyncio
+        asyncio.ensure_future(close_after_delay())
+
+        return {
+            "status": "test_trade_started",
+            "direction": direction,
+            "entry_price": entry_price,
+            "stop_loss": stop_loss,
+            "close_after_seconds": close_after_seconds,
+            "range": {"high": local_high, "low": local_low}
+        }
+
+    except Exception as e:
+        logger.exception(f"[TEST] full_trade error: {e}")
+        await ws_manager.send_log(f"🧪 TEST ERROR: {e}", level="error", source="test")
+        return {"error": str(e)}
+
+
 @router.post("/test-alert")
 async def send_test_alert(
     alert_type: str = "BTC Diamond",
