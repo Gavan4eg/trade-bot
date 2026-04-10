@@ -199,8 +199,15 @@ async def on_price_update(ticker: dict):
             logger.debug(f"Exchange sync error: {e}")
 
     # Sync in-memory position state → DB after every price update
+    # Include recently closed positions so UI reflects close immediately
+    from ..models.position import PositionStatus
     active = position_manager.get_active_positions()
-    if not active:
+    recently_closed = [
+        p for p in position_manager.positions.values()
+        if p.status == PositionStatus.CLOSED and p.closed_at is not None
+    ]
+    to_sync = active + [p for p in recently_closed if p not in active]
+    if not to_sync:
         return
 
     try:
@@ -208,7 +215,7 @@ async def on_price_update(ticker: dict):
             pos_repo = PositionRepository(session)
             trade_repo = TradeRepository(session)
 
-            for pos in active:
+            for pos in to_sync:
                 if not pos.id:
                     continue
 
