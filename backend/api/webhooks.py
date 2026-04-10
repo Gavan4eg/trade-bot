@@ -624,27 +624,24 @@ async def test_full_trade(
             import asyncio
             await asyncio.sleep(close_after_seconds)
 
-            # Сначала закрываем через position_manager (обновляет UI и БД)
-            closed_via_pm = False
+            # 1. Закрываем на бирже
+            exchange_positions = _bybit_client.get_positions(symbol="BTCUSDT")
+            if exchange_positions:
+                p = exchange_positions[0]
+                side = "Sell" if p["side"] == "Buy" else "Buy"
+                _bybit_client.place_order(side=side, qty=p["size"], order_type="Market", reduce_only=True)
+                await ws_manager.send_log(
+                    f"🧪 TEST: Closed on exchange after {close_after_seconds}s",
+                    level="success", source="test"
+                )
+
+            # 2. Синкаем position_manager с биржей → ghost пропадёт из UI
             if _position_manager:
-                active = _position_manager.get_active_positions()
-                for pos in active:
-                    await _position_manager.close_position(pos, "test_auto_close")
-                    closed_via_pm = True
-                    break
-
-            # Если position_manager не сработал — закрываем напрямую через биржу
-            if not closed_via_pm:
-                exchange_positions = _bybit_client.get_positions(symbol="BTCUSDT")
-                if exchange_positions:
-                    p = exchange_positions[0]
-                    side = "Sell" if p["side"] == "Buy" else "Buy"
-                    _bybit_client.place_order(side=side, qty=p["size"], order_type="Market", reduce_only=True)
-
-            await ws_manager.send_log(
-                f"🧪 TEST: Position closed after {close_after_seconds}s",
-                level="success", source="test"
-            )
+                _position_manager.sync_with_exchange()
+                await ws_manager.send_log(
+                    f"🧪 TEST: Position manager synced — UI updated",
+                    level="success", source="test"
+                )
 
         import asyncio
         asyncio.ensure_future(close_after_delay())

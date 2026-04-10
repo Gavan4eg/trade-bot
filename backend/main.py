@@ -186,23 +186,15 @@ async def on_price_update(ticker: dict):
     if now - _last_exchange_sync > EXCHANGE_SYNC_INTERVAL:
         _last_exchange_sync = now
         try:
-            real = bybit_client.get_positions(symbol="BTCUSDT")
-            real_sizes = {p["side"]: p["size"] for p in real}
-            for pos in position_manager.get_active_positions():
-                exchange_side = "Buy" if pos.direction.value == "long" else "Sell"
-                if exchange_side not in real_sizes:
-                    # Позиция закрыта на бирже — закрываем в памяти
-                    logger.info(f"Sync: position {pos.trade_id} closed on exchange — updating bot state")
-                    pos.status = __import__('backend.trading.position_manager', fromlist=['PositionStatus']).PositionStatus.CLOSED
-                    from datetime import datetime
-                    pos.closed_at = datetime.utcnow()
-                    if risk_manager:
-                        risk_manager.register_trade_close(pos.direction.value, pos.realized_pnl)
-                    position_manager._positions.pop(pos.trade_id, None)
-                    await ws_manager.send_log(
-                        f"🔄 Sync: position closed externally on exchange",
-                        level="warning", source="sync"
-                    )
+            before = len(position_manager.get_active_positions())
+            position_manager.sync_with_exchange()
+            after = len(position_manager.get_active_positions())
+            if before != after:
+                logger.info(f"Sync: {before - after} position(s) closed externally on exchange")
+                await ws_manager.send_log(
+                    f"🔄 Sync: {before - after} position(s) closed on exchange — UI updated",
+                    level="warning", source="sync"
+                )
         except Exception as e:
             logger.debug(f"Exchange sync error: {e}")
 
