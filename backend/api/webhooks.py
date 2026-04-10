@@ -623,21 +623,28 @@ async def test_full_trade(
         async def close_after_delay():
             import asyncio
             await asyncio.sleep(close_after_seconds)
-            positions = _bybit_client.get_positions(symbol="BTCUSDT")
-            if positions:
-                pos = positions[0]
-                side = "Sell" if pos["side"] == "Buy" else "Buy"
-                qty = pos["size"]
-                _bybit_client.place_order(side=side, qty=qty, order_type="Market", reduce_only=True)
-                await ws_manager.send_log(
-                    f"🧪 TEST: Position closed after {close_after_seconds}s | PnL will show on Bybit",
-                    level="success", source="test"
-                )
-            else:
-                await ws_manager.send_log(
-                    f"🧪 TEST: No position found to close (may have been closed by SL/TP)",
-                    level="warning", source="test"
-                )
+
+            # Сначала закрываем через position_manager (обновляет UI и БД)
+            closed_via_pm = False
+            if _position_manager:
+                active = _position_manager.get_active_positions()
+                for pos in active:
+                    await _position_manager.close_position(pos, "test_auto_close")
+                    closed_via_pm = True
+                    break
+
+            # Если position_manager не сработал — закрываем напрямую через биржу
+            if not closed_via_pm:
+                exchange_positions = _bybit_client.get_positions(symbol="BTCUSDT")
+                if exchange_positions:
+                    p = exchange_positions[0]
+                    side = "Sell" if p["side"] == "Buy" else "Buy"
+                    _bybit_client.place_order(side=side, qty=p["size"], order_type="Market", reduce_only=True)
+
+            await ws_manager.send_log(
+                f"🧪 TEST: Position closed after {close_after_seconds}s",
+                level="success", source="test"
+            )
 
         import asyncio
         asyncio.ensure_future(close_after_delay())

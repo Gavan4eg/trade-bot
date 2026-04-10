@@ -136,7 +136,8 @@ async def lifespan(app: FastAPI):
     # Wire trading components + engine into the webhook handler
     setup_trading(bybit_client, trade_executor, risk_manager, trading_engine, position_manager)
 
-    logger.info(f"Bot initialized (testnet={settings.bybit_testnet})")
+    is_testnet = settings.binance_testnet if settings.exchange == "binance" else settings.bybit_testnet
+    logger.info(f"Bot initialized (exchange={settings.exchange}, testnet={is_testnet})")
 
     yield
 
