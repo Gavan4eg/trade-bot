@@ -139,6 +139,19 @@ async def lifespan(app: FastAPI):
     is_testnet = settings.binance_testnet if settings.exchange == "binance" else settings.bybit_testnet
     logger.info(f"Bot initialized (exchange={settings.exchange}, testnet={is_testnet})")
 
+    # Синхронизация с реальными позициями на бирже при старте
+    # Если на бирже нет открытых позиций — очищаем in-memory ghost позиции
+    try:
+        real_positions = bybit_client.get_positions(symbol="BTCUSDT")
+        if not real_positions:
+            position_manager._positions.clear()
+            position_manager._trades.clear()
+            logger.info("Startup sync: no open positions on exchange — memory cleared")
+        else:
+            logger.info(f"Startup sync: {len(real_positions)} open position(s) on exchange")
+    except Exception as e:
+        logger.warning(f"Startup sync failed: {e}")
+
     yield
 
     # Shutdown
@@ -148,8 +161,14 @@ async def lifespan(app: FastAPI):
     await market_data_service.stop()
 
 
+_last_exchange_sync: float = 0.0
+EXCHANGE_SYNC_INTERVAL = 30  # секунд
+
+
 async def on_price_update(ticker: dict):
     """Callback for price updates — drives the Diamond signal pipeline and position management"""
+    import time
+    global _last_exchange_sync
     from .database.db import AsyncSessionLocal
     from .database.repositories import PositionRepository, TradeRepository
 
@@ -161,6 +180,31 @@ async def on_price_update(ticker: dict):
     else:
         for position in position_manager.get_active_positions():
             position_manager.update_position(position, current_price)
+
+    # Каждые 30 секунд сверяем in-memory позиции с реальными на бирже
+    now = time.time()
+    if now - _last_exchange_sync > EXCHANGE_SYNC_INTERVAL:
+        _last_exchange_sync = now
+        try:
+            real = bybit_client.get_positions(symbol="BTCUSDT")
+            real_sizes = {p["side"]: p["size"] for p in real}
+            for pos in position_manager.get_active_positions():
+                exchange_side = "Buy" if pos.direction.value == "long" else "Sell"
+                if exchange_side not in real_sizes:
+                    # Позиция закрыта на бирже — закрываем в памяти
+                    logger.info(f"Sync: position {pos.trade_id} closed on exchange — updating bot state")
+                    pos.status = __import__('backend.trading.position_manager', fromlist=['PositionStatus']).PositionStatus.CLOSED
+                    from datetime import datetime
+                    pos.closed_at = datetime.utcnow()
+                    if risk_manager:
+                        risk_manager.register_trade_close(pos.direction.value, pos.realized_pnl)
+                    position_manager._positions.pop(pos.trade_id, None)
+                    await ws_manager.send_log(
+                        f"🔄 Sync: position closed externally on exchange",
+                        level="warning", source="sync"
+                    )
+        except Exception as e:
+            logger.debug(f"Exchange sync error: {e}")
 
     # Sync in-memory position state → DB after every price update
     active = position_manager.get_active_positions()
