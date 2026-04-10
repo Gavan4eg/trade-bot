@@ -267,22 +267,24 @@ class PositionManager:
         if qty <= 0:
             return
 
+        # ✅ Реально закрываем позицию на бирже через executor
+        success = self.executor.close_position(trade, current_price, reason)
+        if not success:
+            logger.error(f"Failed to close position on exchange for {reason} — will retry on next tick")
+            return
+
+        # Обновляем in-memory состояние
         if position.direction == TradeDirection.LONG:
             pnl = (current_price - position.entry_price) * qty
         else:
             pnl = (position.entry_price - current_price) * qty
-
-        trade.realized_pnl += pnl
-        trade.executed_quantity = 0
-        trade.status = TradeStatus.CLOSED
-        trade.closed_at = datetime.utcnow()
 
         position.realized_pnl += pnl
         position.current_quantity = 0
         position.status = PositionStatus.CLOSED
         position.closed_at = datetime.utcnow()
 
-        # ✅ Уведомляем risk manager что позиция закрыта
+        # Уведомляем risk manager что позиция закрыта
         if self.risk_manager:
             self.risk_manager.register_trade_close(position.direction.value, pnl)
 
