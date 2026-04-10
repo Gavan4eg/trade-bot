@@ -559,12 +559,15 @@ async def test_full_trade(
         local_high = max(highs)
         local_low  = min(lows)
 
+        now = datetime.utcnow()
         price_range = Range(
             alert_id=99999,
             local_high=local_high,
             local_low=local_low,
             timeframe="1h",
-            candles_count=24
+            candles_count=24,
+            start_time=now,
+            end_time=now
         )
 
         # 3. Sweep
