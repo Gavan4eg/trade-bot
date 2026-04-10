@@ -606,7 +606,6 @@ async def test_full_trade(
         )
 
         # 5. Открываем реальную позицию
-        from ..models.alert import AlertState
         from ..core.trading_engine import AlertState as TradingAlertState
         state = TradingAlertState(alert=alert)
         state.range = price_range
