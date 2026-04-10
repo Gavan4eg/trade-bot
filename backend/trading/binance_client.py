@@ -411,9 +411,9 @@ class BinanceClient:
                         symbol=symbol,
                         side=close_side,
                         type="STOP_MARKET",
-                        stopPrice=str(stop_loss),
+                        stopPrice=str(round(stop_loss, 2)),
                         closePosition="true",
-                        timeInForce="GTE_GTC"
+                        workingType="MARK_PRICE"
                     )
                     logger.info(f"Stop loss set @ {stop_loss} for {symbol}")
                 except Exception as e:
@@ -426,9 +426,9 @@ class BinanceClient:
                         symbol=symbol,
                         side=close_side,
                         type="TAKE_PROFIT_MARKET",
-                        stopPrice=str(take_profit),
+                        stopPrice=str(round(take_profit, 2)),
                         closePosition="true",
-                        timeInForce="GTE_GTC"
+                        workingType="MARK_PRICE"
                     )
                     logger.info(f"Take profit set @ {take_profit} for {symbol}")
                 except Exception as e:
@@ -441,8 +441,9 @@ class BinanceClient:
                         symbol=symbol,
                         side=close_side,
                         type="TRAILING_STOP_MARKET",
-                        callbackRate=str(trailing_stop),
-                        closePosition="true"
+                        callbackRate=str(round(trailing_stop, 2)),
+                        closePosition="true",
+                        workingType="MARK_PRICE"
                     )
                     logger.info(f"Trailing stop set @ {trailing_stop}% for {symbol}")
                 except Exception as e:
