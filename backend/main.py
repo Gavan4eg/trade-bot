@@ -16,6 +16,18 @@ from .api.settings import router as settings_router
 from .services.websocket_manager import ws_manager
 from .services.market_data import MarketDataService
 from .trading.bybit_client import BybitClient
+from .trading.binance_client import BinanceClient
+
+
+def create_exchange_client():
+    """Фабрика: выбирает биржу через ENV EXCHANGE=bybit|binance"""
+    exchange = settings.exchange.lower()
+    if exchange == "binance":
+        logger.info("Exchange: Binance Futures")
+        return BinanceClient(testnet=settings.binance_testnet)
+    else:
+        logger.info("Exchange: Bybit")
+        return BybitClient(testnet=settings.bybit_testnet)
 from .trading.risk_manager import RiskManager
 from .trading.trade_executor import TradeExecutor
 from .trading.position_manager import PositionManager
@@ -85,7 +97,7 @@ async def lifespan(app: FastAPI):
     await init_db()
 
     # Initialize trading components
-    bybit_client = BybitClient(testnet=settings.bybit_testnet)
+    bybit_client = create_exchange_client()
     risk_manager = RiskManager()
     trade_executor = TradeExecutor(bybit_client, risk_manager)
     position_manager = PositionManager(bybit_client, trade_executor, risk_manager)

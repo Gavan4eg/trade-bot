@@ -3,10 +3,19 @@ from typing import Literal
 
 
 class Settings(BaseSettings):
+    # Exchange selection: "bybit" | "binance"
+    exchange: str = "bybit"
+
     # Bybit API
     bybit_api_key: str = ""
     bybit_api_secret: str = ""
     bybit_testnet: bool = True
+
+    # Binance API
+    binance_api_key: str = ""
+    binance_api_secret: str = ""
+    binance_testnet: bool = True
+
     paper_trading: bool = True  # Симуляция без реальных сделок
 
     # Trading settings
