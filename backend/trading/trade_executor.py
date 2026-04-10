@@ -61,15 +61,18 @@ class TradeExecutor:
             logger.error("Calculated position size is 0")
             return None
 
-        # Проверяем что маржа не превышает доступный баланс
-        # Binance EU ограничение: max 2x, поэтому margin = qty * price / 2
-        # Используем консервативно 90% баланса как максимум маржи
+        # Проверяем что маржа не превышает доступный баланс с учётом плеча
+        # margin_required = qty * price / leverage
+        # max_qty = balance * leverage * 0.9 / price (90% для безопасности)
         ticker = self.client.get_ticker()
         approx_price = ticker["last_price"] if ticker else entry_price
-        max_qty_by_margin = round((balance["available_balance"] * 0.9) / approx_price, 3)
+        max_qty_by_margin = round(
+            (balance["available_balance"] * settings.leverage * 0.9) / approx_price, 3
+        )
         if quantity > max_qty_by_margin:
             logger.warning(
-                f"Position size {quantity} exceeds margin limit, "
+                f"Position size {quantity} BTC exceeds margin limit "
+                f"(balance=${balance['available_balance']:.0f}, leverage={settings.leverage}x), "
                 f"reducing to {max_qty_by_margin} BTC"
             )
             quantity = max_qty_by_margin

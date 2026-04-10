@@ -21,6 +21,7 @@ class Settings(BaseSettings):
     # Trading settings
     max_positions: int = 3
     risk_per_trade: float = 1.0  # % of balance
+    leverage: int = 5  # Плечо на бирже (должно совпадать с настройкой на Binance)
     min_rr: float = 2.0
     range_timeframe: str = "1h"
     range_candles: int = 24
