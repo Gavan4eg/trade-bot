@@ -29,6 +29,7 @@ def create_exchange_client():
         logger.info("Exchange: Bybit")
         return BybitClient(testnet=settings.bybit_testnet)
 from .trading.risk_manager import RiskManager
+from .models.position import PositionStatus
 from .trading.trade_executor import TradeExecutor
 from .trading.position_manager import PositionManager
 from .core.alert_processor import AlertProcessor
@@ -144,7 +145,7 @@ async def lifespan(app: FastAPI):
     try:
         real_positions = bybit_client.get_positions(symbol="BTCUSDT")
         if not real_positions:
-            position_manager._positions.clear()
+            position_manager.positions.clear()
             position_manager._trades.clear()
             logger.info("Startup sync: no open positions on exchange — memory cleared")
         else:
@@ -200,7 +201,6 @@ async def on_price_update(ticker: dict):
 
     # Sync in-memory position state → DB after every price update
     # Include recently closed positions so UI reflects close immediately
-    from ..models.position import PositionStatus
     active = position_manager.get_active_positions()
     recently_closed = [
         p for p in position_manager.positions.values()
