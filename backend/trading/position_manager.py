@@ -352,6 +352,9 @@ class PositionManager:
                 if position.status != PositionStatus.CLOSED:
                     position.status = PositionStatus.CLOSED
                     position.closed_at = datetime.utcnow()
+                    # Notify risk manager so can_open_position() works correctly
+                    if self.risk_manager:
+                        self.risk_manager.register_trade_close(position.direction.value, position.realized_pnl)
             return
 
         for pos in exchange_positions:
