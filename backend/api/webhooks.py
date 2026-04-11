@@ -727,7 +727,12 @@ async def test_pipeline(
 
         # 2. Запускаем pipeline (range detection)
         await _trading_engine.process_alert_direct(alert)
-        await asyncio.sleep(3)  # ждём range detection
+        # Ждём range detection (до 10 сек)
+        for _ in range(10):
+            await asyncio.sleep(1)
+            state = _trading_engine.active_states.get(alert.id)
+            if state and state.range:
+                break
 
         state = _trading_engine.active_states.get(alert.id)
         if not state or not state.range:
