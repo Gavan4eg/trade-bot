@@ -35,7 +35,7 @@ class WebSocketManager:
         message_json = json.dumps(message)
         disconnected = set()
 
-        for connection in self.active_connections:
+        for connection in list(self.active_connections):
             try:
                 await connection.send_text(message_json)
             except Exception as e:
