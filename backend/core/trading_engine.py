@@ -306,8 +306,19 @@ class TradingEngine:
         for alert_id, state in list(self.active_states.items()):
             state.last_price = price
 
-            # Check for sweep if we have a range and waiting for sweep
+            # Check sweep timeout
             if state.alert.status == AlertStatus.WAITING_SWEEP and state.range:
+                sweep_age = datetime.utcnow() - state.range.start_time
+                if sweep_age > timedelta(hours=self.sweep_wait_hours):
+                    logger.info(f"Alert {alert_id} sweep timeout after {self.sweep_wait_hours}h — cleaning up")
+                    await ws_manager.send_log(
+                        f"⌛ Alert #{alert_id} expired — sweep not detected in {self.sweep_wait_hours}h",
+                        level="warning", source="pipeline"
+                    )
+                    state.alert.status = AlertStatus.REJECTED
+                    await self._broadcast_alert_update(state.alert)
+                    self._cleanup_state(alert_id)
+                    continue
                 await self._check_for_sweep(state, price)
 
             # Check for confirmation if sweep detected
