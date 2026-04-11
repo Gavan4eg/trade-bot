@@ -32,6 +32,7 @@ class AlertState:
     trade: Optional[Trade] = None
     last_price: float = 0.0
     created_at: datetime = field(default_factory=datetime.utcnow)
+    range_detected_at: Optional[datetime] = None  # когда range был обнаружен
     # Последняя ликвидация — для ConfirmationEngine
     pending_liquidation: Optional[dict] = None
     # Кластер всех ликвидаций — для расчёта стопа за зону дисбаланса
@@ -263,6 +264,7 @@ class TradingEngine:
 
                 if detected_range and detected_range.is_valid:
                     state.range = detected_range
+                    state.range_detected_at = datetime.utcnow()
                     state.alert.status = AlertStatus.RANGE_DETECTED
 
                     await self._broadcast_range_update(detected_range)
@@ -308,7 +310,8 @@ class TradingEngine:
 
             # Check sweep timeout
             if state.alert.status == AlertStatus.WAITING_SWEEP and state.range:
-                sweep_age = datetime.utcnow() - state.range.start_time
+                detected_at = state.range_detected_at or state.created_at
+                sweep_age = datetime.utcnow() - detected_at
                 if sweep_age > timedelta(hours=self.sweep_wait_hours):
                     logger.info(f"Alert {alert_id} sweep timeout after {self.sweep_wait_hours}h — cleaning up")
                     await ws_manager.send_log(
