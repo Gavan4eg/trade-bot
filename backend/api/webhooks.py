@@ -661,6 +661,151 @@ async def test_full_trade(
         return {"error": str(e)}
 
 
+@router.post("/test-pipeline")
+async def test_pipeline(
+    direction: str = "short",
+    db: AsyncSession = Depends(get_db),
+):
+    """
+    Полный тест через реальный pipeline:
+    1. Создаёт Diamond алерт (сохраняет в DB)
+    2. Ждёт range detection (~2 сек)
+    3. Форсирует sweep price tick
+    4. Ждёт confirmation → открывает реальную позицию
+    5. Симулирует движение цены → TP1 → TP2 → trailing stop
+    """
+    import asyncio
+    from ..models.alert import Alert, AlertType, AlertStatus
+    from ..database.repositories import AlertRepository
+
+    if _trading_engine is None or _bybit_client is None:
+        return {"error": "Trading engine not initialized"}
+
+    try:
+        ticker = _bybit_client.get_ticker()
+        if not ticker:
+            return {"error": "Cannot get ticker"}
+
+        current_price = ticker["last_price"]
+
+        await ws_manager.send_log(
+            f"🧪 PIPELINE TEST | direction={direction} | price=${current_price:,.0f}",
+            level="warning", source="test"
+        )
+
+        # 1. Создаём Alert объект и сохраняем в DB
+        alert_raw = {
+            "type": "BTC Diamond", "price": current_price,
+            "side": direction, "timeframe": "1 hour", "test": True
+        }
+        alert = Alert(
+            alert_type=AlertType.BTC_DIAMOND,
+            price=current_price,
+            status=AlertStatus.PENDING,
+            priority=2,
+            raw_data=alert_raw,
+            timestamp=datetime.utcnow(),
+        )
+
+        repo = AlertRepository(db)
+        db_alert = await repo.create({
+            "alert_type": alert.alert_type.value,
+            "timestamp": alert.timestamp,
+            "price": alert.price,
+            "levels": [],
+            "status": alert.status.value,
+            "priority": alert.priority,
+            "raw_data": alert.raw_data,
+        })
+        alert.id = db_alert.id
+        alert_processor.register_alert(alert)
+
+        await ws_manager.send_log(
+            f"🧪 Alert #{alert.id} created → entering pipeline",
+            level="info", source="test"
+        )
+
+        # 2. Запускаем pipeline (range detection)
+        await _trading_engine.process_alert_direct(alert)
+        await asyncio.sleep(3)  # ждём range detection
+
+        state = _trading_engine.active_states.get(alert.id)
+        if not state or not state.range:
+            return {"error": f"Range not detected for alert {alert.id}"}
+
+        r = state.range
+        await ws_manager.send_log(
+            f"🧪 Range: H=${r.local_high:,.0f} L=${r.local_low:,.0f} → forcing sweep",
+            level="info", source="test"
+        )
+
+        # 3. Форсируем sweep через price tick
+        sweep_price = r.local_high * 1.002 if direction == "short" else r.local_low * 0.998
+        await _trading_engine.on_price_update(sweep_price)
+        await asyncio.sleep(0.5)
+        await _trading_engine.on_price_update(current_price)
+        await asyncio.sleep(3)  # ждём confirmation
+
+        # 4. Проверяем позицию
+        active = _position_manager.get_active_positions() if _position_manager else []
+        if not active:
+            return {"error": "Trade not opened — check logs"}
+
+        position = active[0]
+        await ws_manager.send_log(
+            f"🧪 Position: {position.direction.value} @ ${position.entry_price:,.0f} "
+            f"SL=${position.stop_loss:,.0f} TP1=${position.take_profit_1:,.0f} TP2=${position.take_profit_2:,.0f}",
+            level="success", source="test"
+        )
+
+        # 5. Симулируем цену к TP1 → TP2 → trailing
+        async def simulate_price_movement():
+            await asyncio.sleep(3)
+            tp1 = position.take_profit_1
+            tp2 = position.take_profit_2
+            entry = position.entry_price
+
+            if direction == "short":
+                prices = (
+                    [entry - (entry - tp1) / 20 * i for i in range(21)] +  # к TP1
+                    [tp1] * 3 +
+                    [tp1 - (tp1 - tp2) / 15 * i for i in range(16)] +  # к TP2
+                    [tp2] * 3 +
+                    [tp2 - (tp2 * 0.02) / 10 * i for i in range(11)]   # trailing
+                )
+            else:
+                prices = (
+                    [entry + (tp1 - entry) / 20 * i for i in range(21)] +
+                    [tp1] * 3 +
+                    [tp1 + (tp2 - tp1) / 15 * i for i in range(16)] +
+                    [tp2] * 3 +
+                    [tp2 + (tp2 * 0.02) / 10 * i for i in range(11)]
+                )
+
+            for p in prices:
+                await _trading_engine.on_price_update(p)
+                await asyncio.sleep(0.3)
+
+            await ws_manager.send_log("🧪 Price simulation complete", level="success", source="test")
+
+        asyncio.ensure_future(simulate_price_movement())
+
+        return {
+            "status": "pipeline_test_started",
+            "alert_id": alert.id,
+            "direction": direction,
+            "entry_price": position.entry_price,
+            "stop_loss": position.stop_loss,
+            "take_profit_1": position.take_profit_1,
+            "take_profit_2": position.take_profit_2,
+        }
+
+    except Exception as e:
+        logger.exception(f"[TEST PIPELINE] error: {e}")
+        await ws_manager.send_log(f"🧪 PIPELINE TEST ERROR: {e}", level="error", source="test")
+        return {"error": str(e)}
+
+
 @router.post("/test-alert")
 async def send_test_alert(
     alert_type: str = "BTC Diamond",
