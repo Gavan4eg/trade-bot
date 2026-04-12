@@ -373,6 +373,14 @@ class TradingEngine:
 
     async def _check_for_confirmation(self, state: AlertState, price: float):
         """Check if entry is confirmed after sweep"""
+        # Require price to return back inside range after sweep (confirms reversal)
+        if not self.liquidity_tracker.check_price_back_in_range(price, state.range, state.sweep):
+            logger.debug(
+                f"Alert #{state.alert.id}: price ${price:,.0f} not yet back in range "
+                f"[{state.range.low:,.0f}–{state.range.high:,.0f}] — waiting for reversal"
+            )
+            return
+
         candles = self._get_cached_klines()  # cached, max 1 request per 60s
 
         result = self.confirmation_engine.check_confirmation(
@@ -548,6 +556,17 @@ class TradingEngine:
 
             # Cleanup state (trade is now managed by position manager)
             self._cleanup_state(state.alert.id)
+
+            # Reject all other pending alerts — position already open
+            for other_id in list(self.active_states.keys()):
+                if other_id == state.alert.id:
+                    continue
+                other_state = self.active_states.get(other_id)
+                if other_state:
+                    other_state.alert.status = AlertStatus.REJECTED
+                    await self._broadcast_alert_update(other_state.alert)
+                    logger.info(f"Alert {other_id} rejected — position already opened by alert {state.alert.id}")
+                    self._cleanup_state(other_id)
         else:
             logger.error(f"Failed to execute trade for alert {state.alert.id}")
             await ws_manager.send_log(

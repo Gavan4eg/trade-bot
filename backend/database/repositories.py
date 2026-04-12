@@ -1,6 +1,6 @@
 import logging
 from typing import Optional, List
-from datetime import datetime
+from datetime import datetime, timedelta
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, update, delete
 from sqlalchemy.orm import selectinload
@@ -45,6 +45,20 @@ class AlertRepository:
             select(AlertDB).order_by(AlertDB.timestamp.desc()).limit(limit)
         )
         return result.scalars().all()
+
+    async def expire_old_alerts(self, max_age_hours: int = 4) -> int:
+        """Mark old pending/processing alerts as rejected in DB"""
+        cutoff = datetime.utcnow() - timedelta(hours=max_age_hours)
+        result = await self.session.execute(
+            update(AlertDB)
+            .where(
+                AlertDB.status.in_(["pending", "processing", "range_detected", "waiting_sweep"]),
+                AlertDB.timestamp < cutoff
+            )
+            .values(status="rejected")
+        )
+        await self.session.commit()
+        return result.rowcount
 
     async def update_status(self, alert_id: int, status: str) -> bool:
         """Update alert status"""

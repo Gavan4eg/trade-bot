@@ -164,6 +164,8 @@ async def lifespan(app: FastAPI):
 
 _last_exchange_sync: float = 0.0
 EXCHANGE_SYNC_INTERVAL = 30  # секунд
+_last_alert_cleanup: float = 0.0
+ALERT_CLEANUP_INTERVAL = 300  # 5 минут
 
 
 async def on_price_update(ticker: dict):
@@ -198,6 +200,22 @@ async def on_price_update(ticker: dict):
                 )
         except Exception as e:
             logger.debug(f"Exchange sync error: {e}")
+
+    # Каждые 5 минут чистим старые алерты (>4 часов) из памяти и DB
+    global _last_alert_cleanup
+    if now - _last_alert_cleanup > ALERT_CLEANUP_INTERVAL:
+        _last_alert_cleanup = now
+        try:
+            from .database.db import AsyncSessionLocal
+            from .database.repositories import AlertRepository as AR
+            expired = alert_processor.expire_old_alerts(max_age_hours=4)
+            async with AsyncSessionLocal() as session:
+                repo = AR(session)
+                await repo.expire_old_alerts(max_age_hours=4)
+            if expired:
+                logger.info(f"Alert cleanup: {expired} expired alert(s) removed")
+        except Exception as e:
+            logger.debug(f"Alert cleanup error: {e}")
 
     # Sync in-memory position state → DB after every price update
     # Include recently closed positions so UI reflects close immediately

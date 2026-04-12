@@ -124,6 +124,20 @@ class AlertProcessor:
                         continue
                     return False
 
+        # Deduplicate by price — reject if any active Diamond alert has price within 1%
+        DIAMOND_TYPES = {AlertType.BTC_DIAMOND, AlertType.BTC_DOUBLE_DIAMOND, AlertType.DIAMOND_TOP_LEVELS}
+        if alert.alert_type in DIAMOND_TYPES:
+            for active in self.active_alerts:
+                if active.status not in [AlertStatus.TRADED, AlertStatus.EXPIRED, AlertStatus.REJECTED]:
+                    if active.alert_type in DIAMOND_TYPES and active.price > 0:
+                        price_diff_pct = abs(alert.price - active.price) / active.price * 100
+                        if price_diff_pct <= 1.0:
+                            logger.info(
+                                f"Duplicate Diamond alert rejected — price ${alert.price:,.0f} "
+                                f"too close to active ${active.price:,.0f} ({price_diff_pct:.2f}%)"
+                            )
+                            return False
+
         return True
 
     def register_alert(self, alert: Alert) -> None:
