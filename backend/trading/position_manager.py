@@ -83,8 +83,8 @@ class PositionManager:
                 if hit:
                     self._close_by_stop(position, current_price, reason="trailing_stop")
 
-        # Проверяем обычный стоп-лосс (для позиций до активации trailing)
-        if position.status == PositionStatus.OPEN:
+        # Check stop loss — applies to OPEN, TP1_HIT and TP2_HIT (before trailing activates)
+        if position.status in [PositionStatus.OPEN, PositionStatus.TP1_HIT, PositionStatus.TP2_HIT]:
             sl_hit = (
                 position.direction == TradeDirection.LONG and current_price <= position.stop_loss
             ) or (

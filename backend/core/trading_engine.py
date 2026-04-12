@@ -377,7 +377,7 @@ class TradingEngine:
         if not self.liquidity_tracker.check_price_back_in_range(price, state.range, state.sweep):
             logger.debug(
                 f"Alert #{state.alert.id}: price ${price:,.0f} not yet back in range "
-                f"[{state.range.low:,.0f}–{state.range.high:,.0f}] — waiting for reversal"
+                f"[{state.range.local_low:,.0f}–{state.range.local_high:,.0f}] — waiting for reversal"
             )
             return
 
