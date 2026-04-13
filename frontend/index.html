@@ -566,7 +566,57 @@ function App() {
 
     useEffect(() => {
         if (!lastMessage) return;
-        if (lastMessage.type === 'alert') setAlerts(p => [lastMessage.data, ...p.slice(0,49)]);
+
+        // Alert: update existing by ID or add new
+        if (lastMessage.type === 'alert') {
+            setAlerts(p => {
+                const idx = p.findIndex(a => a.id === lastMessage.data.id);
+                if (idx !== -1) {
+                    const u = [...p];
+                    u[idx] = { ...u[idx], ...lastMessage.data };
+                    return u;
+                }
+                return [lastMessage.data, ...p.slice(0, 49)];
+            });
+        }
+
+        // Range detected — attach to alert's pipeline data
+        if (lastMessage.type === 'range') {
+            const d = lastMessage.data;
+            setAlerts(p => p.map(a => a.id === d.alert_id ? {
+                ...a,
+                status: a.status === 'pending' || a.status === 'processing' ? 'waiting_sweep' : a.status,
+                pipeline: {
+                    ...(a.pipeline || {}),
+                    range: {
+                        local_high: d.local_high,
+                        local_low:  d.local_low,
+                        mid:        d.mid_range,
+                        width_percent: d.width_percent,
+                        timeframe:  (a.pipeline || {}).range?.timeframe || '1h',
+                        candles:    (a.pipeline || {}).range?.candles   || 24,
+                    }
+                }
+            } : a));
+        }
+
+        // Sweep detected — attach to alert's pipeline data
+        if (lastMessage.type === 'sweep') {
+            const d = lastMessage.data;
+            setAlerts(p => p.map(a => a.id === d.alert_id ? {
+                ...a,
+                pipeline: {
+                    ...(a.pipeline || {}),
+                    sweep: {
+                        direction:   d.direction,
+                        sweep_price: d.sweep_price,
+                        level_swept: d.level_swept,
+                        wick_percent: d.wick_percent,
+                    }
+                }
+            } : a));
+        }
+
         if (lastMessage.type === 'price') setPrice({ price:lastMessage.data.price, high24h:lastMessage.data.high_24h, low24h:lastMessage.data.low_24h });
         if (lastMessage.type === 'position') setPositions(p => {
             const i = p.findIndex(x => x.id === lastMessage.data.id);
@@ -602,8 +652,21 @@ function App() {
                 fetch('/api/settings/balance').then(r=>r.json()).catch(()=>({})),
             ]);
             setPositions(pos); setStats(st); setBalance(bal);
-            // Also refresh alerts to get pipeline state updates
-            fetch('/api/alerts').then(r=>r.json()).then(setAlerts).catch(()=>{});
+            // Refresh alerts — merge DB data with in-memory state (preserve WebSocket status/pipeline)
+            fetch('/api/alerts').then(r=>r.json()).then(dbAlerts => {
+                setAlerts(current => {
+                    const memById = {};
+                    current.forEach(a => { memById[a.id] = a; });
+                    const terminal = ['traded','expired','rejected'];
+                    return dbAlerts.map(db => {
+                        const mem = memById[db.id];
+                        if (!mem) return db;
+                        // Terminal states from DB always win; for active alerts prefer memory
+                        if (terminal.includes(db.status)) return { ...mem, ...db };
+                        return { ...db, status: mem.status || db.status, pipeline: mem.pipeline || db.pipeline };
+                    });
+                });
+            }).catch(()=>{});
         }, 3000);
         return () => clearInterval(t);
     }, []);
