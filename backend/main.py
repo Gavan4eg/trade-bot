@@ -137,6 +137,17 @@ async def lifespan(app: FastAPI):
     # Wire trading components + engine into the webhook handler
     setup_trading(bybit_client, trade_executor, risk_manager, trading_engine, position_manager)
 
+    # Set leverage on exchange to match settings
+    if not settings.paper_trading:
+        try:
+            ok = bybit_client.set_leverage(symbol="BTCUSDT", leverage=settings.leverage)
+            if ok:
+                logger.info(f"Leverage set to {settings.leverage}x on exchange")
+            else:
+                logger.warning(f"Failed to set leverage — check exchange settings manually")
+        except Exception as e:
+            logger.warning(f"Leverage setup error: {e}")
+
     is_testnet = settings.binance_testnet if settings.exchange == "binance" else settings.bybit_testnet
     logger.info(f"Bot initialized (exchange={settings.exchange}, testnet={is_testnet})")
 

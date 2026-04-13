@@ -37,6 +37,14 @@ def setup_trading(bybit_client, trade_executor, risk_manager, trading_engine=Non
     _risk_manager = risk_manager
     _trading_engine = trading_engine
     _position_manager = position_manager
+
+    # Share ONE AlertProcessor instance between webhook handler and trading engine.
+    # Without this, each has its own instance → engine clears its copy but webhook's copy
+    # still blocks new alerts with "Higher priority alert already active".
+    if trading_engine is not None:
+        trading_engine.alert_processor = alert_processor
+        logger.info("AlertProcessor shared: webhook ↔ trading_engine (same instance)")
+
     logger.info("Trading components wired to webhook handler (engine=%s)", trading_engine is not None)
 
 
