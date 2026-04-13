@@ -210,30 +210,34 @@ async def receive_trdr_webhook(
         background_tasks.add_task(process_alert_background, alert, parsed_data)
         return {"status": "received", "type": "liquidation", "price": alert.price}
 
-    # Check if should process
-    if not alert_processor.should_process(alert):
-        await ws_manager.send_log(f"⏭ Alert skipped (cooldown or priority): {alert.alert_type.value}", level="warning", source="webhook")
-        return {
-            "status": "skipped",
-            "reason": "Alert filtered (cooldown or priority)"
-        }
+    # Check if should process — protected by lock to prevent race condition
+    # when BTC Diamond and Diamond Top Levels arrive simultaneously (within ms).
+    # Without lock: both see empty processor → both pass → both enter pipeline.
+    # With lock: BTC Diamond (P2) registers first → Diamond Top Levels (P3) is blocked.
+    async with alert_processor._lock:
+        if not alert_processor.should_process(alert):
+            await ws_manager.send_log(f"⏭ Alert skipped (cooldown or priority): {alert.alert_type.value}", level="warning", source="webhook")
+            return {
+                "status": "skipped",
+                "reason": "Alert filtered (cooldown or priority)"
+            }
 
-    # Save to database
-    repo = AlertRepository(db)
-    db_alert = await repo.create({
-        "alert_type": alert.alert_type.value,
-        "timestamp": alert.timestamp,
-        "price": alert.price,
-        "levels": alert.levels,
-        "status": alert.status.value,
-        "priority": alert.priority,
-        "raw_data": alert.raw_data
-    })
+        # Save to database
+        repo = AlertRepository(db)
+        db_alert = await repo.create({
+            "alert_type": alert.alert_type.value,
+            "timestamp": alert.timestamp,
+            "price": alert.price,
+            "levels": alert.levels,
+            "status": alert.status.value,
+            "priority": alert.priority,
+            "raw_data": alert.raw_data
+        })
 
-    alert.id = db_alert.id
+        alert.id = db_alert.id
 
-    # Register alert
-    alert_processor.register_alert(alert)
+        # Register alert (inside lock — atomically with should_process)
+        alert_processor.register_alert(alert)
 
     # Broadcast to WebSocket clients
     await ws_manager.send_alert({

@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from datetime import datetime, timedelta
 from typing import Optional, List, Dict
@@ -22,6 +23,7 @@ class AlertProcessor:
     def __init__(self):
         self.recent_alerts: Dict[AlertType, datetime] = {}
         self.active_alerts: List[Alert] = []
+        self._lock = asyncio.Lock()  # prevents race condition when 2 alerts arrive simultaneously
 
     def parse_webhook(self, data: dict) -> Optional[Alert]:
         """Parse incoming webhook data and create Alert object"""
