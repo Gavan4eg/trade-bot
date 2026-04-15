@@ -3,3 +3,12 @@ venv/
 env/
 .env
 logs/
+*.log
+__pycache__/
+**/__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.db-shm
+*.db-wal
