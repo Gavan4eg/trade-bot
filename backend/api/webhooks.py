@@ -210,34 +210,34 @@ async def receive_trdr_webhook(
         background_tasks.add_task(process_alert_background, alert, parsed_data)
         return {"status": "received", "type": "liquidation", "price": alert.price}
 
-    # Check if should process — protected by lock to prevent race condition
-    # when BTC Diamond and Diamond Top Levels arrive simultaneously (within ms).
-    # Without lock: both see empty processor → both pass → both enter pipeline.
-    # With lock: BTC Diamond (P2) registers first → Diamond Top Levels (P3) is blocked.
-    async with alert_processor._lock:
-        if not alert_processor.should_process(alert):
-            await ws_manager.send_log(f"⏭ Alert skipped (cooldown or priority): {alert.alert_type.value}", level="warning", source="webhook")
-            return {
-                "status": "skipped",
-                "reason": "Alert filtered (cooldown or priority)"
-            }
+    # Atomically check + register (synchronous, no asyncio.Lock needed).
+    # Since FastAPI runs on a single-threaded event loop, no two coroutines
+    # can interleave between check and register — this is race-condition safe.
+    # BTC Diamond (P2) wins over Diamond Top Levels (P3) when both arrive
+    # simultaneously because the first one to reach check_and_register registers
+    # and the second one is blocked by priority check.
+    if not alert_processor.check_and_register(alert):
+        await ws_manager.send_log(f"⏭ Alert skipped (cooldown or priority): {alert.alert_type.value}", level="warning", source="webhook")
+        return {
+            "status": "skipped",
+            "reason": "Alert filtered (cooldown or priority)"
+        }
 
-        # Save to database
-        repo = AlertRepository(db)
-        db_alert = await repo.create({
-            "alert_type": alert.alert_type.value,
-            "timestamp": alert.timestamp,
-            "price": alert.price,
-            "levels": alert.levels,
-            "status": alert.status.value,
-            "priority": alert.priority,
-            "raw_data": alert.raw_data
-        })
+    # Save to database (alert is already registered in processor memory)
+    repo = AlertRepository(db)
+    db_alert = await repo.create({
+        "alert_type": alert.alert_type.value,
+        "timestamp": alert.timestamp,
+        "price": alert.price,
+        "levels": alert.levels,
+        "status": alert.status.value,
+        "priority": alert.priority,
+        "raw_data": alert.raw_data
+    })
 
-        alert.id = db_alert.id
-
-        # Register alert (inside lock — atomically with should_process)
-        alert_processor.register_alert(alert)
+    # alert is already in active_alerts by reference — setting .id here
+    # updates it in place so pipeline can find it by alert.id
+    alert.id = db_alert.id
 
     # Broadcast to WebSocket clients
     await ws_manager.send_alert({

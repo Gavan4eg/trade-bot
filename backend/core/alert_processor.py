@@ -1,4 +1,3 @@
-import asyncio
 import logging
 from datetime import datetime, timedelta
 from typing import Optional, List, Dict
@@ -23,7 +22,7 @@ class AlertProcessor:
     def __init__(self):
         self.recent_alerts: Dict[AlertType, datetime] = {}
         self.active_alerts: List[Alert] = []
-        self._lock = asyncio.Lock()  # prevents race condition when 2 alerts arrive simultaneously
+        # No asyncio.Lock — check_and_register() is synchronous and GIL-safe
 
     def parse_webhook(self, data: dict) -> Optional[Alert]:
         """Parse incoming webhook data and create Alert object"""
@@ -147,6 +146,21 @@ class AlertProcessor:
         self.recent_alerts[alert.alert_type] = datetime.utcnow()
         self.active_alerts.append(alert)
         logger.info(f"Registered alert: {alert.alert_type.value}")
+
+    def check_and_register(self, alert: Alert) -> bool:
+        """
+        Atomically check if alert should be processed AND register it in one call.
+
+        This replaces the asyncio.Lock approach. Since FastAPI runs on a single-threaded
+        asyncio event loop, this synchronous method is safe — no two coroutines can
+        interleave here (no await between check and register).
+
+        Returns True if alert was registered, False if it was blocked.
+        """
+        if not self.should_process(alert):
+            return False
+        self.register_alert(alert)
+        return True
 
     def get_active_alerts(self) -> List[Alert]:
         """Get list of active alerts"""
