@@ -39,10 +39,14 @@ class AlertRepository:
         )
         return result.scalars().all()
 
-    async def get_recent(self, limit: int = 50) -> List[AlertDB]:
-        """Get recent alerts"""
+    async def get_recent(self, limit: int = 50, hours: int = 72) -> List[AlertDB]:
+        """Get recent alerts — only last N hours (default 72h = 3 days)"""
+        cutoff = datetime.utcnow() - timedelta(hours=hours)
         result = await self.session.execute(
-            select(AlertDB).order_by(AlertDB.timestamp.desc()).limit(limit)
+            select(AlertDB)
+            .where(AlertDB.timestamp >= cutoff)
+            .order_by(AlertDB.timestamp.desc())
+            .limit(limit)
         )
         return result.scalars().all()
 

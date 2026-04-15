@@ -237,12 +237,13 @@ def _format_alert(a, pipeline_state=None) -> dict:
 @router.get("/alerts")
 async def get_alerts(
     limit: int = 50,
+    hours: int = 72,
     db: AsyncSession = Depends(get_db)
 ):
-    """Get alert history with full pipeline details."""
+    """Get alert history with full pipeline details (default: last 72 hours)."""
     from ..main import trading_engine
     repo = AlertRepository(db)
-    alerts = await repo.get_recent(limit)
+    alerts = await repo.get_recent(limit, hours=hours)
 
     result = []
     for a in alerts:
