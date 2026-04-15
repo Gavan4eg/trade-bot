@@ -47,6 +47,10 @@ class Position(BaseModel):
     # Bybit order IDs
     position_id: Optional[str] = None
     stop_order_id: Optional[str] = None
+
+    # Exchange this position is on
+    exchange: str = "binance"
+
     tp1_order_id: Optional[str] = None
     tp2_order_id: Optional[str] = None
 

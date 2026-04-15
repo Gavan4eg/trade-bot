@@ -1836,3 +1836,53 @@ pip install python-multipart
 2026-04-10 15:41:43,157 - backend.trading.bybit_client - ERROR - Error getting ticker: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
 2026-04-10 15:58:02,252 - backend.trading.bybit_client - ERROR - Error getting ticker: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
 2026-04-10 16:14:43,431 - backend.trading.bybit_client - ERROR - Error getting ticker: ('Connection aborted.', RemoteDisconnected('Remote end closed connection without response'))
+2026-04-14 20:54:06,857 - backend.main - INFO - Starting BTC Trading Bot...
+2026-04-14 20:54:06,866 - backend.database.db - INFO - Database initialized
+2026-04-14 20:54:06,866 - backend.main - INFO - Exchange: Bybit
+2026-04-14 20:54:07,530 - backend.trading.bybit_client - INFO - BybitClient initialized (testnet=True)
+2026-04-14 20:54:07,530 - backend.main - WARNING - Failed to init binance: No module named 'binance'
+2026-04-14 20:54:07,662 - backend.trading.okx_client - INFO - OKXClient initialized (testnet=False)
+2026-04-14 20:54:07,662 - backend.main - INFO - Multi-exchange mode: ['bybit', 'okx']
+2026-04-14 20:54:07,662 - backend.services.market_data - INFO - Market data service started
+2026-04-14 20:54:07,662 - backend.core.trading_engine - INFO - Trading engine started
+2026-04-14 20:54:07,662 - backend.api.webhooks - INFO - AlertProcessor shared: webhook ↔ trading_engine (same instance)
+2026-04-14 20:54:07,662 - backend.api.webhooks - INFO - Trading components wired to webhook handler (engine=True)
+2026-04-14 20:54:08,335 - backend.trading.bybit_client - INFO - Leverage set to 5x for BTCUSDT
+2026-04-14 20:54:08,335 - backend.main - INFO - Leverage set to 5x on bybit
+2026-04-14 20:54:08,587 - httpx - INFO - HTTP Request: POST https://www.okx.com/api/v5/account/set-leverage "HTTP/2 401 Unauthorized"
+2026-04-14 20:54:08,588 - backend.trading.okx_client - ERROR - OKX set_leverage error: {'msg': 'Invalid OK-ACCESS-KEY', 'code': '50111'}
+2026-04-14 20:54:08,588 - backend.main - WARNING - Failed to set leverage on okx — check exchange settings manually
+2026-04-14 20:54:08,588 - backend.main - INFO - Bot initialized (exchange=bybit, testnet=True)
+2026-04-14 20:54:09,200 - backend.trading.bybit_client - ERROR - Error getting positions: could not convert string to float: ''
+2026-04-14 20:54:09,201 - backend.main - INFO - Startup sync [bybit]: no open positions
+2026-04-14 20:54:09,406 - httpx - INFO - HTTP Request: GET https://www.okx.com/api/v5/account/positions?instType=SWAP&instId=BTC-USDT-SWAP "HTTP/2 401 Unauthorized"
+2026-04-14 20:54:09,407 - backend.trading.okx_client - ERROR - OKX get_positions error: {'msg': 'Invalid OK-ACCESS-KEY', 'code': '50111'}
+2026-04-14 20:54:09,407 - backend.main - INFO - Startup sync [okx]: no open positions
+2026-04-14 20:54:09,407 - backend.main - INFO - Startup sync: memory cleared
+2026-04-14 20:54:10,120 - backend.trading.bybit_client - ERROR - Error getting positions: could not convert string to float: ''
+2026-04-14 20:54:10,344 - httpx - INFO - HTTP Request: GET https://www.okx.com/api/v5/account/positions?instType=SWAP&instId=BTC-USDT-SWAP "HTTP/2 401 Unauthorized"
+2026-04-14 20:54:10,345 - backend.trading.okx_client - ERROR - OKX get_positions error: {'msg': 'Invalid OK-ACCESS-KEY', 'code': '50111'}
+2026-04-14 20:54:18,810 - backend.services.websocket_manager - INFO - WebSocket connected. Total connections: 1
+2026-04-14 20:54:19,954 - httpx - INFO - HTTP Request: GET https://www.okx.com/api/v5/account/balance?ccy=USDT "HTTP/2 401 Unauthorized"
+2026-04-14 20:54:19,955 - backend.trading.okx_client - ERROR - OKX get_balance error: {'msg': 'Invalid OK-ACCESS-KEY', 'code': '50111'}
+2026-04-14 20:54:22,664 - httpx - INFO - HTTP Request: GET https://www.okx.com/api/v5/account/balance?ccy=USDT "HTTP/2 401 Unauthorized"
+2026-04-14 20:54:22,666 - backend.trading.okx_client - ERROR - OKX get_balance error: {'msg': 'Invalid OK-ACCESS-KEY', 'code': '50111'}
+2026-04-14 20:54:25,608 - httpx - INFO - HTTP Request: GET https://www.okx.com/api/v5/account/balance?ccy=USDT "HTTP/2 401 Unauthorized"
+2026-04-14 20:54:25,610 - backend.trading.okx_client - ERROR - OKX get_balance error: {'msg': 'Invalid OK-ACCESS-KEY', 'code': '50111'}
+2026-04-14 20:54:28,662 - httpx - INFO - HTTP Request: GET https://www.okx.com/api/v5/account/balance?ccy=USDT "HTTP/2 401 Unauthorized"
+2026-04-14 20:54:28,662 - backend.trading.okx_client - ERROR - OKX get_balance error: {'msg': 'Invalid OK-ACCESS-KEY', 'code': '50111'}
+2026-04-14 20:54:31,705 - httpx - INFO - HTTP Request: GET https://www.okx.com/api/v5/account/balance?ccy=USDT "HTTP/2 401 Unauthorized"
+2026-04-14 20:54:31,707 - backend.trading.okx_client - ERROR - OKX get_balance error: {'msg': 'Invalid OK-ACCESS-KEY', 'code': '50111'}
+2026-04-14 20:54:34,907 - httpx - INFO - HTTP Request: GET https://www.okx.com/api/v5/account/balance?ccy=USDT "HTTP/2 401 Unauthorized"
+2026-04-14 20:54:34,908 - backend.trading.okx_client - ERROR - OKX get_balance error: {'msg': 'Invalid OK-ACCESS-KEY', 'code': '50111'}
+2026-04-14 20:54:37,605 - httpx - INFO - HTTP Request: GET https://www.okx.com/api/v5/account/balance?ccy=USDT "HTTP/2 401 Unauthorized"
+2026-04-14 20:54:37,607 - backend.trading.okx_client - ERROR - OKX get_balance error: {'msg': 'Invalid OK-ACCESS-KEY', 'code': '50111'}
+2026-04-14 20:54:40,324 - httpx - INFO - HTTP Request: GET https://www.okx.com/api/v5/account/balance?ccy=USDT "HTTP/2 401 Unauthorized"
+2026-04-14 20:54:40,325 - backend.trading.okx_client - ERROR - OKX get_balance error: {'msg': 'Invalid OK-ACCESS-KEY', 'code': '50111'}
+2026-04-14 20:54:41,306 - backend.trading.bybit_client - ERROR - Error getting positions: could not convert string to float: ''
+2026-04-14 20:54:41,510 - httpx - INFO - HTTP Request: GET https://www.okx.com/api/v5/account/positions?instType=SWAP&instId=BTC-USDT-SWAP "HTTP/2 401 Unauthorized"
+2026-04-14 20:54:41,511 - backend.trading.okx_client - ERROR - OKX get_positions error: {'msg': 'Invalid OK-ACCESS-KEY', 'code': '50111'}
+2026-04-14 20:54:41,821 - backend.services.websocket_manager - INFO - WebSocket disconnected. Total connections: 0
+2026-04-14 20:54:41,919 - backend.main - INFO - Shutting down...
+2026-04-14 20:54:41,920 - backend.core.trading_engine - INFO - Trading engine stopped
+2026-04-14 20:54:41,920 - backend.services.market_data - INFO - Market data service stopped

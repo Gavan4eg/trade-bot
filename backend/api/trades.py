@@ -180,7 +180,7 @@ def _format_alert(a, pipeline_state=None) -> dict:
         "type": a.alert_type,
         "price": a.price,
         "levels": a.levels,
-        "status": a.status,
+        "status": pipeline_state.alert.status.value if pipeline_state else a.status,
         "priority": a.priority,
         "timestamp": a.timestamp.isoformat(),
         "raw_data": a.raw_data,
@@ -250,6 +250,24 @@ async def get_alerts(
         if trading_engine and a.id in trading_engine.active_states:
             state = trading_engine.active_states[a.id]
         result.append(_format_alert(a, state))
+    return result
+
+
+@router.get("/balances")
+async def get_balances():
+    """Get balances from all configured exchanges."""
+    from ..main import trade_executor
+    result = {}
+    if hasattr(trade_executor, 'get_all_balances'):
+        result = trade_executor.get_all_balances()
+    elif hasattr(trade_executor, 'client'):
+        try:
+            bal = trade_executor.client.get_balance()
+            if bal:
+                from ..config import settings
+                result[settings.exchange] = bal
+        except Exception as e:
+            result["error"] = str(e)
     return result
 
 

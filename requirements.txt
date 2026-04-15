@@ -15,3 +15,4 @@ python-multipart==0.0.9
 httpx==0.26.0
 pytest==7.4.4
 pytest-asyncio==0.23.3
+python-okx==0.3.8

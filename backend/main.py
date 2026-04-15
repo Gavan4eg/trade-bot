@@ -32,6 +32,7 @@ from .trading.risk_manager import RiskManager
 from .models.position import PositionStatus
 from .trading.trade_executor import TradeExecutor
 from .trading.position_manager import PositionManager
+from .trading.multi_exchange_executor import MultiExchangeExecutor, MultiPositionManager
 from .core.alert_processor import AlertProcessor
 from .core.range_detector import RangeDetector
 from .core.liquidity_tracker import LiquidityTracker
@@ -97,11 +98,55 @@ async def lifespan(app: FastAPI):
     # Initialize database
     await init_db()
 
-    # Initialize trading components
-    bybit_client = create_exchange_client()
+    # Initialize trading components — multi-exchange aware
     risk_manager = RiskManager()
-    trade_executor = TradeExecutor(bybit_client, risk_manager)
-    position_manager = PositionManager(bybit_client, trade_executor, risk_manager)
+    _exchange_pairs = []  # [(name, client, TradeExecutor, PositionManager)]
+
+    def _make_exchange_pair(name: str, client) -> tuple:
+        ex = TradeExecutor(client, risk_manager)
+        pm = PositionManager(client, ex, risk_manager)
+        return (name, client, ex, pm)
+
+    # Primary exchange (always included)
+    primary_client = create_exchange_client()
+    _exchange_pairs.append(_make_exchange_pair(settings.exchange, primary_client))
+
+    # Additional exchanges from exchanges_enabled setting
+    enabled = [e.strip().lower() for e in settings.exchanges_enabled.split(",") if e.strip()]
+    for exch in enabled:
+        if exch == settings.exchange.lower():
+            continue  # already added as primary
+        try:
+            if exch == "binance" and settings.binance_api_key:
+                from .trading.binance_client import BinanceClient
+                c = BinanceClient(testnet=settings.binance_testnet)
+                _exchange_pairs.append(_make_exchange_pair("binance", c))
+            elif exch == "bybit" and settings.bybit_api_key:
+                from .trading.bybit_client import BybitClient as BC
+                c = BC(testnet=settings.bybit_testnet)
+                _exchange_pairs.append(_make_exchange_pair("bybit", c))
+            elif exch == "okx" and settings.okx_api_key:
+                from .trading.okx_client import OKXClient
+                c = OKXClient(testnet=settings.okx_testnet)
+                _exchange_pairs.append(_make_exchange_pair("okx", c))
+            else:
+                logger.info(f"Exchange '{exch}' skipped (no API keys configured)")
+        except Exception as e:
+            logger.warning(f"Failed to init {exch}: {e}")
+
+    # Wire up executor/position_manager (multi or single)
+    if len(_exchange_pairs) > 1:
+        multi_executor = MultiExchangeExecutor([(n, ex) for n, _, ex, _ in _exchange_pairs])
+        multi_pm = MultiPositionManager([(n, pm) for n, _, _, pm in _exchange_pairs], multi_executor)
+        trade_executor = multi_executor
+        position_manager = multi_pm
+        bybit_client = primary_client  # keep reference for market data
+        logger.info(f"Multi-exchange mode: {[n for n, _, _, _ in _exchange_pairs]}")
+    else:
+        trade_executor = _exchange_pairs[0][2]
+        position_manager = _exchange_pairs[0][3]
+        bybit_client = primary_client
+        logger.info(f"Single exchange mode: {settings.exchange}")
 
     # Initialize core components
     alert_processor = AlertProcessor()
@@ -137,30 +182,32 @@ async def lifespan(app: FastAPI):
     # Wire trading components + engine into the webhook handler
     setup_trading(bybit_client, trade_executor, risk_manager, trading_engine, position_manager)
 
-    # Set leverage on exchange to match settings
+    # Set leverage on all configured exchanges
     if not settings.paper_trading:
-        try:
-            ok = bybit_client.set_leverage(symbol="BTCUSDT", leverage=settings.leverage)
-            if ok:
-                logger.info(f"Leverage set to {settings.leverage}x on exchange")
-            else:
-                logger.warning(f"Failed to set leverage — check exchange settings manually")
-        except Exception as e:
-            logger.warning(f"Leverage setup error: {e}")
+        for name, client, _, _ in _exchange_pairs:
+            try:
+                ok = client.set_leverage(symbol="BTCUSDT", leverage=settings.leverage)
+                if ok:
+                    logger.info(f"Leverage set to {settings.leverage}x on {name}")
+                else:
+                    logger.warning(f"Failed to set leverage on {name} — check exchange settings manually")
+            except Exception as e:
+                logger.warning(f"Leverage setup error on {name}: {e}")
 
     is_testnet = settings.binance_testnet if settings.exchange == "binance" else settings.bybit_testnet
     logger.info(f"Bot initialized (exchange={settings.exchange}, testnet={is_testnet})")
 
-    # Синхронизация с реальными позициями на бирже при старте
-    # Если на бирже нет открытых позиций — очищаем in-memory ghost позиции
+    # Startup sync: check real positions on all exchanges, clear in-memory ghosts
     try:
-        real_positions = bybit_client.get_positions(symbol="BTCUSDT")
-        if not real_positions:
-            position_manager.positions.clear()
-            position_manager._trades.clear()
-            logger.info("Startup sync: no open positions on exchange — memory cleared")
-        else:
-            logger.info(f"Startup sync: {len(real_positions)} open position(s) on exchange")
+        for name, client, _, _ in _exchange_pairs:
+            real_positions = client.get_positions(symbol="BTCUSDT")
+            if not real_positions:
+                logger.info(f"Startup sync [{name}]: no open positions")
+            else:
+                logger.info(f"Startup sync [{name}]: {len(real_positions)} open position(s)")
+        position_manager.positions.clear()
+        position_manager._trades.clear()
+        logger.info("Startup sync: memory cleared")
     except Exception as e:
         logger.warning(f"Startup sync failed: {e}")
 

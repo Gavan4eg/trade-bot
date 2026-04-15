@@ -16,6 +16,16 @@ class Settings(BaseSettings):
     binance_api_secret: str = ""
     binance_testnet: bool = True
 
+    # OKX API
+    okx_api_key: str = ""
+    okx_api_secret: str = ""
+    okx_passphrase: str = ""
+    okx_testnet: bool = False
+
+    # Multi-exchange: which exchanges to use (comma-separated: "binance,bybit,okx")
+    # Leave empty to use only the primary EXCHANGE setting
+    exchanges_enabled: str = ""
+
     paper_trading: bool = True  # Симуляция без реальных сделок
 
     # Trading settings

@@ -45,6 +45,9 @@ class Trade(BaseModel):
     # Risk/Reward
     risk_reward: float = 0.0
 
+    # Exchange this trade was executed on
+    exchange: str = "binance"
+
     class Config:
         from_attributes = True
 

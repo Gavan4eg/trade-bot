@@ -276,7 +276,7 @@ function PositionCard({ pos }) {
     return (
         <div className={`rounded-xl border p-4 ${isLong ? 'border-green-700 bg-green-950/30' : 'border-red-700 bg-red-950/30'}`}>
             <div className="flex justify-between items-start mb-3">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                     <span className={`text-lg font-bold ${isLong?'text-green-400':'text-red-400'}`}>
                         {isLong ? '▲ LONG' : '▼ SHORT'}
                     </span>
@@ -284,6 +284,12 @@ function PositionCard({ pos }) {
                     <span className={`text-xs px-2 py-0.5 rounded-full bg-gray-800 ${statusColors[pos.status]||'text-gray-400'}`}>
                         {pos.status}
                     </span>
+                    {pos.exchange && (() => {
+                        const exMeta = EXCHANGE_COLORS[pos.exchange.toLowerCase()];
+                        return exMeta
+                            ? <span className={`text-xs px-2 py-0.5 rounded-full border ${exMeta.border} ${exMeta.bg} ${exMeta.text}`}>{exMeta.label}</span>
+                            : <span className="text-xs px-2 py-0.5 rounded-full bg-gray-800 text-gray-400">{pos.exchange}</span>;
+                    })()}
                 </div>
                 <div className="text-right">
                     <div className={`text-xl font-bold font-mono ${pnl>=0?'text-green-400':'text-red-400'}`}>
@@ -374,6 +380,52 @@ function StatsPanel({ stats, balance }) {
                         <div className={`text-lg font-bold font-mono mt-1 ${c.color}`}>{c.value}</div>
                     </div>
                 ))}
+            </div>
+        </div>
+    );
+}
+
+/* ── Exchange Balances ───────────────────────── */
+const EXCHANGE_COLORS = {
+    binance: { label: 'Binance', bg: 'bg-yellow-900/40', border: 'border-yellow-600', text: 'text-yellow-300', dot: 'bg-yellow-400' },
+    bybit:   { label: 'Bybit',   bg: 'bg-purple-900/40', border: 'border-purple-600', text: 'text-purple-300', dot: 'bg-purple-400' },
+    okx:     { label: 'OKX',     bg: 'bg-blue-900/40',   border: 'border-blue-600',   text: 'text-blue-300',   dot: 'bg-blue-400'   },
+};
+
+function ExchangeBalances({ balances }) {
+    const entries = Object.entries(balances || {});
+    if (entries.length === 0) return null;
+    return (
+        <div className="bg-gray-900 rounded-xl p-4">
+            <h2 className="text-lg font-bold mb-3">Exchange Balances</h2>
+            <div className="space-y-2">
+                {entries.map(([name, bal]) => {
+                    const meta = EXCHANGE_COLORS[name.toLowerCase()] || { label: name, bg: 'bg-gray-800', border: 'border-gray-600', text: 'text-gray-300', dot: 'bg-gray-400' };
+                    const avail = bal?.available_balance;
+                    const total = bal?.total_balance;
+                    const hasError = !!bal?.error;
+                    return (
+                        <div key={name} className={`rounded-lg border ${meta.border} ${meta.bg} p-3`}>
+                            <div className="flex items-center justify-between mb-2">
+                                <div className="flex items-center gap-2">
+                                    <span className={`w-2 h-2 rounded-full ${meta.dot}`}/>
+                                    <span className={`font-semibold text-sm ${meta.text}`}>{meta.label}</span>
+                                </div>
+                                {hasError && <span className="text-xs text-red-400">error</span>}
+                            </div>
+                            <div className="grid grid-cols-2 gap-2 text-xs">
+                                <div>
+                                    <div className="text-gray-500">Available</div>
+                                    <div className="font-mono font-semibold text-cyan-300">{avail != null ? '$'+fmt(avail) : '—'}</div>
+                                </div>
+                                <div>
+                                    <div className="text-gray-500">Total</div>
+                                    <div className="font-mono font-semibold text-blue-300">{total != null ? '$'+fmt(total) : '—'}</div>
+                                </div>
+                            </div>
+                        </div>
+                    );
+                })}
             </div>
         </div>
     );
@@ -550,16 +602,17 @@ function LogsPanel({ logs, onClear, logsEndRef }) {
 
 /* ── Main App ────────────────────────────────── */
 function App() {
-    const [alerts, setAlerts]       = useState([]);
-    const [positions, setPositions] = useState([]);
-    const [price, setPrice]         = useState({});
-    const [stats, setStats]         = useState({});
-    const [balance, setBalance]     = useState({});
-    const [settings, setSettings]   = useState({});
-    const [botStatus, setBotStatus] = useState({ is_active:false, testnet:true });
-    const [tab, setTab]             = useState('dashboard');
-    const [logs, setLogs]           = useState([]);
-    const logsEndRef                = useRef(null);
+    const [alerts, setAlerts]           = useState([]);
+    const [positions, setPositions]     = useState([]);
+    const [price, setPrice]             = useState({});
+    const [stats, setStats]             = useState({});
+    const [balance, setBalance]         = useState({});
+    const [balances, setBalances]       = useState({});
+    const [settings, setSettings]       = useState({});
+    const [botStatus, setBotStatus]     = useState({ is_active:false, testnet:true });
+    const [tab, setTab]                 = useState('dashboard');
+    const [logs, setLogs]               = useState([]);
+    const logsEndRef                    = useRef(null);
 
     const wsProto = window.location.protocol === 'https:' ? 'wss' : 'ws';
     const { lastMessage, connected } = useWebSocket(`${wsProto}://${window.location.host}/ws`);
@@ -634,24 +687,26 @@ function App() {
 
     useEffect(() => {
         const load = async () => {
-            const [a,pos,st,se,status,bal] = await Promise.all([
+            const [a,pos,st,se,status,bal,bals] = await Promise.all([
                 fetch('/api/alerts').then(r=>r.json()).catch(()=>[]),
                 fetch('/api/positions').then(r=>r.json()).catch(()=>[]),
                 fetch('/api/stats').then(r=>r.json()).catch(()=>({})),
                 fetch('/api/settings').then(r=>r.json()).catch(()=>({})),
                 fetch('/api/settings/status').then(r=>r.json()).catch(()=>({is_active:false,testnet:true})),
                 fetch('/api/settings/balance').then(r=>r.json()).catch(()=>({})),
+                fetch('/api/balances').then(r=>r.json()).catch(()=>({})),
             ]);
-            setAlerts(a); setPositions(pos); setStats(st); setSettings(se); setBotStatus(status); setBalance(bal);
+            setAlerts(a); setPositions(pos); setStats(st); setSettings(se); setBotStatus(status); setBalance(bal); setBalances(bals);
         };
         load();
         const t = setInterval(async () => {
-            const [pos,st,bal] = await Promise.all([
+            const [pos,st,bal,bals] = await Promise.all([
                 fetch('/api/positions').then(r=>r.json()).catch(()=>[]),
                 fetch('/api/stats').then(r=>r.json()).catch(()=>({})),
                 fetch('/api/settings/balance').then(r=>r.json()).catch(()=>({})),
+                fetch('/api/balances').then(r=>r.json()).catch(()=>({})),
             ]);
-            setPositions(pos); setStats(st); setBalance(bal);
+            setPositions(pos); setStats(st); setBalance(bal); setBalances(bals);
             // Refresh alerts — merge DB data with in-memory state (preserve WebSocket status/pipeline)
             fetch('/api/alerts').then(r=>r.json()).then(dbAlerts => {
                 setAlerts(current => {
@@ -725,6 +780,7 @@ function App() {
                         <div className="space-y-4">
                             <BotControl status={botStatus} onStart={startBot} onStop={stopBot} onCloseAll={() => fetch('/api/positions').then(r=>r.json()).then(setPositions)}/>
                             <StatsPanel stats={stats} balance={balance}/>
+                            <ExchangeBalances balances={balances}/>
                         </div>
                     </div>
                 )}
