@@ -39,7 +39,7 @@ class Settings(BaseSettings):
     liquidation_buffer_percent: float = 0.2  # % buffer beyond liquidation cluster for stop
 
     # Confirmation settings
-    min_confirmations: int = 2
+    min_confirmations: int = 1
     sweep_threshold_percent: float = 0.1
     volume_spike_multiplier: float = 2.0
 

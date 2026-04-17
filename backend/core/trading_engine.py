@@ -87,7 +87,7 @@ class TradingEngine:
         # Klines cache to avoid rate limit (cache for 60 seconds)
         self._klines_cache: Optional[list] = None
         self._klines_cache_time: Optional[datetime] = None
-        self._klines_cache_ttl = 60  # seconds
+        self._klines_cache_ttl = 5  # seconds
 
     async def start(self):
         """Start the trading engine"""
