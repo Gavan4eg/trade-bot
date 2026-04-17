@@ -33,7 +33,7 @@ class Settings(BaseSettings):
     risk_per_trade: float = 1.0  # % of balance
     leverage: int = 5  # Плечо на бирже (должно совпадать с настройкой на Binance)
     min_rr: float = 2.0
-    range_timeframe: str = "1h"
+    range_timeframe: str = "15m"
     range_candles: int = 24
     range_max_width_percent: float = 5.0  # % max range width (increase for testnet)
     liquidation_buffer_percent: float = 0.2  # % buffer beyond liquidation cluster for stop
