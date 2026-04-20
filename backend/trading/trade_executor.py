@@ -40,12 +40,10 @@ class TradeExecutor:
             alert_id: Associated alert ID
             order_type: Market or Limit
         """
-        # Check if we can open position
         if not self.risk_manager.can_open_position(direction.value):
             logger.warning("Cannot open position: risk limits exceeded")
             return None
 
-        # Calculate position size
         balance = self.client.get_balance()
         if not balance:
             logger.error("Failed to get balance")
@@ -61,9 +59,7 @@ class TradeExecutor:
             logger.error("Calculated position size is 0")
             return None
 
-        # Проверяем что маржа не превышает доступный баланс с учётом плеча
-        # margin_required = qty * price / leverage
-        # max_qty = balance * leverage * 0.9 / price (90% для безопасности)
+        # max_qty = balance * leverage * 0.9 / price (90% safety margin)
         ticker = self.client.get_ticker()
         approx_price = ticker["last_price"] if ticker else entry_price
         max_qty_by_margin = round(
@@ -81,14 +77,12 @@ class TradeExecutor:
             logger.error("Position size too small after margin adjustment")
             return None
 
-        # Calculate take profits
         tp1, tp2 = self._calculate_take_profits(
             direction=direction,
             entry_price=entry_price,
             stop_loss=stop_loss
         )
 
-        # Create trade object
         trade = Trade(
             alert_id=alert_id,
             direction=direction,
@@ -101,12 +95,10 @@ class TradeExecutor:
         )
         trade.risk_reward = trade.calculate_rr()
 
-        # Validate RR
         if not self.risk_manager.is_valid_rr(trade.risk_reward):
             logger.warning(f"Trade rejected: RR {trade.risk_reward} below minimum")
             return None
 
-        # Execute order
         side = "Buy" if direction == TradeDirection.LONG else "Sell"
 
         ticker = self.client.get_ticker()
@@ -208,9 +200,9 @@ class TradeExecutor:
             return False
 
         current_qty = trade.executed_quantity or trade.quantity
-        close_qty = round(current_qty * (percent / 100), 3)  # Bybit требует 3 знака
+        close_qty = round(current_qty * (percent / 100), 3)  # Bybit minimum precision
 
-        if close_qty < 0.001:  # Минимальный ордер Bybit
+        if close_qty < 0.001:  # Bybit minimum order size
             return False
 
         side = "Sell" if trade.direction == TradeDirection.LONG else "Buy"

@@ -62,7 +62,6 @@ class TradingEngine:
         self.position_manager = position_manager
         self.risk_manager = risk_manager
 
-        # Core components
         self.alert_processor = AlertProcessor()
         self.range_detector = RangeDetector(
             timeframe=settings.range_timeframe,
@@ -76,15 +75,12 @@ class TradingEngine:
             min_confirmations=settings.min_confirmations
         )
 
-        # State tracking
         self.active_states: Dict[int, AlertState] = {}
         self.is_running = False
 
-        # Timing
         self.range_wait_hours = 4  # Max time to wait for range formation
         self.sweep_wait_hours = 4  # Max time to wait for sweep after range
 
-        # Klines cache to avoid rate limit (cache for 60 seconds)
         self._klines_cache: Optional[list] = None
         self._klines_cache_time: Optional[datetime] = None
         self._klines_cache_ttl = 5  # seconds
@@ -112,13 +108,11 @@ class TradingEngine:
         if not self.active_states:
             return False
 
-        # Берём Diamond алерт с наивысшим приоритетом
         best_state = min(
             self.active_states.values(),
             key=lambda s: s.alert.priority
         )
 
-        # Принимаем ликвидацию только если алерт уже прошёл range detection
         if best_state.alert.status not in [
             "waiting_sweep", "sweep_detected", "confirmed",
             "range_detected"
@@ -129,7 +123,6 @@ class TradingEngine:
             )
             return False
 
-        # Извлекаем данные ликвидаций из вебхука
         side = (liquidation_raw.get("side") or "").lower()
         price = liquidation_raw.get("price") or best_state.last_price
         message = liquidation_raw.get("message", "")
@@ -145,16 +138,13 @@ class TradingEngine:
             "side": side,
             "price": price,
             "volume": liq_volume,
-            # Для ConfirmationEngine
             "long_liquidations": liq_volume if side == "long" else 0,
             "short_liquidations": liq_volume if side == "short" else 0,
             "avg_liquidations": 2_000_000,  # порог из алерта trdr.io
             "price_at_spike": price,
         }
 
-        # Обновляем текущую ликвидацию (для ConfirmationEngine)
         best_state.pending_liquidation = liquidation_data
-        # Накапливаем кластер (для расчёта стопа за зону дисбаланса)
         best_state.liquidation_cluster.append(liquidation_data)
 
         cluster_size = len(best_state.liquidation_cluster)
@@ -182,25 +172,20 @@ class TradingEngine:
             logger.warning("Trading engine is not running")
             return False
 
-        # Validate and check if should process
         if not self.alert_processor.should_process(alert):
             logger.info(f"Alert {alert.id} filtered out")
             return False
 
-        # Register alert
         self.alert_processor.register_alert(alert)
 
-        # Create state tracking
         state = AlertState(alert=alert)
         self.active_states[alert.id] = state
 
-        # Update alert status
         alert.status = AlertStatus.PROCESSING
         await self._broadcast_alert_update(alert)
 
         logger.info(f"Alert {alert.id} ({alert.alert_type.value}) accepted for processing")
 
-        # Start range detection
         asyncio.create_task(self._detect_range_for_alert(alert.id))
 
         return True
@@ -242,7 +227,6 @@ class TradingEngine:
 
         logger.info(f"Starting range detection for alert {alert_id}")
 
-        # Wait for range formation (check periodically)
         start_time = datetime.utcnow()
         max_wait = timedelta(hours=self.range_wait_hours)
 
@@ -250,14 +234,12 @@ class TradingEngine:
             if not self.is_running:
                 break
 
-            # Fetch candle data
             candles = self.client.get_klines(
                 interval=self._timeframe_to_interval(settings.range_timeframe),
                 limit=settings.range_candles
             )
 
             if candles:
-                # Detect range
                 detected_range = self.range_detector.detect_range(
                     state.alert, candles
                 )
@@ -282,15 +264,12 @@ class TradingEngine:
                         level="info", source="pipeline"
                     )
 
-                    # Move to sweep detection
                     state.alert.status = AlertStatus.WAITING_SWEEP
                     await self._broadcast_alert_update(state.alert)
                     return
 
-            # Wait before next check
             await asyncio.sleep(60)  # Check every minute
 
-        # Timeout - expire alert
         logger.warning(f"Range detection timed out for alert {alert_id}")
         await ws_manager.send_log(
             f"⌛ Alert #{alert_id} expired — range not detected in {self.range_wait_hours}h",
@@ -308,7 +287,6 @@ class TradingEngine:
         for alert_id, state in list(self.active_states.items()):
             state.last_price = price
 
-            # Check sweep timeout
             if state.alert.status == AlertStatus.WAITING_SWEEP and state.range:
                 detected_at = state.range_detected_at or state.created_at
                 sweep_age = datetime.utcnow() - detected_at
@@ -324,11 +302,9 @@ class TradingEngine:
                     continue
                 await self._check_for_sweep(state, price)
 
-            # Check for confirmation if sweep detected
             elif state.alert.status == AlertStatus.SWEEP_DETECTED and state.sweep:
                 await self._check_for_confirmation(state, price)
 
-        # Update active positions
         for position in self.position_manager.get_active_positions():
             self.position_manager.update_position(position, price)
 
@@ -381,14 +357,14 @@ class TradingEngine:
             )
             return
 
-        candles = self._get_cached_klines()  # cached, max 1 request per 60s
+        candles = self._get_cached_klines()
 
         result = self.confirmation_engine.check_confirmation(
             sweep=state.sweep,
             price_range=state.range,
             current_price=price,
             recent_candles=candles,
-            liquidation_data=state.pending_liquidation  # подтверждение от Liquidation
+            liquidation_data=state.pending_liquidation
         )
 
         if result.is_confirmed:
@@ -426,7 +402,6 @@ class TradingEngine:
             self._cleanup_state(state.alert.id)
             return
 
-        # Если есть кластер ликвидаций — стоп за зону дисбаланса
         stop_loss = confirmation.stop_loss
         if state.liquidation_cluster:
             cluster_copy = list(state.liquidation_cluster)  # защита от race condition
@@ -438,12 +413,10 @@ class TradingEngine:
             if prices:
                 buffer_pct = settings.liquidation_buffer_percent / 100
                 if direction == TradeDirection.LONG:
-                    # Стоп за нижнюю границу кластера ликвидаций
                     cluster_extreme = min(prices)
                     imbalance_stop = round(cluster_extreme * (1 - buffer_pct), 2)
                     stop_loss = min(imbalance_stop, confirmation.stop_loss)
                 else:
-                    # Стоп за верхнюю границу кластера ликвидаций
                     cluster_extreme = max(prices)
                     imbalance_stop = round(cluster_extreme * (1 + buffer_pct), 2)
                     stop_loss = max(imbalance_stop, confirmation.stop_loss)
@@ -465,19 +438,15 @@ class TradingEngine:
             state.trade = trade
             state.alert.status = AlertStatus.TRADED
 
-            # Register with risk manager
             self.risk_manager.register_trade_open(direction.value)
 
-            # Set SL on exchange after order fills (retry up to 5x with 1s delay)
             if not self.client.paper_trading:
                 asyncio.ensure_future(
                     self._set_sl_after_fill(trade.stop_loss, direction)
                 )
 
-            # Create position tracking (in-memory)
             position = self.position_manager.create_position(trade)
 
-            # Persist trade and position to DB
             try:
                 from ..database.db import AsyncSessionLocal
                 from ..database.repositories import TradeRepository, PositionRepository, AlertRepository
@@ -521,7 +490,6 @@ class TradingEngine:
                     alert_repo = AlertRepository(session)
                     await alert_repo.update_status(state.alert.id, "traded")
 
-                    # Update trade_id reference in position_manager
                     self.position_manager._trades[db_trade.id] = trade
                     self.position_manager.positions[db_trade.id] = position
                     if trade.id != state.alert.id:
@@ -554,7 +522,6 @@ class TradingEngine:
                 level="success", source="trade"
             )
 
-            # Cleanup state (trade is now managed by position manager)
             self._cleanup_state(state.alert.id)
 
             # Reject all other pending alerts — position already open

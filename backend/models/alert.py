@@ -23,7 +23,6 @@ class AlertStatus(str, Enum):
     REJECTED = "rejected"
 
 
-# Signal priority (lower = higher priority)
 ALERT_PRIORITY = {
     AlertType.BTC_DOUBLE_DIAMOND: 1,
     AlertType.BTC_DIAMOND: 2,
@@ -53,24 +52,19 @@ class Alert(BaseModel):
 
 class AlertWebhook(BaseModel):
     """Schema for incoming webhook from trdr.io"""
-    # Core alert fields
     type: Optional[str] = None       # Alert type (legacy)
     name: Optional[str] = None       # Alert name from trdr.io (maps to type)
-    # Symbol / price
     symbol: str = "BTCUSDT"
     ticker: Optional[str] = None     # e.g. "BTCUSDT", "BTCUSD_PERP"
     base: Optional[str] = None       # e.g. "BTC"
     price: Optional[float] = None
     levels: Optional[List[float]] = None
-    # Side: which side was liquidated ("long" | "short")
-    side: Optional[str] = None
-    # Timing
+    side: Optional[str] = None       # which side was liquidated ("long" | "short")
     timestamp: Optional[str] = None  # Legacy timestamp field
     time: Optional[str] = None       # trdr.io timestamp field
     timeframe: Optional[str] = None
     cooldown: Optional[int] = None
     continuation: Optional[int] = None
-    # Meta
     message: Optional[str] = None
     exchange: Optional[str] = None
 

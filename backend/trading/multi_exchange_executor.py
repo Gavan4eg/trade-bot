@@ -52,12 +52,9 @@ class MultiExchangeExecutor:
     """
 
     def __init__(self, executors: List[Tuple[str, TradeExecutor]]):
-        # [(exchange_name, TradeExecutor), ...]
         self.executors = executors
         self._executor_map: Dict[str, TradeExecutor] = {name: ex for name, ex in executors}
         self._secondary_trades: List[Tuple[str, Trade]] = []  # picked up by MultiPositionManager
-
-        # Expose attributes that trading_engine might check
         primary = executors[0][1] if executors else None
         self.client = primary.client if primary else None
         self.risk_manager = primary.risk_manager if primary else None
@@ -152,7 +149,6 @@ class MultiPositionManager:
         position = primary_pm.create_position(trade)
         position.exchange = getattr(trade, 'exchange', self.managers[0][0])
 
-        # Create positions for secondary exchanges
         for name, sec_trade in self.multi_executor._secondary_trades:
             manager = self._manager_map.get(name)
             if manager:

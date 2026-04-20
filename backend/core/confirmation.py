@@ -66,49 +66,42 @@ class ConfirmationEngine:
             required_confirmations=self.min_confirmations
         )
 
-        # 1. Check price back in range (current price)
         in_range = self.price_back_in_range(current_price, price_range)
         result.details["price_in_range"] = in_range
         if in_range:
             result.confirmations_met += 1
 
-        # 2. Check candle CLOSED inside range (stronger than just current price)
+        # Candle closed check is stronger than just current price — confirms rejection on a closed bar
         if recent_candles:
             candle_closed = self.candle_closed_in_range(recent_candles[-1], price_range)
             result.details["candle_closed_in_range"] = candle_closed
             if candle_closed:
                 result.confirmations_met += 1
 
-        # 3. Check impulse reversal
         if recent_candles:
             impulse = self.impulse_reversal(recent_candles, sweep.direction)
             result.details["impulse_reversal"] = impulse
             if impulse:
                 result.confirmations_met += 1
 
-        # 4. Check liquidation spike
         if liquidation_data:
             liq_spike = self.liquidation_spike(liquidation_data, sweep)
             result.details["liquidation_spike"] = liq_spike
             if liq_spike:
                 result.confirmations_met += 1
 
-        # 5. Check volume confirmation
         if volume_data:
             vol_confirm = self.volume_confirmation(volume_data, sweep.direction)
             result.details["volume_confirmation"] = vol_confirm
             if vol_confirm:
                 result.confirmations_met += 1
 
-        # Determine if confirmed
         result.is_confirmed = result.confirmations_met >= self.min_confirmations
 
         if result.is_confirmed:
-            # Set trade direction (opposite to sweep direction)
+            # Trade direction is opposite to sweep direction
             if sweep.direction == SweepDirection.HIGH:
                 result.trade_direction = "short"
-                # Entry: цена вернулась в рендж — входим у верхней границы ренджа
-                # (оптимально) или по текущей если уже внутри
                 if price_range and price_range.is_price_in_range(current_price):
                     result.entry_price = min(current_price, price_range.local_high)
                 else:
@@ -116,8 +109,6 @@ class ConfirmationEngine:
                 result.stop_loss = round(sweep.sweep_price * 1.002, 2)  # За sweep high + буфер
             else:
                 result.trade_direction = "long"
-                # Entry: цена вернулась в рендж — входим у нижней границы ренджа
-                # (оптимально) или по текущей если уже внутри
                 if price_range and price_range.is_price_in_range(current_price):
                     result.entry_price = max(current_price, price_range.local_low)
                 else:
@@ -176,7 +167,6 @@ class ConfirmationEngine:
         if not candles:
             return False
 
-        # Check last 2-3 candles for impulse
         check_candles = candles[-3:] if len(candles) >= 3 else candles
 
         for candle in check_candles:
@@ -192,11 +182,9 @@ class ConfirmationEngine:
             candle_range = high_price - low_price
             body_ratio = body / candle_range
 
-            # Check if body is significant
             if body_ratio < self.impulse_body_ratio:
                 continue
 
-            # Check direction
             if sweep_direction == SweepDirection.HIGH:
                 # After high sweep, looking for bearish candle
                 if close_price < open_price:
@@ -233,14 +221,13 @@ class ConfirmationEngine:
         if avg <= 0:
             return False
 
-        # HIGH sweep = short squeeze → shorts ликвидируются → проверяем short_liquidations
+        # HIGH sweep = short squeeze → shorts liquidated; LOW sweep = long squeeze → longs liquidated
         if sweep.direction == SweepDirection.HIGH:
             short_liqs = liquidation_data.get("short_liquidations", 0)
             if short_liqs > avg:  # порог: выше среднего (не x2, уже отфильтровано trdr.io)
                 logger.debug(f"Short liquidation spike at HIGH sweep: {short_liqs:.0f} vs avg {avg:.0f}")
                 return True
 
-        # LOW sweep = long squeeze → longs ликвидируются → проверяем long_liquidations
         else:
             long_liqs = liquidation_data.get("long_liquidations", 0)
             if long_liqs > avg:
@@ -272,11 +259,9 @@ class ConfirmationEngine:
         avg = volume_data.get("avg_volume", 0)
         delta = volume_data.get("delta", 0)
 
-        # Volume should be elevated
         if avg > 0 and current < avg * self.volume_confirmation_multiplier:
             return False
 
-        # Check delta direction
         if sweep_direction == SweepDirection.HIGH:
             # After high sweep, expecting selling pressure (negative delta)
             if delta < 0:
@@ -298,7 +283,6 @@ class ConfirmationEngine:
     ) -> dict:
         """Calculate optimal entry zone"""
         if sweep.direction == SweepDirection.HIGH:
-            # For short after high sweep
             entry_zone = {
                 "optimal": price_range.local_high,
                 "aggressive": current_price,
@@ -306,7 +290,6 @@ class ConfirmationEngine:
                 "direction": "short"
             }
         else:
-            # For long after low sweep
             entry_zone = {
                 "optimal": price_range.local_low,
                 "aggressive": current_price,
@@ -335,8 +318,6 @@ class ConfirmationEngine:
         buffer = base_price * (buffer_percent / 100)
 
         if sweep.direction == SweepDirection.HIGH:
-            # For short, stop above sweep high
             return round(base_price + buffer, 2)
         else:
-            # For long, stop below sweep low
             return round(base_price - buffer, 2)

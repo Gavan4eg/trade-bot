@@ -29,13 +29,12 @@ class AlertProcessor:
         try:
             webhook = AlertWebhook(**data)
 
-            # Resolve alert type from 'type' or 'name' field
             type_str = webhook.effective_type()
             if type_str not in self.VALID_ALERT_TYPES:
                 logger.warning(f"Unknown alert type: {type_str}")
                 return None
 
-            # Validate symbol — accept BTC/USD, BTCUSDT, BTCUSD_PERP, etc.
+            # Accept BTC/USD, BTCUSDT, BTCUSD_PERP, etc.
             symbol = webhook.ticker or webhook.symbol or ""
             if symbol and "BTC" not in symbol.upper() and webhook.base != "BTC":
                 logger.info(f"Ignoring non-BTC alert: {symbol}")
@@ -43,20 +42,16 @@ class AlertProcessor:
 
             alert_type = self.VALID_ALERT_TYPES[type_str]
 
-            # Parse timestamp — accept 'timestamp' or 'time' field
             timestamp = datetime.utcnow()
             ts_str = webhook.effective_timestamp()
             if ts_str:
                 try:
                     timestamp = datetime.fromisoformat(ts_str.replace("Z", "+00:00"))
-                    timestamp = timestamp.replace(tzinfo=None)  # store as naive UTC
+                    timestamp = timestamp.replace(tzinfo=None)  # naive UTC
                 except ValueError:
                     pass
 
-            # Extract price
             price = webhook.price or 0.0
-
-            # Extract levels
             levels = webhook.levels or []
 
             alert = Alert(
@@ -80,11 +75,9 @@ class AlertProcessor:
         if not alert:
             return False
 
-        # Check if alert type is valid
         if alert.alert_type not in self.VALID_ALERT_TYPES.values():
             return False
 
-        # Check if price is valid
         if alert.price <= 0:
             logger.warning(f"Alert with invalid price: {alert.price}")
             return False
@@ -96,7 +89,6 @@ class AlertProcessor:
         if not self.validate_alert(alert):
             return False
 
-        # Check cooldown for same type alerts
         if alert.alert_type in self.recent_alerts:
             last_alert_time = self.recent_alerts[alert.alert_type]
             # Use cooldown from webhook payload if present, else default
@@ -113,7 +105,6 @@ class AlertProcessor:
                 )
                 return False
 
-        # Check for active alerts of same or higher priority
         for active in self.active_alerts:
             if active.status not in [AlertStatus.TRADED, AlertStatus.EXPIRED, AlertStatus.REJECTED]:
                 if active.priority <= alert.priority:
@@ -125,7 +116,7 @@ class AlertProcessor:
                         continue
                     return False
 
-        # Deduplicate by price — reject if any active Diamond alert has price within 1%
+        # Reject if any active Diamond alert has price within 1%
         DIAMOND_TYPES = {AlertType.BTC_DIAMOND, AlertType.BTC_DOUBLE_DIAMOND, AlertType.DIAMOND_TOP_LEVELS}
         if alert.alert_type in DIAMOND_TYPES:
             for active in self.active_alerts:
@@ -197,11 +188,9 @@ class AlertProcessor:
         """Extract significant price levels from alert"""
         levels = alert.levels.copy() if alert.levels else []
 
-        # Add alert price as a level if not already present
         if alert.price > 0 and alert.price not in levels:
             levels.append(alert.price)
 
-        # Sort levels
         levels.sort()
 
         return levels

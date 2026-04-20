@@ -35,7 +35,6 @@ class BinanceClient:
         self.testnet = testnet if testnet is not None else settings.bybit_testnet
         self.paper_trading = paper_trading if paper_trading is not None else settings.paper_trading
 
-        # Paper trading state (такой же как у Bybit)
         self._paper_balance = 10000.0
         self._paper_positions: List[dict] = []
         self._paper_orders: List[dict] = []
@@ -51,7 +50,6 @@ class BinanceClient:
                 api_secret=self.api_secret,
                 testnet=self.testnet
             )
-            # Для фьючерсного тестнета нужен отдельный URL
             if self.testnet:
                 self.client.FUTURES_URL = "https://testnet.binancefuture.com/fapi"
             logger.info(f"BinanceClient initialized (testnet={self.testnet})")
@@ -69,10 +67,6 @@ class BinanceClient:
         if self.paper_trading:
             self._simulated_price = price
             logger.info(f"[TEST] Simulated price set to {price}")
-
-    # ──────────────────────────────────────────────────────────────────────────
-    # TICKER
-    # ──────────────────────────────────────────────────────────────────────────
 
     def get_ticker(self, symbol: str = None) -> Optional[dict]:
         """Получить текущую цену"""
@@ -109,10 +103,6 @@ class BinanceClient:
         except Exception as e:
             logger.error(f"Error getting ticker: {e}")
             return None
-
-    # ──────────────────────────────────────────────────────────────────────────
-    # KLINES
-    # ──────────────────────────────────────────────────────────────────────────
 
     def get_klines(
         self,
@@ -169,10 +159,6 @@ class BinanceClient:
             logger.error(f"Error getting klines: {e}")
             return []
 
-    # ──────────────────────────────────────────────────────────────────────────
-    # BALANCE
-    # ──────────────────────────────────────────────────────────────────────────
-
     def get_balance(self) -> Optional[dict]:
         """Получить баланс USDT фьючерсного аккаунта"""
         if self.paper_trading:
@@ -204,10 +190,6 @@ class BinanceClient:
         except Exception as e:
             logger.error(f"Error getting balance: {e}")
             return None
-
-    # ──────────────────────────────────────────────────────────────────────────
-    # ORDERS
-    # ──────────────────────────────────────────────────────────────────────────
 
     def place_order(
         self,
@@ -250,7 +232,6 @@ class BinanceClient:
         try:
             symbol = symbol or self.SYMBOL
 
-            # Binance использует BUY/SELL (верхний регистр)
             binance_side = "BUY" if side.upper() in ("BUY", "BUY") else "SELL"
             if side.lower() == "buy":
                 binance_side = "BUY"
@@ -307,10 +288,6 @@ class BinanceClient:
             logger.error(f"Error cancelling order: {e}")
             return False
 
-    # ──────────────────────────────────────────────────────────────────────────
-    # POSITIONS
-    # ──────────────────────────────────────────────────────────────────────────
-
     def get_positions(self, symbol: str = None) -> List[dict]:
         """Получить открытые позиции"""
         if self.paper_trading:
@@ -347,8 +324,7 @@ class BinanceClient:
                 size = float(pos["positionAmt"])
                 if size == 0:
                     continue
-                # Binance: positionAmt > 0 = Long, < 0 = Short
-                side = "Buy" if size > 0 else "Sell"
+                side = "Buy" if size > 0 else "Sell"  # Binance: positionAmt > 0 = Long, < 0 = Short
                 positions.append({
                     "symbol": pos["symbol"],
                     "side": side,
@@ -365,10 +341,6 @@ class BinanceClient:
         except Exception as e:
             logger.error(f"Error getting positions: {e}")
             return []
-
-    # ──────────────────────────────────────────────────────────────────────────
-    # TP / SL
-    # ──────────────────────────────────────────────────────────────────────────
 
     def set_trading_stop(
         self,
@@ -393,14 +365,12 @@ class BinanceClient:
             return True
 
         try:
-            # Определяем сторону позиции чтобы понять какой side ставить на закрывающий ордер
             positions = self.get_positions(symbol=symbol)
             if not positions:
                 logger.warning(f"No open position found for {symbol} to set SL/TP")
                 return False
 
             pos = positions[0]
-            # Если Long → SL/TP ставим как SELL. Если Short → BUY.
             close_side = "SELL" if pos["side"] == "Buy" else "BUY"
 
             success = True
@@ -468,10 +438,6 @@ class BinanceClient:
             logger.error(f"Error setting trading stop: {e}")
             return False
 
-    # ──────────────────────────────────────────────────────────────────────────
-    # LEVERAGE
-    # ──────────────────────────────────────────────────────────────────────────
-
     def set_leverage(self, symbol: str, leverage: int) -> bool:
         """Установить плечо"""
         if self.paper_trading:
@@ -485,10 +451,6 @@ class BinanceClient:
         except Exception as e:
             logger.error(f"Error setting leverage: {e}")
             return False
-
-    # ──────────────────────────────────────────────────────────────────────────
-    # HISTORY
-    # ──────────────────────────────────────────────────────────────────────────
 
     def get_order_history(self, symbol: str = None, limit: int = 50) -> List[dict]:
         """История ордеров"""

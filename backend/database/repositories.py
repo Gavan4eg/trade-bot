@@ -142,14 +142,11 @@ class TradeRepository:
         )
         trades = result.scalars().all()
 
-        # Realized PnL — из закрытых и частично закрытых
         total_realized = sum(t.realized_pnl for t in trades)
-        # Unrealized — из открытых позиций
         total_unrealized = sum(t.unrealized_pnl for t in trades
                                if t.status in ("open", "partial_close"))
         total_pnl = total_realized + total_unrealized
 
-        # Считаем победами трейды с положительным realized PnL
         closed = [t for t in trades if t.status == "closed"]
         win_count = sum(1 for t in closed if t.realized_pnl > 0)
         loss_count = sum(1 for t in closed if t.realized_pnl <= 0)

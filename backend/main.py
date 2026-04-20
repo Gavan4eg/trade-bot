@@ -39,7 +39,6 @@ from .core.liquidity_tracker import LiquidityTracker
 from .core.confirmation import ConfirmationEngine
 from .core.trading_engine import TradingEngine
 
-# Configure logging to both console and file
 log_format = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 log_dir = os.path.join(os.path.dirname(__file__), "..", "logs")
 os.makedirs(log_dir, exist_ok=True)
@@ -49,12 +48,11 @@ logging.basicConfig(
     level=logging.INFO,
     format=log_format,
     handlers=[
-        logging.StreamHandler(),  # Console
-        logging.FileHandler(os.path.join(log_dir, "bot.log"), encoding="utf-8"),  # File
+        logging.StreamHandler(),
+        logging.FileHandler(os.path.join(log_dir, "bot.log"), encoding="utf-8"),
     ]
 )
 
-# Webhook specific logger
 webhook_logger = logging.getLogger("webhook")
 webhook_handler = logging.FileHandler(os.path.join(log_dir, "webhook.log"), encoding="utf-8")
 webhook_handler.setFormatter(logging.Formatter(log_format))

@@ -68,10 +68,6 @@ class OKXClient:
                 logger.error("python-okx package not installed. Run: pip install python-okx==0.3.8")
                 raise
 
-    # ------------------------------------------------------------------
-    # Internal helpers
-    # ------------------------------------------------------------------
-
     def _normalize_symbol(self, symbol: Optional[str]) -> str:
         """Accept both BTCUSDT and BTC-USDT-SWAP and return OKX format."""
         if symbol is None:
@@ -90,10 +86,6 @@ class OKXClient:
         if self.paper_trading:
             self._simulated_price = price
             logger.info(f"[OKX TEST] Simulated price set to {price}")
-
-    # ------------------------------------------------------------------
-    # Market data
-    # ------------------------------------------------------------------
 
     def get_ticker(self, symbol: str = None) -> Optional[dict]:
         """Get current ticker. Returns dict with last_price, high_24h, low_24h, volume_24h."""
@@ -179,10 +171,6 @@ class OKXClient:
             logger.error(f"OKX get_klines exception: {e}")
             return []
 
-    # ------------------------------------------------------------------
-    # Account
-    # ------------------------------------------------------------------
-
     def get_balance(self) -> Optional[dict]:
         """Get USDT balance. Returns dict with available_balance, total_balance."""
         if self.paper_trading:
@@ -232,10 +220,6 @@ class OKXClient:
             logger.error(f"OKX set_leverage exception: {e}")
             return False
 
-    # ------------------------------------------------------------------
-    # Orders & positions
-    # ------------------------------------------------------------------
-
     def place_order(
         self,
         side: str,
@@ -263,7 +247,6 @@ class OKXClient:
             exec_price = ticker["last_price"] if ticker else self._simulated_price
 
             if not reduce_only:
-                # Open position
                 pos_side = "long" if side_lower == "buy" else "short"
                 self._paper_positions.append({
                     "symbol": inst_id,
@@ -279,7 +262,6 @@ class OKXClient:
                 self._paper_balance -= cost
                 logger.info(f"[OKX PAPER] Opened {pos_side} {qty} BTC @ {exec_price:.2f} (order {order_id})")
             else:
-                # Close position
                 logger.info(f"[OKX PAPER] Closed position {qty} BTC (reduce_only)")
 
             return {"order_id": order_id, "executed_price": exec_price, "qty": qty}
@@ -451,14 +433,13 @@ class OKXClient:
 
         inst_id = self._normalize_symbol(symbol)
         try:
-            # Determine position side from open positions
             positions = self.get_positions(inst_id)
             if not positions:
                 logger.warning(f"OKX set_trading_stop: no open position for {inst_id}")
                 return False
 
             pos = positions[0]
-            pos_side = pos["side"]  # 'long' or 'short'
+            pos_side = pos["side"]
 
             params: Dict[str, Any] = {
                 "instId": inst_id,

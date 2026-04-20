@@ -42,15 +42,12 @@ class RangeDetector:
         try:
             df = pd.DataFrame(candle_data)
 
-            # Calculate local high and low
             local_high = df["high"].max()
             local_low = df["low"].min()
 
-            # Get time boundaries
             start_time = df["timestamp"].min()
             end_time = df["timestamp"].max()
 
-            # Create range object
             price_range = Range(
                 alert_id=alert.id or 0,
                 local_high=local_high,
@@ -61,7 +58,6 @@ class RangeDetector:
                 end_time=end_time
             )
 
-            # Validate range
             price_range.is_valid = self.is_range_valid(price_range)
 
             logger.info(
@@ -123,11 +119,9 @@ class RangeDetector:
         low = price_range.local_low
         mid = price_range.mid_range
 
-        # Fibonacci levels
         fib_382 = low + (high - low) * 0.382
         fib_618 = low + (high - low) * 0.618
 
-        # Quarter levels
         quarter_1 = low + (high - low) * 0.25
         quarter_3 = low + (high - low) * 0.75
 
@@ -177,7 +171,6 @@ class RangeDetector:
             return swing_highs, swing_lows
 
         for i in range(lookback, len(candle_data) - lookback):
-            # Check for swing high
             is_swing_high = all(
                 candle_data[i]["high"] >= candle_data[i - j]["high"] and
                 candle_data[i]["high"] >= candle_data[i + j]["high"]
@@ -190,7 +183,6 @@ class RangeDetector:
                     "index": i
                 })
 
-            # Check for swing low
             is_swing_low = all(
                 candle_data[i]["low"] <= candle_data[i - j]["low"] and
                 candle_data[i]["low"] <= candle_data[i + j]["low"]

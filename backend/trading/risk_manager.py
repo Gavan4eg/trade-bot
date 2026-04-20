@@ -20,18 +20,15 @@ class RiskManager:
         self.risk_per_trade = risk_per_trade or settings.risk_per_trade
         self.min_rr = min_rr or settings.min_rr
 
-        # Track active positions by direction
         self.active_longs: int = 0
         self.active_shorts: int = 0
 
-        # Track daily stats
         self.daily_trades: int = 0
         self.daily_pnl: float = 0.0
         self.last_reset: datetime = datetime.utcnow().replace(
             hour=0, minute=0, second=0, microsecond=0
         )
 
-        # Cooldown tracking
         self.last_trade_time: Dict[str, datetime] = {}
         self.trade_cooldown_minutes: int = 5
 
@@ -52,23 +49,17 @@ class RiskManager:
         Returns:
             Position size in BTC
         """
-        # Calculate risk amount in USDT
         risk_amount = balance * (self.risk_per_trade / 100)
 
-        # Calculate stop distance
         stop_distance = abs(entry_price - stop_loss)
 
         if stop_distance <= 0:
             logger.error("Invalid stop distance")
             return 0.0
 
-        # Position size = risk amount / stop distance
         position_size = risk_amount / stop_distance
-
-        # Round to appropriate decimals (BTC typically 3 decimals)
         position_size = round(position_size, 3)
 
-        # Minimum position check
         min_position = 0.001  # Minimum 0.001 BTC on Bybit
         if position_size < min_position:
             logger.warning(
@@ -112,10 +103,8 @@ class RiskManager:
 
     def can_open_position(self, direction: str) -> bool:
         """Check if new position can be opened"""
-        # Reset daily stats if new day
         self._check_daily_reset()
 
-        # Check total position limit
         total_positions = self.active_longs + self.active_shorts
         if total_positions >= self.max_positions:
             logger.warning(
@@ -123,7 +112,6 @@ class RiskManager:
             )
             return False
 
-        # Check direction-specific limits (no duplicate positions in same direction)
         if direction == "long" and self.active_longs > 0:
             logger.warning("Already have an active long position")
             return False
@@ -132,7 +120,6 @@ class RiskManager:
             logger.warning("Already have an active short position")
             return False
 
-        # Check cooldown
         if not self._check_cooldown(direction):
             return False
 
@@ -220,7 +207,6 @@ class RiskManager:
 
         volatility_ratio = current_volatility / avg_volatility
 
-        # Reduce size if volatility is high
         if volatility_ratio > 1.5:
             adjustment = 0.5  # Reduce to 50%
         elif volatility_ratio > 1.2:
@@ -262,7 +248,6 @@ class RiskManager:
         errors = []
         warnings = []
 
-        # Check entry vs stop
         if direction == "long":
             if stop_loss >= entry:
                 errors.append("Stop loss must be below entry for long")
@@ -274,12 +259,10 @@ class RiskManager:
             if take_profit >= entry:
                 errors.append("Take profit must be below entry for short")
 
-        # Check RR
         rr = self.calculate_rr(entry, stop_loss, take_profit, direction)
         if rr < self.min_rr:
             warnings.append(f"RR {rr} is below minimum {self.min_rr}")
 
-        # Check stop distance
         stop_percent = abs(entry - stop_loss) / entry * 100
         if stop_percent > 5:
             warnings.append(f"Stop distance is {stop_percent:.1f}% from entry")

@@ -42,7 +42,7 @@ class PositionManager:
         )
 
         self.positions[trade_id] = position
-        self._trades[trade_id] = trade  # сохраняем для TP/SL
+        self._trades[trade_id] = trade
         logger.info(f"Position created for trade {trade.id}")
 
         return position
@@ -56,24 +56,19 @@ class PositionManager:
         position.current_price = current_price
         position.calculate_unrealized_pnl()
 
-        # Check TP1
         if not position.tp1_filled:
             if self._is_tp_hit(position, position.take_profit_1, current_price):
                 self._handle_tp1(position, current_price)
 
-        # Check TP2
         elif not position.tp2_filled:
             if self._is_tp_hit(position, position.take_profit_2, current_price):
                 self._handle_tp2(position, current_price)
 
-        # Check trailing stop activation
         elif position.status == PositionStatus.TP2_HIT:
             self._check_trailing_activation(position, current_price)
 
-        # Update trailing stop if active
         if position.status == PositionStatus.TRAILING:
             self._update_trailing_stop(position, current_price)
-            # Проверяем — пробила ли цена trailing stop → закрываем остаток
             if position.trailing_stop:
                 hit = (
                     position.direction == TradeDirection.LONG and current_price <= position.trailing_stop
@@ -83,7 +78,6 @@ class PositionManager:
                 if hit:
                     self._close_by_stop(position, current_price, reason="trailing_stop")
 
-        # Check stop loss — applies to OPEN, TP1_HIT and TP2_HIT (before trailing activates)
         if position.status in [PositionStatus.OPEN, PositionStatus.TP1_HIT, PositionStatus.TP2_HIT]:
             sl_hit = (
                 position.direction == TradeDirection.LONG and current_price <= position.stop_loss
@@ -131,10 +125,8 @@ class PositionManager:
                 f"of position, realized PnL: {position.realized_pnl:.2f}"
             )
 
-            # Move stop to breakeven
             self._move_stop_to_breakeven(position, trade)
 
-            # Sync trailing stop activation check
             if position.current_quantity <= 0:
                 position.status = PositionStatus.CLOSED
                 if self.risk_manager:
@@ -174,7 +166,6 @@ class PositionManager:
         trade: Trade
     ) -> None:
         """Move stop loss to breakeven after TP1"""
-        # Add small buffer above/below entry
         buffer = position.entry_price * 0.001
 
         if position.direction == TradeDirection.LONG:
@@ -232,11 +223,9 @@ class PositionManager:
         new_trail = self._calculate_trailing_stop(position, current_price)
 
         if position.direction == TradeDirection.LONG:
-            # Only move stop up for long
             if new_trail > (position.trailing_stop or 0):
                 self._set_trailing_stop(position, new_trail)
         else:
-            # Only move stop down for short
             if position.trailing_stop is None or new_trail < position.trailing_stop:
                 self._set_trailing_stop(position, new_trail)
 
@@ -267,13 +256,11 @@ class PositionManager:
         if qty <= 0:
             return
 
-        # ✅ Реально закрываем позицию на бирже через executor
         success = self.executor.close_position(trade, current_price, reason)
         if not success:
             logger.error(f"Failed to close position on exchange for {reason} — will retry on next tick")
             return
 
-        # Обновляем in-memory состояние
         if position.direction == TradeDirection.LONG:
             pnl = (current_price - position.entry_price) * qty
         else:
@@ -284,7 +271,6 @@ class PositionManager:
         position.status = PositionStatus.CLOSED
         position.closed_at = datetime.utcnow()
 
-        # Уведомляем risk manager что позиция закрыта
         if self.risk_manager:
             self.risk_manager.register_trade_close(position.direction.value, pnl)
 
@@ -316,11 +302,9 @@ class PositionManager:
             position.closed_at = datetime.utcnow()
             position.realized_pnl = trade.realized_pnl
 
-            # ✅ Уведомляем risk manager
             if self.risk_manager:
                 self.risk_manager.register_trade_close(position.direction.value, position.realized_pnl)
 
-            # Remove from active positions
             if position.trade_id in self.positions:
                 del self.positions[position.trade_id]
 
@@ -347,7 +331,6 @@ class PositionManager:
         exchange_positions = self.client.get_positions(symbol="BTCUSDT")
 
         if not exchange_positions:
-            # No positions on exchange, close all local
             for position in list(self.positions.values()):
                 if position.status != PositionStatus.CLOSED:
                     position.status = PositionStatus.CLOSED
@@ -358,7 +341,6 @@ class PositionManager:
             return
 
         for pos in exchange_positions:
-            # Find matching local position
             for local_pos in self.positions.values():
                 if local_pos.status == PositionStatus.CLOSED:
                     continue

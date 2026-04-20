@@ -17,7 +17,6 @@ class MarketDataService:
         self._task: Optional[asyncio.Task] = None
         self._callbacks: List[Callable] = []
 
-        # Cache
         self.current_price: float = 0.0
         self.last_update: Optional[datetime] = None
 
@@ -62,7 +61,6 @@ class MarketDataService:
         self.current_price = ticker["last_price"]
         self.last_update = datetime.utcnow()
 
-        # Broadcast to WebSocket clients
         await ws_manager.send_price_update({
             "symbol": ticker["symbol"],
             "price": ticker["last_price"],
@@ -74,7 +72,6 @@ class MarketDataService:
             "timestamp": self.last_update.isoformat()
         })
 
-        # Call registered callbacks
         for callback in self._callbacks:
             try:
                 await callback(ticker)

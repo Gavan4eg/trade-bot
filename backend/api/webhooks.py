@@ -15,10 +15,8 @@ logger = logging.getLogger(__name__)
 webhook_logger = logging.getLogger("webhook")  # Separate logger for webhook.log
 router = APIRouter(prefix="/webhook", tags=["webhooks"])
 
-# Global alert processor
 alert_processor = AlertProcessor()
 
-# Webhook secret token from settings
 WEBHOOK_TOKEN = settings.webhook_token
 
 # Trading components — injected from main.py after startup
@@ -87,26 +85,21 @@ async def receive_trdr_webhook(
         "timestamp": "2024-01-15T12:00:00Z"
     }
     """
-    # Check token if configured
     if WEBHOOK_TOKEN and token != WEBHOOK_TOKEN:
         logger.warning(f"Invalid webhook token from {request.client.host}")
         raise HTTPException(status_code=403, detail="Invalid token")
 
-    # Handle both GET and POST
     import json
 
     if request.method == "GET":
-        # Build data from query parameters
         raw_data = {
             "type": type or alert_type,
             "price": price,
             "symbol": symbol or "BTCUSDT",
             "message": message
         }
-        # Remove None values
         raw_data = {k: v for k, v in raw_data.items() if v is not None}
     else:
-        # Get raw body for POST
         raw_body = await request.body()
         try:
             raw_data = json.loads(raw_body) if raw_body else {}
@@ -117,13 +110,11 @@ async def receive_trdr_webhook(
     logger.info(f"From: {request.client.host}")
     logger.info(f"Raw data: {raw_data}")
 
-    # Also log to webhook.log file
     webhook_logger.info(f"=== WEBHOOK [{request.method}] ===")
     webhook_logger.info(f"From: {request.client.host}")
     webhook_logger.info(f"Headers: {dict(request.headers)}")
     webhook_logger.info(f"Raw data: {raw_data}")
 
-    # Broadcast raw data to UI for debugging
     await ws_manager.broadcast({
         "type": "webhook_debug",
         "data": {
@@ -138,22 +129,18 @@ async def receive_trdr_webhook(
         level="info", source="webhook"
     )
 
-    # Parse trdr.io format — pass all raw fields directly and let the model handle it
     parsed_data = {}
 
     if isinstance(raw_data, dict):
-        # Copy all raw fields so AlertWebhook model can use them
         parsed_data = dict(raw_data)
 
         # Normalize: trdr.io uses 'name' for alert type
         if not parsed_data.get("type") and parsed_data.get("name"):
             parsed_data["type"] = parsed_data["name"]
 
-        # Normalize: trdr.io uses 'time' for timestamp
         if not parsed_data.get("timestamp") and parsed_data.get("time"):
             parsed_data["timestamp"] = parsed_data["time"]
 
-        # Normalize: get price from markets array if present (old format)
         markets = parsed_data.get("markets", [])
         if markets and len(markets) > 0:
             parsed_data.setdefault("price", markets[0].get("price"))
@@ -167,14 +154,12 @@ async def receive_trdr_webhook(
     else:
         parsed_data = {"message": str(raw_data)}
 
-    # Try to parse payload
     try:
         payload = WebhookPayload(**parsed_data)
     except Exception as e:
         logger.error(f"Failed to parse payload: {e}")
         payload = WebhookPayload(**parsed_data)
 
-    # Try to extract alert type from message if type is missing
     alert_type = payload.type
     if not alert_type and payload.message:
         msg = payload.message.lower()
@@ -191,15 +176,13 @@ async def receive_trdr_webhook(
 
     logger.info(f"Parsed: type={payload.type}, price={payload.price}, side={parsed_data.get('side')}")
 
-    # Parse webhook
     alert = alert_processor.parse_webhook(payload.model_dump())
 
     if not alert:
         await ws_manager.send_log(f"❌ Invalid alert type: {payload.type}", level="error", source="webhook")
         raise HTTPException(status_code=400, detail="Invalid alert type")
 
-    # Aggregated Liquidation — не сохраняем в БД и не показываем в UI
-    # Просто инжектируем в пайплайн как confirmation фактор
+    # Aggregated Liquidation: inject into pipeline as confirmation factor, don't save to DB
     is_liquidation = "Aggregated Liquidation" in (payload.type or "")
 
     if is_liquidation:
@@ -210,12 +193,6 @@ async def receive_trdr_webhook(
         background_tasks.add_task(process_alert_background, alert, parsed_data)
         return {"status": "received", "type": "liquidation", "price": alert.price}
 
-    # Atomically check + register (synchronous, no asyncio.Lock needed).
-    # Since FastAPI runs on a single-threaded event loop, no two coroutines
-    # can interleave between check and register — this is race-condition safe.
-    # BTC Diamond (P2) wins over Diamond Top Levels (P3) when both arrive
-    # simultaneously because the first one to reach check_and_register registers
-    # and the second one is blocked by priority check.
     if not alert_processor.check_and_register(alert):
         await ws_manager.send_log(f"⏭ Alert skipped (cooldown or priority): {alert.alert_type.value}", level="warning", source="webhook")
         return {
@@ -223,7 +200,6 @@ async def receive_trdr_webhook(
             "reason": "Alert filtered (cooldown or priority)"
         }
 
-    # Save to database (alert is already registered in processor memory)
     repo = AlertRepository(db)
     db_alert = await repo.create({
         "alert_type": alert.alert_type.value,
@@ -235,11 +211,9 @@ async def receive_trdr_webhook(
         "raw_data": alert.raw_data
     })
 
-    # alert is already in active_alerts by reference — setting .id here
-    # updates it in place so pipeline can find it by alert.id
+    # alert is already in active_alerts by reference — setting .id here updates it in place
     alert.id = db_alert.id
 
-    # Broadcast to WebSocket clients
     await ws_manager.send_alert({
         "id": alert.id,
         "type": alert.alert_type.value,
@@ -255,7 +229,6 @@ async def receive_trdr_webhook(
         level="success", source="webhook"
     )
 
-    # Process alert in background (pass parsed_data so price/type are normalized)
     background_tasks.add_task(process_alert_background, alert, parsed_data)
 
     return {
@@ -294,7 +267,6 @@ async def process_alert_background(alert, alert_raw: dict):
         logger.warning(f"Alert {alert_id}: trading components not wired, skipping execution")
         return
 
-    # ── Aggregated Liquidation: подтверждающий фактор для Diamond ──────────
     if "Aggregated Liquidation" in alert_type:
         side = (alert_raw.get("side") or "").lower()
 
@@ -335,7 +307,6 @@ async def process_alert_background(alert, alert_raw: dict):
                 level="warning", source="pipeline"
             )
 
-    # ── Diamond сигналы: полный пайплайн ────────────────────────────────────
     elif any(t in alert_type for t in ("BTC Diamond", "BTC Double Diamond", "Diamond Top Levels")):
         if _trading_engine is None:
             logger.warning(f"Alert {alert_id}: TradingEngine не инициализирован")
@@ -483,11 +454,10 @@ async def force_sweep(alert_id: int = 0):
         if not state:
             return {"error": "Нет активных алертов в пайплайне"}
 
-        # Создаём sweep event (LOW = sweep ниже range → LONG)
         ticker = _bybit_client.get_ticker() if _bybit_client else None
         current_price = ticker["last_price"] if ticker else (state.last_price or state.alert.price)
         level_swept = state.range.local_low if state.range else current_price * 0.995
-        sweep_price = level_swept * 0.995  # чуть ниже low
+        sweep_price = level_swept * 0.995  # slightly below low
 
         sweep = SweepEvent(
             alert_id=state.alert.id or 0,
@@ -503,7 +473,6 @@ async def force_sweep(alert_id: int = 0):
 
         logger.info(f"[TEST] Force sweep injected for alert {state.alert.id}: LOW at {sweep_price:.2f}")
 
-        # Триггерим confirmation
         await _trading_engine._check_for_confirmation(state, current_price)
 
         return {
@@ -551,7 +520,6 @@ async def test_full_trade(
             level="warning", source="test"
         )
 
-        # 1. Создаём фейковый Diamond алерт
         alert = Alert(
             id=99999,
             alert_type=AlertType.BTC_DIAMOND,
@@ -561,7 +529,6 @@ async def test_full_trade(
             raw_data={"type": "BTC Diamond", "test": True}
         )
 
-        # 2. Реальный range с биржи
         candles = _bybit_client.get_klines(interval="60", limit=24)
         if not candles:
             return {"error": "Cannot get candles"}
@@ -582,7 +549,6 @@ async def test_full_trade(
             end_time=now
         )
 
-        # 3. Sweep
         sweep_dir = SweepDirection.LOW if direction == "long" else SweepDirection.HIGH
         if direction == "long":
             sweep_price = local_low * 0.998
@@ -600,7 +566,6 @@ async def test_full_trade(
             timestamp=datetime.utcnow()
         )
 
-        # 4. Форсируем confirmation напрямую
         from ..core.confirmation import ConfirmationResult
         entry_price = current_price
         if direction == "long":
@@ -617,7 +582,6 @@ async def test_full_trade(
             stop_loss=stop_loss,
         )
 
-        # 5. Открываем реальную позицию
         from ..core.trading_engine import AlertState as TradingAlertState
         state = TradingAlertState(alert=alert)
         state.range = price_range
@@ -631,12 +595,10 @@ async def test_full_trade(
             level="success", source="test"
         )
 
-        # 6. Закрываем через N секунд
         async def close_after_delay():
             import asyncio
             await asyncio.sleep(close_after_seconds)
 
-            # 1. Закрываем на бирже
             exchange_positions = _bybit_client.get_positions(symbol="BTCUSDT")
             if exchange_positions:
                 p = exchange_positions[0]
@@ -647,7 +609,6 @@ async def test_full_trade(
                     level="success", source="test"
                 )
 
-            # 2. Синкаем position_manager с биржей → ghost пропадёт из UI
             if _position_manager:
                 _position_manager.sync_with_exchange()
                 await ws_manager.send_log(
@@ -705,7 +666,6 @@ async def test_pipeline(
             level="warning", source="test"
         )
 
-        # 1. Создаём Alert объект и сохраняем в DB
         alert_raw = {
             "type": "BTC Diamond", "price": current_price,
             "side": direction, "timeframe": "1 hour", "test": True
@@ -737,9 +697,7 @@ async def test_pipeline(
             level="info", source="test"
         )
 
-        # 2. Запускаем pipeline (range detection)
         await _trading_engine.process_alert_direct(alert)
-        # Ждём range detection (до 10 сек)
         for _ in range(10):
             await asyncio.sleep(1)
             state = _trading_engine.active_states.get(alert.id)
@@ -756,14 +714,12 @@ async def test_pipeline(
             level="info", source="test"
         )
 
-        # 3. Форсируем sweep через price tick
         sweep_price = r.local_high * 1.002 if direction == "short" else r.local_low * 0.998
         await _trading_engine.on_price_update(sweep_price)
         await asyncio.sleep(0.5)
         await _trading_engine.on_price_update(current_price)
-        await asyncio.sleep(3)  # ждём confirmation
+        await asyncio.sleep(3)  # wait for confirmation
 
-        # 4. Проверяем позицию
         active = _position_manager.get_active_positions() if _position_manager else []
         if not active:
             return {"error": "Trade not opened — check logs"}
@@ -775,7 +731,6 @@ async def test_pipeline(
             level="success", source="test"
         )
 
-        # 5. Симулируем цену к TP1 → TP2 → trailing
         async def simulate_price_movement():
             await asyncio.sleep(3)
             tp1 = position.take_profit_1

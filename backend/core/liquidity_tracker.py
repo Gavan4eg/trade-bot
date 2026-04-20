@@ -34,7 +34,6 @@ class LiquidityTracker:
         """
         sweep = None
 
-        # Check for high sweep (price went above range)
         if current_price > price_range.local_high:
             sweep = self._create_sweep_event(
                 price_range=price_range,
@@ -47,7 +46,6 @@ class LiquidityTracker:
                 f"local high {price_range.local_high:.2f}"
             )
 
-        # Check for low sweep (price went below range)
         elif current_price < price_range.local_low:
             sweep = self._create_sweep_event(
                 price_range=price_range,
@@ -98,7 +96,6 @@ class LiquidityTracker:
         candle_range = high_price - low_price
 
         if candle_range > 0:
-            # Calculate wick ratio
             if sweep.direction == SweepDirection.HIGH:
                 upper_wick = high_price - max(open_price, close_price)
                 wick_ratio = upper_wick / candle_range
@@ -106,7 +103,6 @@ class LiquidityTracker:
                 lower_wick = min(open_price, close_price) - low_price
                 wick_ratio = lower_wick / candle_range
 
-            # Quick reversal if wick is significant and body closed back
             if wick_ratio > 0.5:
                 sweep.quick_reversal = True
 
@@ -117,7 +113,6 @@ class LiquidityTracker:
         sweep: SweepEvent
     ) -> bool:
         """Validate if sweep is significant enough"""
-        # Check minimum wick size
         if sweep.wick_percent < self.sweep_threshold_percent:
             logger.debug(f"Sweep wick too small: {sweep.wick_percent:.3f}%")
             return False
@@ -156,7 +151,6 @@ class LiquidityTracker:
         recent = candles[-self.reversal_candles:]
 
         if sweep.direction == SweepDirection.HIGH:
-            # For high sweep, check if subsequent candles closed lower
             closes_declining = all(
                 recent[i]["close"] < recent[i - 1]["high"]
                 for i in range(1, len(recent))
@@ -164,7 +158,6 @@ class LiquidityTracker:
             return closes_declining
 
         else:
-            # For low sweep, check if subsequent candles closed higher
             closes_rising = all(
                 recent[i]["close"] > recent[i - 1]["low"]
                 for i in range(1, len(recent))

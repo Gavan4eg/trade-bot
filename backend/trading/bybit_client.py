@@ -26,11 +26,10 @@ class BybitClient:
         self.testnet = testnet if testnet is not None else settings.bybit_testnet
         self.paper_trading = paper_trading if paper_trading is not None else settings.paper_trading
 
-        # Paper trading state
-        self._paper_balance = 10000.0  # Starting balance
+        self._paper_balance = 10000.0
         self._paper_positions: List[dict] = []
         self._paper_orders: List[dict] = []
-        self._simulated_price = 65000.0  # Starting BTC price
+        self._simulated_price = 65000.0
 
         if self.paper_trading:
             logger.info("BybitClient initialized in PAPER TRADING mode")
@@ -46,7 +45,7 @@ class BybitClient:
 
     def _simulate_price_movement(self) -> float:
         """Simulate realistic price movement"""
-        change = random.uniform(-0.002, 0.002)  # ±0.2% movement
+        change = random.uniform(-0.002, 0.002)
         self._simulated_price *= (1 + change)
         return self._simulated_price
 
@@ -60,7 +59,7 @@ class BybitClient:
         """Get current ticker data"""
         if self.paper_trading:
             price = self._simulate_price_movement()
-            spread = price * 0.0001  # 0.01% spread
+            spread = price * 0.0001
             return {
                 "symbol": symbol or self.SYMBOL,
                 "last_price": price,
@@ -169,7 +168,6 @@ class BybitClient:
     def get_balance(self) -> Optional[dict]:
         """Get wallet balance"""
         if self.paper_trading:
-            # Calculate unrealized PnL from open positions
             unrealized_pnl = 0.0
             for pos in self._paper_positions:
                 if pos["side"] == "Buy":
@@ -257,7 +255,6 @@ class BybitClient:
 
             self._paper_orders.append(order)
 
-            # Update positions for paper trading
             if not reduce_only:
                 self._paper_positions.append({
                     "symbol": symbol or self.SYMBOL,
@@ -286,8 +283,7 @@ class BybitClient:
             if order_type == "Limit" and price:
                 params["price"] = str(price)
 
-            # Note: stopLoss/takeProfit NOT set in initial order to avoid
-            # Bybit price-distance restrictions on testnet. Set separately via set_position_stop.
+            # stopLoss/takeProfit not set in initial order — Bybit price-distance restrictions on testnet
 
             response = self.client.place_order(**params)
 
@@ -492,7 +488,7 @@ class BybitClient:
     ) -> List[dict]:
         """Get closed P&L records"""
         if self.paper_trading:
-            return []  # No closed positions in paper trading yet
+            return []
 
         try:
             params = {"category": self.CATEGORY, "limit": limit}
@@ -555,7 +551,6 @@ class BybitClient:
         symbol = symbol or self.SYMBOL
         for i, pos in enumerate(self._paper_positions):
             if pos["symbol"] == symbol:
-                # Calculate PnL
                 if pos["side"] == "Buy":
                     pnl = (self._simulated_price - pos["entry_price"]) * pos["size"]
                 else:
