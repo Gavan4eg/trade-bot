@@ -109,7 +109,6 @@ class PositionManager:
         """Handle TP1 hit - close partial position"""
         close_percent = settings.tp1_close_percent
 
-        # Get associated trade
         trade = self._get_trade_for_position(position)
         if not trade:
             return
@@ -139,7 +138,6 @@ class PositionManager:
     ) -> None:
         """Handle TP2 hit - close more of position"""
         close_percent = settings.tp2_close_percent
-
         trade = self._get_trade_for_position(position)
         if not trade:
             return

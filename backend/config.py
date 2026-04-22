@@ -6,44 +6,37 @@ class Settings(BaseSettings):
     # Exchange selection: "bybit" | "binance"
     exchange: str = "bybit"
 
-    # Bybit API
     bybit_api_key: str = ""
     bybit_api_secret: str = ""
     bybit_testnet: bool = True
 
-    # Binance API
     binance_api_key: str = ""
     binance_api_secret: str = ""
     binance_testnet: bool = True
 
-    # OKX API
     okx_api_key: str = ""
     okx_api_secret: str = ""
     okx_passphrase: str = ""
     okx_testnet: bool = False
 
-    # Multi-exchange: which exchanges to use (comma-separated: "binance,bybit,okx")
-    # Leave empty to use only the primary EXCHANGE setting
+    # Comma-separated list of exchanges to use (e.g. "binance,bybit,okx"). Empty = primary only.
     exchanges_enabled: str = ""
 
-    paper_trading: bool = True  # Симуляция без реальных сделок
+    paper_trading: bool = True
 
-    # Trading settings
     max_positions: int = 3
     risk_per_trade: float = 1.0  # % of balance
-    leverage: int = 5  # Плечо на бирже (должно совпадать с настройкой на Binance)
+    leverage: int = 5
     min_rr: float = 2.0
     range_timeframe: str = "15m"
     range_candles: int = 24
-    range_max_width_percent: float = 5.0  # % max range width (increase for testnet)
+    range_max_width_percent: float = 5.0  # % max range width
     liquidation_buffer_percent: float = 0.2  # % buffer beyond liquidation cluster for stop
 
-    # Confirmation settings
     min_confirmations: int = 1
     sweep_threshold_percent: float = 0.1
     volume_spike_multiplier: float = 2.0
 
-    # TP/SL settings
     tp1_rr: float = 2.0
     tp1_close_percent: int = 50
     tp2_rr: float = 3.0
@@ -51,16 +44,13 @@ class Settings(BaseSettings):
     trailing_activation_rr: float = 2.5
     trailing_step_percent: float = 0.5
 
-    # Server settings
     host: str = "0.0.0.0"
     port: int = 8000
 
-    # Security
     webhook_token: str = ""  # Secret token for webhook authentication
     dashboard_username: str = "admin"
     dashboard_password: str = "admin123"
 
-    # Database
     database_url: str = "sqlite+aiosqlite:///./trading_bot.db"
 
     class Config:

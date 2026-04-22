@@ -143,8 +143,7 @@ class OKXClient:
             return candles
 
         inst_id = self._normalize_symbol(symbol)
-        # Map minute-count strings to OKX bar values
-        bar_map = {
+        bar_map = {  # minute-count strings → OKX bar values
             "1": "1m", "3": "3m", "5": "5m", "15": "15m", "30": "30m",
             "60": "1H", "120": "2H", "240": "4H", "360": "6H", "720": "12H",
             "1440": "1D",

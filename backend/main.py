@@ -60,17 +60,14 @@ webhook_logger.addHandler(webhook_handler)
 
 logger = logging.getLogger(__name__)
 
-# Auth sessions (in-memory, resets on restart)
-_sessions: set = set()
+_sessions: set = set()  # in-memory, resets on restart
 
-# Public routes — no auth required
 PUBLIC_PATHS = {"/login", "/logout", "/health", "/webhook/trdr", "/webhook/test"}
 
 def is_authenticated(request: Request) -> bool:
     token = request.cookies.get("session")
     return token in _sessions
 
-# Global services
 bybit_client: BybitClient = None
 market_data_service: MarketDataService = None
 risk_manager: RiskManager = None
@@ -93,7 +90,6 @@ async def lifespan(app: FastAPI):
 
     logger.info("Starting BTC Trading Bot...")
 
-    # Initialize database
     await init_db()
 
     # Initialize trading components — multi-exchange aware
@@ -105,7 +101,6 @@ async def lifespan(app: FastAPI):
         pm = PositionManager(client, ex, risk_manager)
         return (name, client, ex, pm)
 
-    # Primary exchange (always included)
     primary_client = create_exchange_client()
     _exchange_pairs.append(_make_exchange_pair(settings.exchange, primary_client))
 
@@ -113,7 +108,7 @@ async def lifespan(app: FastAPI):
     enabled = [e.strip().lower() for e in settings.exchanges_enabled.split(",") if e.strip()]
     for exch in enabled:
         if exch == settings.exchange.lower():
-            continue  # already added as primary
+            continue  # skip — already added as primary
         try:
             if exch == "binance" and settings.binance_api_key:
                 from .trading.binance_client import BinanceClient
@@ -132,13 +127,12 @@ async def lifespan(app: FastAPI):
         except Exception as e:
             logger.warning(f"Failed to init {exch}: {e}")
 
-    # Wire up executor/position_manager (multi or single)
     if len(_exchange_pairs) > 1:
         multi_executor = MultiExchangeExecutor([(n, ex) for n, _, ex, _ in _exchange_pairs])
         multi_pm = MultiPositionManager([(n, pm) for n, _, _, pm in _exchange_pairs], multi_executor)
         trade_executor = multi_executor
         position_manager = multi_pm
-        bybit_client = primary_client  # keep reference for market data
+        bybit_client = primary_client
         logger.info(f"Multi-exchange mode: {[n for n, _, _, _ in _exchange_pairs]}")
     else:
         trade_executor = _exchange_pairs[0][2]
@@ -146,7 +140,6 @@ async def lifespan(app: FastAPI):
         bybit_client = primary_client
         logger.info(f"Single exchange mode: {settings.exchange}")
 
-    # Initialize core components
     alert_processor = AlertProcessor()
     range_detector = RangeDetector(
         timeframe=settings.range_timeframe,
@@ -159,16 +152,10 @@ async def lifespan(app: FastAPI):
         min_confirmations=settings.min_confirmations
     )
 
-    # Initialize market data service
     market_data_service = MarketDataService(bybit_client)
-
-    # Start market data polling
     await market_data_service.start(interval=2.0)
-
-    # Register price callback for trading logic
     market_data_service.register_callback(on_price_update)
 
-    # Initialize and start trading engine (Diamond signal pipeline)
     trading_engine = TradingEngine(
         bybit_client=bybit_client,
         trade_executor=trade_executor,
@@ -177,10 +164,8 @@ async def lifespan(app: FastAPI):
     )
     await trading_engine.start()
 
-    # Wire trading components + engine into the webhook handler
     setup_trading(bybit_client, trade_executor, risk_manager, trading_engine, position_manager)
 
-    # Set leverage on all configured exchanges
     if not settings.paper_trading:
         for name, client, _, _ in _exchange_pairs:
             try:
@@ -195,7 +180,6 @@ async def lifespan(app: FastAPI):
     is_testnet = settings.binance_testnet if settings.exchange == "binance" else settings.bybit_testnet
     logger.info(f"Bot initialized (exchange={settings.exchange}, testnet={is_testnet})")
 
-    # Startup sync: check real positions on all exchanges, clear in-memory ghosts
     try:
         for name, client, _, _ in _exchange_pairs:
             real_positions = client.get_positions(symbol="BTCUSDT")
@@ -211,7 +195,6 @@ async def lifespan(app: FastAPI):
 
     yield
 
-    # Shutdown
     logger.info("Shutting down...")
     if trading_engine:
         await trading_engine.stop()
@@ -219,9 +202,9 @@ async def lifespan(app: FastAPI):
 
 
 _last_exchange_sync: float = 0.0
-EXCHANGE_SYNC_INTERVAL = 30  # секунд
+EXCHANGE_SYNC_INTERVAL = 30  # seconds
 _last_alert_cleanup: float = 0.0
-ALERT_CLEANUP_INTERVAL = 300  # 5 минут
+ALERT_CLEANUP_INTERVAL = 300  # seconds
 
 
 async def on_price_update(ticker: dict):
@@ -233,14 +216,12 @@ async def on_price_update(ticker: dict):
 
     current_price = ticker["last_price"]
 
-    # Feed price to trading engine (handles sweep detection + confirmation for Diamond signals)
     if trading_engine and trading_engine.is_running:
         await trading_engine.on_price_update(current_price)
     else:
         for position in position_manager.get_active_positions():
             position_manager.update_position(position, current_price)
 
-    # Каждые 30 секунд сверяем in-memory позиции с реальными на бирже
     now = time.time()
     if now - _last_exchange_sync > EXCHANGE_SYNC_INTERVAL:
         _last_exchange_sync = now
@@ -257,7 +238,6 @@ async def on_price_update(ticker: dict):
         except Exception as e:
             logger.debug(f"Exchange sync error: {e}")
 
-    # Каждые 5 минут чистим старые алерты (>4 часов) из памяти и DB
     global _last_alert_cleanup
     if now - _last_alert_cleanup > ALERT_CLEANUP_INTERVAL:
         _last_alert_cleanup = now
@@ -273,7 +253,6 @@ async def on_price_update(ticker: dict):
         except Exception as e:
             logger.debug(f"Alert cleanup error: {e}")
 
-    # Sync in-memory position state → DB after every price update
     # Include recently closed positions so UI reflects close immediately
     active = position_manager.get_active_positions()
     recently_closed = [
@@ -306,7 +285,6 @@ async def on_price_update(ticker: dict):
                     closed_at=pos.closed_at,
                 )
 
-                # Sync trade PnL
                 trade = position_manager._trades.get(pos.trade_id)
                 if trade and trade.id:
                     await trade_repo.update(trade.id,
@@ -320,7 +298,6 @@ async def on_price_update(ticker: dict):
         logger.debug(f"DB sync error: {e}")
 
 
-# Create FastAPI app
 app = FastAPI(
     title="BTC Trading Bot",
     description="Trading bot with trdr.io signals integration",
@@ -331,7 +308,6 @@ app = FastAPI(
     openapi_url=None,
 )
 
-# CORS middleware
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
@@ -343,8 +319,7 @@ app.add_middleware(
 @app.middleware("http")
 async def auth_middleware(request: Request, call_next):
     path = request.url.path
-    # Only protect the dashboard HTML page (/)
-    # API, webhooks, WebSocket — all open
+    # Only the dashboard root requires auth; API/webhooks/WebSocket are open
     if path == "/" and not is_authenticated(request):
         return RedirectResponse(url="/login")
     return await call_next(request)
@@ -407,7 +382,6 @@ async def logout(request: Request):
     resp.delete_cookie("session")
     return resp
 
-# Include routers
 app.include_router(webhooks_router)
 app.include_router(trades_router)
 app.include_router(settings_router)
@@ -419,9 +393,7 @@ async def websocket_endpoint(websocket: WebSocket):
     await ws_manager.connect(websocket)
     try:
         while True:
-            # Keep connection alive
             data = await websocket.receive_text()
-            # Handle any incoming messages if needed
             if data == "ping":
                 await websocket.send_text("pong")
     except WebSocketDisconnect:
@@ -449,7 +421,6 @@ async def root():
     return {"message": "BTC Trading Bot API", "docs": "/docs"}
 
 
-# Mount static files for frontend
 frontend_dir = os.path.join(os.path.dirname(__file__), "..", "frontend")
 if os.path.exists(frontend_dir):
     app.mount("/static", StaticFiles(directory=frontend_dir), name="static")
