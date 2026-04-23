@@ -313,35 +313,39 @@ class TradingEngine:
             price_range=state.range
         )
 
-        # If tick price didn't trigger sweep — check candle HIGH/LOW to catch fast spikes
-        # that happened between 2s polling ticks
+        # If tick price didn't trigger sweep — check candle HIGH/LOW across all recent
+        # candles to catch fast spikes missed between 2s polling ticks.
+        # Use 15m candles (24 periods = 6 hours) to cover full sweep history since alert.
         if not sweep or not self.liquidity_tracker.is_valid_sweep(sweep):
-            candles = self._get_cached_klines()
+            range_candles = self.client.get_klines(
+                interval=self._timeframe_to_interval(settings.range_timeframe),
+                limit=settings.range_candles
+            )
+            candles = range_candles or self._get_cached_klines()
             if candles:
-                last = candles[-1]
-                candle_high = last.get("high", 0)
-                candle_low = last.get("low", float("inf"))
-                # Check if candle HIGH swept the range high
-                if candle_high and candle_high > state.range.local_high:
+                # Find max high and min low across ALL recent candles (not just last one)
+                candle_max_high = max((c.get("high", 0) for c in candles), default=0)
+                candle_min_low = min((c.get("low", float("inf")) for c in candles), default=float("inf"))
+
+                if candle_max_high > state.range.local_high:
                     sweep = self.liquidity_tracker.detect_sweep(
-                        current_price=candle_high,
+                        current_price=candle_max_high,
                         price_range=state.range
                     )
                     if sweep and self.liquidity_tracker.is_valid_sweep(sweep):
                         logger.info(
                             f"Sweep detected via candle HIGH for alert {state.alert.id}: "
-                            f"candle_high={candle_high:.0f} > range_high={state.range.local_high:.0f}"
+                            f"candle_high={candle_max_high:.0f} > range_high={state.range.local_high:.0f}"
                         )
-                # Check if candle LOW swept the range low
-                elif candle_low and candle_low < state.range.local_low:
+                elif candle_min_low < state.range.local_low:
                     sweep = self.liquidity_tracker.detect_sweep(
-                        current_price=candle_low,
+                        current_price=candle_min_low,
                         price_range=state.range
                     )
                     if sweep and self.liquidity_tracker.is_valid_sweep(sweep):
                         logger.info(
                             f"Sweep detected via candle LOW for alert {state.alert.id}: "
-                            f"candle_low={candle_low:.0f} < range_low={state.range.local_low:.0f}"
+                            f"candle_low={candle_min_low:.0f} < range_low={state.range.local_low:.0f}"
                         )
 
         if sweep and self.liquidity_tracker.is_valid_sweep(sweep):
