@@ -362,6 +362,7 @@ class OKXClient:
                     "side": "long" if float(p.get("pos", 0)) > 0 else "short",
                     "size": pos_qty,
                     "entry_price": float(p.get("avgPx", 0)),
+                    "mark_price": float(p.get("markPx", 0)) if p.get("markPx") else float(p.get("avgPx", 0)),
                     "unrealized_pnl": float(p.get("upl", 0)),
                     "stop_loss": None,
                     "take_profit": None,

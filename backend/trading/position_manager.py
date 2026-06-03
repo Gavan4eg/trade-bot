@@ -343,12 +343,13 @@ class PositionManager:
                 if local_pos.status == PositionStatus.CLOSED:
                     continue
 
+                pos_side = pos["side"].lower()
                 if (
-                    (local_pos.direction == TradeDirection.LONG and pos["side"] == "Buy") or
-                    (local_pos.direction == TradeDirection.SHORT and pos["side"] == "Sell")
+                    (local_pos.direction == TradeDirection.LONG and pos_side in ("buy", "long")) or
+                    (local_pos.direction == TradeDirection.SHORT and pos_side in ("sell", "short"))
                 ):
                     local_pos.current_quantity = pos["size"]
-                    local_pos.current_price = pos["mark_price"]
+                    local_pos.current_price = pos.get("mark_price") or pos.get("entry_price", 0)
                     local_pos.unrealized_pnl = pos["unrealized_pnl"]
 
                     if pos.get("stop_loss"):

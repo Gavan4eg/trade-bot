@@ -129,7 +129,8 @@ async def close_all_positions(db: AsyncSession = Depends(get_db)):
         try:
             positions = bybit_client.get_positions(symbol="BTCUSDT")
             for pos in positions:
-                side = "Sell" if pos["side"] == "Buy" else "Buy"
+                pos_side = pos["side"].lower()
+                side = "sell" if pos_side in ("buy", "long") else "buy"
                 qty = pos["size"]
                 order = bybit_client.place_order(
                     side=side, qty=qty, order_type="Market", reduce_only=True
