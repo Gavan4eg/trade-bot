@@ -442,28 +442,34 @@ class OKXClient:
                 return False
 
             pos = positions[0]
-            pos_side = pos["side"]
+            close_side = "sell" if pos["side"] == "long" else "buy"
+            contracts = max(1, int(round(pos["size"] / 0.01)))
+
+            has_sl = stop_loss is not None
+            has_tp = take_profit is not None
+
+            if has_sl and has_tp:
+                ord_type = "oco"
+            else:
+                ord_type = "conditional"
 
             params: Dict[str, Any] = {
                 "instId": inst_id,
-                "posSide": pos_side,
+                "tdMode": "cross",
+                "side": close_side,
+                "ordType": ord_type,
+                "sz": str(contracts),
             }
-            if stop_loss is not None:
+            if has_sl:
                 params["slTriggerPx"] = str(stop_loss)
                 params["slOrdPx"] = "-1"
-            if take_profit is not None:
+            if has_tp:
                 params["tpTriggerPx"] = str(take_profit)
                 params["tpOrdPx"] = "-1"
 
-            resp = self._trade_api.place_algo_order(
-                instId=inst_id,
-                tdMode="cross",
-                side="sell" if pos_side == "long" else "buy",
-                ordType="oco",
-                sz=str(pos["size"]),
-                **{k: v for k, v in params.items() if k not in ("instId", "posSide")}
-            )
+            resp = self._trade_api.place_algo_order(**params)
             if resp.get("code") == "0":
+                logger.info(f"OKX algo order set: sl={stop_loss}, tp={take_profit}, contracts={contracts}")
                 return True
             logger.error(f"OKX set_trading_stop error: {resp}")
             return False

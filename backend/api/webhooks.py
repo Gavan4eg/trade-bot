@@ -602,8 +602,9 @@ async def test_full_trade(
             exchange_positions = _bybit_client.get_positions(symbol="BTCUSDT")
             if exchange_positions:
                 p = exchange_positions[0]
-                side = "Sell" if p["side"] == "Buy" else "Buy"
-                _bybit_client.place_order(side=side, qty=p["size"], order_type="Market", reduce_only=True)
+                pos_side = p["side"].lower()
+                close_side = "sell" if pos_side in ("buy", "long") else "buy"
+                _bybit_client.place_order(side=close_side, qty=p["size"], order_type="Market", reduce_only=True)
                 await ws_manager.send_log(
                     f"🧪 TEST: Closed on exchange after {close_after_seconds}s",
                     level="success", source="test"
