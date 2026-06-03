@@ -20,11 +20,15 @@ from .trading.binance_client import BinanceClient
 
 
 def create_exchange_client():
-    """Фабрика: выбирает биржу через ENV EXCHANGE=bybit|binance"""
+    """Фабрика: выбирает биржу через ENV EXCHANGE=bybit|binance|okx"""
     exchange = settings.exchange.lower()
     if exchange == "binance":
         logger.info("Exchange: Binance Futures")
         return BinanceClient(testnet=settings.binance_testnet)
+    elif exchange == "okx":
+        from .trading.okx_client import OKXClient
+        logger.info("Exchange: OKX")
+        return OKXClient(testnet=settings.okx_testnet)
     else:
         logger.info("Exchange: Bybit")
         return BybitClient(testnet=settings.bybit_testnet)
@@ -177,7 +181,8 @@ async def lifespan(app: FastAPI):
             except Exception as e:
                 logger.warning(f"Leverage setup error on {name}: {e}")
 
-    is_testnet = settings.binance_testnet if settings.exchange == "binance" else settings.bybit_testnet
+    _testnet_map = {"binance": settings.binance_testnet, "okx": settings.okx_testnet}
+    is_testnet = _testnet_map.get(settings.exchange.lower(), settings.bybit_testnet)
     logger.info(f"Bot initialized (exchange={settings.exchange}, testnet={is_testnet})")
 
     try:
