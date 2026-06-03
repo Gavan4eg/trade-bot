@@ -265,13 +265,16 @@ class OKXClient:
 
             return {"order_id": order_id, "executed_price": exec_price, "qty": qty}
 
-        # Real order
+        # Real order — OKX BTC-USDT-SWAP: 1 contract = 0.01 BTC
+        contracts = max(1, int(round(qty / 0.01)))
+        logger.info(f"OKX order: qty={qty} BTC → {contracts} contracts")
+
         params: Dict[str, Any] = {
             "instId": inst_id,
             "tdMode": "cross",
             "side": side_lower,
             "ordType": okx_type,
-            "sz": str(qty),
+            "sz": str(contracts),
         }
         if reduce_only:
             params["reduceOnly"] = "true"
@@ -350,9 +353,10 @@ class OKXClient:
                 return []
             positions = []
             for p in resp["data"]:
-                pos_qty = abs(float(p.get("pos", 0)))
-                if pos_qty == 0:
+                pos_contracts = abs(float(p.get("pos", 0)))
+                if pos_contracts == 0:
                     continue
+                pos_qty = pos_contracts * 0.01  # contracts → BTC
                 positions.append({
                     "symbol": p["instId"],
                     "side": "long" if float(p.get("pos", 0)) > 0 else "short",
