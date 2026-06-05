@@ -845,8 +845,17 @@ function TradingChart({ trades, positions, alerts, currentPrice }) {
                 });
             }
 
-            // Open position — add PnL to entry marker text
-            // (no separate marker needed, entry arrow is enough)
+            // Open position marker (no close yet)
+            if (!isClosed) {
+                const unrealPnl = trade.unrealized_pnl || 0;
+                markers.push({
+                    time,
+                    position: isLong ? 'belowBar' : 'aboveBar',
+                    color: '#3b82f6',
+                    shape: 'circle',
+                    text: `OPEN ${unrealPnl >= 0 ? '+' : ''}$${unrealPnl.toFixed(2)}`,
+                });
+            }
         });
 
         // Helper: draw SL/TP/Entry lines for a trade or position
