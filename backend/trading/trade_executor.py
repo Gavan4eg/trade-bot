@@ -116,14 +116,16 @@ class TradeExecutor:
         order = self.client.place_order(**order_params)
 
         if order:
+            real_qty = order.get("qty", quantity)  # use actual qty from exchange
             trade.order_id = order["order_id"]
             trade.status = TradeStatus.OPEN
             trade.opened_at = datetime.utcnow()
             trade.executed_price = exec_price
-            trade.executed_quantity = quantity
+            trade.executed_quantity = real_qty
+            trade.quantity = real_qty  # update planned qty too
 
             logger.info(
-                f"Position opened: {direction.value} {quantity} BTC @ {exec_price}, "
+                f"Position opened: {direction.value} {real_qty} BTC @ {exec_price}, "
                 f"SL: {stop_loss}, TP1: {tp1}, TP2: {tp2}, RR: {trade.risk_reward}"
             )
             return trade

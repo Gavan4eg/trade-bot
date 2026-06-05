@@ -301,8 +301,9 @@ class OKXClient:
             resp = self._trade_api.place_order(**params)
             if resp.get("code") == "0":
                 order_id = resp["data"][0]["ordId"]
-                logger.info(f"OKX order placed: {order_id} ({side} {qty} {inst_id})")
-                return {"order_id": order_id, "qty": qty}
+                real_qty = contracts * 0.01  # actual BTC amount
+                logger.info(f"OKX order placed: {order_id} ({side} {real_qty} BTC = {contracts} contracts {inst_id})")
+                return {"order_id": order_id, "qty": real_qty}
             logger.error(f"OKX place_order error: {resp}")
             return None
         except Exception as e:
