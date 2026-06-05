@@ -153,9 +153,9 @@ class TradeRepository:
                                if t.status in ("open", "partial_close"))
         total_pnl = total_realized + total_unrealized
 
-        closed = [t for t in trades if t.status == "closed"]
+        closed = [t for t in trades if t.status in ("closed", "partial_close")]
         win_count = sum(1 for t in closed if t.realized_pnl > 0)
-        loss_count = sum(1 for t in closed if t.realized_pnl <= 0)
+        loss_count = sum(1 for t in closed if t.realized_pnl < 0)
         total_count = len(trades)
         closed_count = len(closed)
 
