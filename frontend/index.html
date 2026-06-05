@@ -106,7 +106,7 @@ function PipelineBar({ status }) {
 }
 
 /* ── Alert Card ──────────────────────────────── */
-function AlertCard({ alert }) {
+function AlertCard({ alert, trade, position }) {
     const [expanded, setExpanded] = useState(false);
     const meta   = PRIORITY_META[alert.priority] || PRIORITY_META[2];
     const status = STATUS_META[alert.status]     || { label: alert.status, color:'text-gray-400', icon:'•' };
@@ -202,6 +202,84 @@ function AlertCard({ alert }) {
                         </div>
                     )}
 
+                    {/* Trade details */}
+                    {(trade || position) && (() => {
+                        const t = trade;
+                        const pos = position;
+                        const isLong = (t?.direction || pos?.direction) === 'long';
+                        const entry = t?.entry_price || pos?.entry_price;
+                        const sl = t?.stop_loss || pos?.stop_loss;
+                        const tp1 = t?.take_profit_1 || pos?.take_profit_1;
+                        const tp2 = t?.take_profit_2 || pos?.take_profit_2;
+                        const qty = t?.quantity || pos?.current_quantity;
+                        const rr = t?.risk_reward;
+                        const pnl = t?.realized_pnl || pos?.realized_pnl || 0;
+                        const upnl = pos?.unrealized_pnl || t?.unrealized_pnl || 0;
+                        const isClosed = t?.status === 'closed' || pos?.status === 'closed';
+                        const trailing = pos?.trailing_stop;
+                        const tp1Hit = pos?.tp1_filled || false;
+                        const tp2Hit = pos?.tp2_filled || false;
+
+                        return (
+                            <div className="bg-gray-900/60 rounded-lg p-3">
+                                <div className="text-xs text-gray-400 font-semibold mb-2 uppercase tracking-wide">
+                                    💹 Trade {isClosed ? '(Closed)' : '(Active)'}
+                                </div>
+                                <div className="grid grid-cols-2 gap-x-4 gap-y-1">
+                                    <span className="text-gray-400">Direction</span>
+                                    <span className={`font-bold ${isLong ? 'text-green-400' : 'text-red-400'}`}>
+                                        {isLong ? '▲ LONG' : '▼ SHORT'}
+                                    </span>
+                                    <span className="text-gray-400">Entry</span>
+                                    <span className="font-mono text-blue-400">${fmt(entry, 0)}</span>
+                                    <span className="text-gray-400">Stop Loss</span>
+                                    <span className="font-mono text-red-400">${fmt(sl, 0)}</span>
+                                    <span className="text-gray-400">TP1</span>
+                                    <span className={`font-mono ${tp1Hit ? 'text-gray-500 line-through' : 'text-green-400'}`}>
+                                        ${fmt(tp1, 0)} {tp1Hit ? '✓' : ''}
+                                    </span>
+                                    <span className="text-gray-400">TP2</span>
+                                    <span className={`font-mono ${tp2Hit ? 'text-gray-500 line-through' : 'text-purple-400'}`}>
+                                        ${fmt(tp2, 0)} {tp2Hit ? '✓' : ''}
+                                    </span>
+                                    {trailing && <>
+                                        <span className="text-gray-400">Trailing</span>
+                                        <span className="font-mono text-yellow-400">${fmt(trailing, 0)}</span>
+                                    </>}
+                                    <span className="text-gray-400">Quantity</span>
+                                    <span className="font-mono">{qty} BTC</span>
+                                    {rr && <>
+                                        <span className="text-gray-400">Risk/Reward</span>
+                                        <span className="font-mono text-cyan-400">{rr.toFixed(1)}x</span>
+                                    </>}
+                                </div>
+                                <div className="mt-2 pt-2 border-t border-gray-700/50 flex justify-between">
+                                    {!isClosed ? (
+                                        <div>
+                                            <span className="text-xs text-gray-500">Unrealized PnL</span>
+                                            <div className={`font-mono font-bold ${upnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                                {upnl >= 0 ? '+' : ''}{fmt(upnl)}$
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div>
+                                            <span className="text-xs text-gray-500">Realized PnL</span>
+                                            <div className={`font-mono font-bold ${pnl >= 0 ? 'text-green-400' : 'text-red-400'}`}>
+                                                {pnl >= 0 ? '+' : ''}{fmt(pnl)}$
+                                            </div>
+                                        </div>
+                                    )}
+                                    {pos?.current_price && !isClosed && (
+                                        <div className="text-right">
+                                            <span className="text-xs text-gray-500">Current</span>
+                                            <div className="font-mono font-bold">${fmt(pos.current_price, 0)}</div>
+                                        </div>
+                                    )}
+                                </div>
+                            </div>
+                        );
+                    })()}
+
                     {/* Liquidation cluster */}
                     {p.liquidation_cluster?.length > 0 && (
                         <div className="bg-gray-900/60 rounded-lg p-3">
@@ -234,7 +312,13 @@ function AlertCard({ alert }) {
 }
 
 /* ── Alerts Panel ────────────────────────────── */
-function AlertsPanel({ alerts }) {
+function AlertsPanel({ alerts, trades, positions }) {
+    // Match trades/positions to alerts by alert_id
+    const tradesByAlert = {};
+    (trades || []).forEach(t => { if (t.alert_id) tradesByAlert[t.alert_id] = t; });
+    const positionsByTrade = {};
+    (positions || []).forEach(p => { if (p.trade_id) positionsByTrade[p.trade_id] = p; });
+
     return (
         <div className="bg-gray-900 rounded-xl p-4">
             <div className="flex items-center justify-between mb-4">
@@ -247,7 +331,11 @@ function AlertsPanel({ alerts }) {
             <div className="space-y-3 max-h-[600px] overflow-y-auto pr-1">
                 {alerts.length === 0
                     ? <p className="text-gray-600 text-center py-8">Waiting for signals from trdr.io...</p>
-                    : alerts.map((a,i) => <AlertCard key={a.id||i} alert={a}/>)
+                    : alerts.map((a,i) => {
+                        const trade = tradesByAlert[a.id];
+                        const position = trade ? positionsByTrade[trade.id] : null;
+                        return <AlertCard key={a.id||i} alert={a} trade={trade} position={position}/>;
+                    })
                 }
             </div>
         </div>
@@ -680,7 +768,7 @@ function TradingChart({ trades, positions, alerts, currentPrice }) {
             .then(candles => {
                 if (candles.length > 0) {
                     candleSeriesRef.current.setData(candles);
-                    chartRef.current.timeScale().fitContent();
+                    chartRef.current.timeScale().scrollToRealTime();
                 }
                 setLoading(false);
             })
@@ -1109,7 +1197,7 @@ function App() {
                                     : <div className="space-y-3">{positions.map((p,i)=><PositionCard key={p.id||i} pos={p}/>)}</div>
                                 }
                             </div>
-                            <AlertsPanel alerts={alerts.slice(0,5)}/>
+                            <AlertsPanel alerts={alerts.slice(0,5)} trades={trades} positions={positions}/>
                         </div>
                         <div className="space-y-4">
                             <BotControl status={botStatus} onStart={startBot} onStop={stopBot} onCloseAll={() => fetch('/api/positions').then(r=>r.json()).then(setPositions)}/>
@@ -1122,14 +1210,14 @@ function App() {
                     <div className="space-y-4">
                         <TradingChart trades={trades} positions={positions} alerts={alerts} currentPrice={price?.price}/>
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-                            <AlertsPanel alerts={alerts.filter(a => !['expired','rejected'].includes(a.status))}/>
+                            <AlertsPanel alerts={alerts.filter(a => !['expired','rejected'].includes(a.status))} trades={trades} positions={positions}/>
                             <div className="space-y-3">
                                 {positions.filter(p=>p.status!=='closed'&&p.status!=='stopped').map((p,i)=><PositionCard key={p.id||i} pos={p}/>)}
                             </div>
                         </div>
                     </div>
                 )}
-                {tab === 'alerts'    && <AlertsPanel alerts={alerts}/>}
+                {tab === 'alerts'    && <AlertsPanel alerts={alerts} trades={trades} positions={positions}/>}
                 {tab === 'positions' && (
                     <div className="space-y-3">
                         {positions.length===0
