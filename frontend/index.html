@@ -719,99 +719,139 @@ function TradingChart({ trades, positions, alerts, currentPrice }) {
             if (!trade.opened_at) return;
             const ts = trade.opened_at;
             const utcTs = ts && !ts.endsWith('Z') ? ts + 'Z' : ts;
-            const time = Math.floor(new Date(utcTs).getTime() / 1000);
+            const openDate = new Date(utcTs);
+            const time = Math.floor(openDate.getTime() / 1000);
             const isLong = trade.direction === 'long';
+            const isClosed = trade.status === 'closed' || trade.status === 'cancelled';
+            const pnl = trade.realized_pnl || 0;
+            const dateStr = openDate.toLocaleDateString('ru-RU', {day:'2-digit',month:'2-digit'}) + ' ' + openDate.toLocaleTimeString('ru-RU', {hour:'2-digit',minute:'2-digit'});
 
-            // Entry marker
+            // Entry marker with date
             markers.push({
                 time,
                 position: isLong ? 'belowBar' : 'aboveBar',
                 color: isLong ? '#22c55e' : '#ef4444',
                 shape: isLong ? 'arrowUp' : 'arrowDown',
-                text: `${isLong ? 'LONG' : 'SHORT'} $${Math.round(trade.entry_price)}`,
+                text: `${isLong ? '▲ LONG' : '▼ SHORT'} $${Math.round(trade.entry_price)} | ${dateStr}`,
             });
 
-            // Close marker
+            // Close marker with details
             if (trade.closed_at) {
                 const closeUtc = trade.closed_at && !trade.closed_at.endsWith('Z') ? trade.closed_at + 'Z' : trade.closed_at;
-                const closeTime = Math.floor(new Date(closeUtc).getTime() / 1000);
-                const pnl = trade.realized_pnl || 0;
+                const closeDate = new Date(closeUtc);
+                const closeTime = Math.floor(closeDate.getTime() / 1000);
+                const closeDateStr = closeDate.toLocaleDateString('ru-RU', {day:'2-digit',month:'2-digit'}) + ' ' + closeDate.toLocaleTimeString('ru-RU', {hour:'2-digit',minute:'2-digit'});
+                const pnlStr = pnl >= 0 ? `+$${pnl.toFixed(2)}` : `-$${Math.abs(pnl).toFixed(2)}`;
+                const reason = trade.status === 'stopped' ? 'SL' : (pnl >= 0 ? 'TP' : 'SL');
+
                 markers.push({
                     time: closeTime,
                     position: isLong ? 'aboveBar' : 'belowBar',
                     color: pnl >= 0 ? '#22c55e' : '#ef4444',
+                    shape: pnl >= 0 ? 'circle' : 'square',
+                    text: `✕ ${reason} ${pnlStr} | ${closeDateStr}`,
+                });
+            }
+
+            // Open position marker (no close yet)
+            if (!isClosed) {
+                const unrealPnl = trade.unrealized_pnl || 0;
+                markers.push({
+                    time,
+                    position: isLong ? 'belowBar' : 'aboveBar',
+                    color: '#3b82f6',
                     shape: 'circle',
-                    text: `CLOSE ${pnl >= 0 ? '+' : ''}$${pnl.toFixed(1)}`,
+                    text: `OPEN ${unrealPnl >= 0 ? '+' : ''}$${unrealPnl.toFixed(2)}`,
                 });
             }
         });
 
-        // Active positions — draw SL/TP lines
-        (positions || []).filter(p => p.status !== 'closed' && p.status !== 'stopped').forEach(pos => {
-            const isLong = pos.direction === 'long';
+        // Helper: draw SL/TP/Entry lines for a trade or position
+        const drawTradeLines = (item, isClosed) => {
+            const isLong = item.direction === 'long';
+            const opacity = isClosed ? 0.4 : 1;
+            const prefix = isClosed ? '(closed) ' : '';
 
             // Entry line
-            const entryLine = candleSeriesRef.current.createPriceLine({
-                price: pos.entry_price,
-                color: '#3b82f6',
-                lineWidth: 2,
-                lineStyle: LightweightCharts.LineStyle.Solid,
-                axisLabelVisible: true,
-                title: `Entry ${isLong ? '▲' : '▼'} $${Math.round(pos.entry_price)}`,
-            });
-            linesRef.current.push(entryLine);
+            if (item.entry_price) {
+                const entryLine = candleSeriesRef.current.createPriceLine({
+                    price: item.entry_price,
+                    color: isClosed ? '#64748b' : '#3b82f6',
+                    lineWidth: isClosed ? 1 : 2,
+                    lineStyle: isClosed ? LightweightCharts.LineStyle.Dotted : LightweightCharts.LineStyle.Solid,
+                    axisLabelVisible: !isClosed,
+                    title: `${prefix}Entry ${isLong ? '▲' : '▼'} $${Math.round(item.entry_price)}`,
+                });
+                linesRef.current.push(entryLine);
+            }
 
             // SL line
-            if (pos.stop_loss) {
+            const sl = item.stop_loss;
+            if (sl) {
                 const slLine = candleSeriesRef.current.createPriceLine({
-                    price: pos.stop_loss,
-                    color: '#ef4444',
-                    lineWidth: 2,
+                    price: sl,
+                    color: isClosed ? '#991b1b' : '#ef4444',
+                    lineWidth: isClosed ? 1 : 2,
                     lineStyle: LightweightCharts.LineStyle.Dashed,
-                    axisLabelVisible: true,
-                    title: `SL $${Math.round(pos.stop_loss)}`,
+                    axisLabelVisible: !isClosed,
+                    title: `${prefix}SL $${Math.round(sl)}`,
                 });
                 linesRef.current.push(slLine);
             }
 
             // TP1 line
-            if (pos.take_profit_1) {
+            const tp1 = item.take_profit_1;
+            if (tp1) {
+                const filled = item.tp1_filled;
                 const tp1Line = candleSeriesRef.current.createPriceLine({
-                    price: pos.take_profit_1,
-                    color: pos.tp1_filled ? '#6b7280' : '#22c55e',
+                    price: tp1,
+                    color: isClosed ? '#374151' : (filled ? '#6b7280' : '#22c55e'),
                     lineWidth: 1,
-                    lineStyle: pos.tp1_filled ? LightweightCharts.LineStyle.Dotted : LightweightCharts.LineStyle.Dashed,
-                    axisLabelVisible: true,
-                    title: `TP1 ${pos.tp1_filled ? '✓' : ''} $${Math.round(pos.take_profit_1)}`,
+                    lineStyle: (isClosed || filled) ? LightweightCharts.LineStyle.Dotted : LightweightCharts.LineStyle.Dashed,
+                    axisLabelVisible: !isClosed,
+                    title: `${prefix}TP1 ${filled ? '✓' : ''} $${Math.round(tp1)}`,
                 });
                 linesRef.current.push(tp1Line);
             }
 
             // TP2 line
-            if (pos.take_profit_2) {
+            const tp2 = item.take_profit_2;
+            if (tp2) {
+                const filled = item.tp2_filled;
                 const tp2Line = candleSeriesRef.current.createPriceLine({
-                    price: pos.take_profit_2,
-                    color: pos.tp2_filled ? '#6b7280' : '#a855f7',
+                    price: tp2,
+                    color: isClosed ? '#374151' : (filled ? '#6b7280' : '#a855f7'),
                     lineWidth: 1,
-                    lineStyle: pos.tp2_filled ? LightweightCharts.LineStyle.Dotted : LightweightCharts.LineStyle.Dashed,
-                    axisLabelVisible: true,
-                    title: `TP2 ${pos.tp2_filled ? '✓' : ''} $${Math.round(pos.take_profit_2)}`,
+                    lineStyle: (isClosed || filled) ? LightweightCharts.LineStyle.Dotted : LightweightCharts.LineStyle.Dashed,
+                    axisLabelVisible: !isClosed,
+                    title: `${prefix}TP2 ${filled ? '✓' : ''} $${Math.round(tp2)}`,
                 });
                 linesRef.current.push(tp2Line);
             }
 
-            // Trailing stop line
-            if (pos.trailing_stop) {
+            // Trailing stop line (active only)
+            if (!isClosed && item.trailing_stop) {
                 const tsLine = candleSeriesRef.current.createPriceLine({
-                    price: pos.trailing_stop,
+                    price: item.trailing_stop,
                     color: '#eab308',
                     lineWidth: 1,
                     lineStyle: LightweightCharts.LineStyle.SparseDotted,
                     axisLabelVisible: true,
-                    title: `Trail $${Math.round(pos.trailing_stop)}`,
+                    title: `Trail $${Math.round(item.trailing_stop)}`,
                 });
                 linesRef.current.push(tsLine);
             }
+        };
+
+        // Draw lines for ALL trades (closed = dimmed, active = bright)
+        (trades || []).forEach(trade => {
+            const isClosed = trade.status === 'closed' || trade.status === 'cancelled';
+            drawTradeLines(trade, isClosed);
+        });
+
+        // Active positions — override with live data (brighter lines)
+        (positions || []).filter(p => p.status !== 'closed' && p.status !== 'stopped').forEach(pos => {
+            drawTradeLines(pos, false);
         });
 
         // Active alerts — draw range zones
