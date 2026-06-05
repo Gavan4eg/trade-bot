@@ -186,15 +186,59 @@ async def lifespan(app: FastAPI):
     logger.info(f"Bot initialized (exchange={settings.exchange}, testnet={is_testnet})")
 
     try:
+        has_exchange_positions = False
         for name, client, _, _ in _exchange_pairs:
             real_positions = client.get_positions(symbol="BTCUSDT")
             if not real_positions:
                 logger.info(f"Startup sync [{name}]: no open positions")
             else:
+                has_exchange_positions = True
                 logger.info(f"Startup sync [{name}]: {len(real_positions)} open position(s)")
         position_manager.positions.clear()
         position_manager._trades.clear()
         logger.info("Startup sync: memory cleared")
+
+        # Close stale DB trades/positions that are no longer on exchange
+        if not has_exchange_positions:
+            from .database.db import AsyncSessionLocal
+            from .database.repositories import TradeRepository, PositionRepository
+            async with AsyncSessionLocal() as session:
+                trade_repo = TradeRepository(session)
+                pos_repo = PositionRepository(session)
+
+                open_trades = await trade_repo.get_open_trades()
+                closed_count = 0
+                for t in open_trades:
+                    # Get last known price for PnL calculation
+                    ticker = primary_client.get_ticker()
+                    last_price = ticker["last_price"] if ticker else t.entry_price
+
+                    if t.direction == "long":
+                        pnl = (last_price - t.entry_price) * (t.executed_quantity or t.quantity)
+                    else:
+                        pnl = (t.entry_price - last_price) * (t.executed_quantity or t.quantity)
+
+                    from datetime import datetime
+                    await trade_repo.update(t.id,
+                        status="closed",
+                        realized_pnl=round(pnl, 4),
+                        closed_at=datetime.utcnow()
+                    )
+
+                    # Close matching position
+                    positions = await pos_repo.get_active()
+                    for p in positions:
+                        if p.trade_id == t.id:
+                            await pos_repo.update(p.id,
+                                status="closed",
+                                realized_pnl=round(pnl, 4),
+                                current_quantity=0,
+                                closed_at=datetime.utcnow()
+                            )
+                    closed_count += 1
+
+                if closed_count > 0:
+                    logger.info(f"Startup sync: closed {closed_count} stale trade(s) in DB (no exchange position)")
     except Exception as e:
         logger.warning(f"Startup sync failed: {e}")
 
@@ -215,6 +259,7 @@ ALERT_CLEANUP_INTERVAL = 300  # seconds
 async def on_price_update(ticker: dict):
     """Callback for price updates — drives the Diamond signal pipeline and position management"""
     import time
+    from datetime import datetime
     global _last_exchange_sync
     from .database.db import AsyncSessionLocal
     from .database.repositories import PositionRepository, TradeRepository
@@ -235,11 +280,40 @@ async def on_price_update(ticker: dict):
             position_manager.sync_with_exchange()
             after = len(position_manager.get_active_positions())
             if before != after:
-                logger.info(f"Sync: {before - after} position(s) closed externally on exchange")
+                closed_count = before - after
+                logger.info(f"Sync: {closed_count} position(s) closed externally on exchange")
                 await ws_manager.send_log(
-                    f"🔄 Sync: {before - after} position(s) closed on exchange — UI updated",
+                    f"🔄 Sync: {closed_count} position(s) closed on exchange — UI updated",
                     level="warning", source="sync"
                 )
+                # Update DB: mark closed trades/positions
+                try:
+                    async with AsyncSessionLocal() as session:
+                        trade_repo = TradeRepository(session)
+                        pos_repo = PositionRepository(session)
+                        open_trades = await trade_repo.get_open_trades()
+                        for t in open_trades:
+                            if t.direction == "long":
+                                pnl = (current_price - t.entry_price) * (t.executed_quantity or t.quantity)
+                            else:
+                                pnl = (t.entry_price - current_price) * (t.executed_quantity or t.quantity)
+                            await trade_repo.update(t.id,
+                                status="closed",
+                                realized_pnl=round(pnl, 4),
+                                closed_at=datetime.utcnow()
+                            )
+                            db_positions = await pos_repo.get_active()
+                            for p in db_positions:
+                                if p.trade_id == t.id:
+                                    await pos_repo.update(p.id,
+                                        status="closed",
+                                        realized_pnl=round(pnl, 4),
+                                        current_quantity=0,
+                                        closed_at=datetime.utcnow()
+                                    )
+                        logger.info(f"Sync: DB updated — {len(open_trades)} trade(s) marked closed")
+                except Exception as e:
+                    logger.warning(f"Sync DB update error: {e}")
         except Exception as e:
             logger.debug(f"Exchange sync error: {e}")
 

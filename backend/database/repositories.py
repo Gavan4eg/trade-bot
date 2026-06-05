@@ -40,11 +40,17 @@ class AlertRepository:
         return result.scalars().all()
 
     async def get_recent(self, limit: int = 50, hours: int = 72) -> List[AlertDB]:
-        """Get recent alerts — only last N hours (default 72h = 3 days)"""
+        """Get recent alerts — last N hours + all traded alerts forever"""
+        from sqlalchemy import or_
         cutoff = datetime.utcnow() - timedelta(hours=hours)
         result = await self.session.execute(
             select(AlertDB)
-            .where(AlertDB.timestamp >= cutoff)
+            .where(
+                or_(
+                    AlertDB.timestamp >= cutoff,
+                    AlertDB.status == "traded",
+                )
+            )
             .order_by(AlertDB.timestamp.desc())
             .limit(limit)
         )
