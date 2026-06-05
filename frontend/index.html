@@ -768,7 +768,11 @@ function TradingChart({ trades, positions, alerts, currentPrice }) {
             .then(candles => {
                 if (candles.length > 0) {
                     candleSeriesRef.current.setData(candles);
-                    chartRef.current.timeScale().scrollToRealTime();
+                    // Show last 80 candles (zoom into recent action)
+                    const visibleBars = 80;
+                    const from = candles.length > visibleBars ? candles[candles.length - visibleBars].time : candles[0].time;
+                    const to = candles[candles.length - 1].time;
+                    chartRef.current.timeScale().setVisibleRange({ from, to });
                 }
                 setLoading(false);
             })
