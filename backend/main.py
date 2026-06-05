@@ -209,14 +209,18 @@ async def lifespan(app: FastAPI):
                 open_trades = await trade_repo.get_open_trades()
                 closed_count = 0
                 for t in open_trades:
-                    # Get last known price for PnL calculation
-                    ticker = primary_client.get_ticker()
-                    last_price = ticker["last_price"] if ticker else t.entry_price
+                    # Get real close price from exchange history
+                    close_price = None
+                    if hasattr(primary_client, 'get_last_close_price'):
+                        close_price = primary_client.get_last_close_price()
+                    if not close_price:
+                        ticker = primary_client.get_ticker()
+                        close_price = ticker["last_price"] if ticker else t.entry_price
 
                     if t.direction == "long":
-                        pnl = (last_price - t.entry_price) * (t.executed_quantity or t.quantity)
+                        pnl = (close_price - t.entry_price) * (t.executed_quantity or t.quantity)
                     else:
-                        pnl = (t.entry_price - last_price) * (t.executed_quantity or t.quantity)
+                        pnl = (t.entry_price - close_price) * (t.executed_quantity or t.quantity)
 
                     from datetime import datetime
                     await trade_repo.update(t.id,
@@ -286,17 +290,24 @@ async def on_price_update(ticker: dict):
                     f"🔄 Sync: {closed_count} position(s) closed on exchange — UI updated",
                     level="warning", source="sync"
                 )
-                # Update DB: mark closed trades/positions
+                # Update DB: mark closed trades/positions with real close price from exchange
                 try:
+                    # Get real close price from exchange order history
+                    close_price = None
+                    if hasattr(primary_client, 'get_last_close_price'):
+                        close_price = primary_client.get_last_close_price()
+                    if not close_price:
+                        close_price = current_price  # fallback
+
                     async with AsyncSessionLocal() as session:
                         trade_repo = TradeRepository(session)
                         pos_repo = PositionRepository(session)
                         open_trades = await trade_repo.get_open_trades()
                         for t in open_trades:
                             if t.direction == "long":
-                                pnl = (current_price - t.entry_price) * (t.executed_quantity or t.quantity)
+                                pnl = (close_price - t.entry_price) * (t.executed_quantity or t.quantity)
                             else:
-                                pnl = (t.entry_price - current_price) * (t.executed_quantity or t.quantity)
+                                pnl = (t.entry_price - close_price) * (t.executed_quantity or t.quantity)
                             await trade_repo.update(t.id,
                                 status="closed",
                                 realized_pnl=round(pnl, 4),
@@ -311,7 +322,7 @@ async def on_price_update(ticker: dict):
                                         current_quantity=0,
                                         closed_at=datetime.utcnow()
                                     )
-                        logger.info(f"Sync: DB updated — {len(open_trades)} trade(s) marked closed")
+                        logger.info(f"Sync: DB updated — {len(open_trades)} trade(s) closed @ ${close_price:,.0f} (real fill price)")
                 except Exception as e:
                     logger.warning(f"Sync DB update error: {e}")
         except Exception as e:

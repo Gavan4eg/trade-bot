@@ -372,6 +372,27 @@ class OKXClient:
             logger.error(f"OKX get_positions exception: {e}")
             return []
 
+    def get_last_close_price(self, symbol: str = None) -> Optional[float]:
+        """Get the fill price of the most recent closing order (SL/TP/manual).
+        Used to calculate real PnL when sync detects a position was closed on exchange."""
+        if self.paper_trading:
+            return None
+        try:
+            inst_id = self._normalize_symbol(symbol)
+            resp = self._trade_api.get_orders_history(instType="SWAP", instId=inst_id, limit="5")
+            if resp.get("code") != "0":
+                return None
+            for o in resp["data"]:
+                avg_px = o.get("avgPx")
+                if avg_px and float(avg_px) > 0:
+                    pnl = float(o.get("pnl", 0))
+                    logger.info(f"OKX last close: {o['side']} @ ${avg_px}, PnL: ${pnl}")
+                    return float(avg_px)
+            return None
+        except Exception as e:
+            logger.error(f"OKX get_last_close_price exception: {e}")
+            return None
+
     def get_order_history(self, symbol: str = None, limit: int = 50) -> List[dict]:
         """Get order history."""
         if self.paper_trading:
