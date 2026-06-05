@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BTC Trading Bot</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lightweight-charts@4.1.0/dist/lightweight-charts.standalone.production.js"></script>
     <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
     <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
@@ -600,10 +601,300 @@ function LogsPanel({ logs, onClear, logsEndRef }) {
     );
 }
 
+/* ── Trading Chart ───────────────────────────── */
+function TradingChart({ trades, positions, alerts, currentPrice }) {
+    const chartContainerRef = useRef(null);
+    const chartRef = useRef(null);
+    const candleSeriesRef = useRef(null);
+    const linesRef = useRef([]);
+    const markersRef = useRef([]);
+    const [interval, setInterval_] = useState('15');
+    const [loading, setLoading] = useState(true);
+
+    // Create chart once
+    useEffect(() => {
+        if (!chartContainerRef.current) return;
+
+        const chart = LightweightCharts.createChart(chartContainerRef.current, {
+            width: chartContainerRef.current.clientWidth,
+            height: 500,
+            layout: {
+                background: { color: '#0f172a' },
+                textColor: '#94a3b8',
+                fontSize: 12,
+            },
+            grid: {
+                vertLines: { color: '#1e293b' },
+                horzLines: { color: '#1e293b' },
+            },
+            crosshair: {
+                mode: LightweightCharts.CrosshairMode.Normal,
+                vertLine: { color: '#475569', style: 2 },
+                horzLine: { color: '#475569', style: 2 },
+            },
+            rightPriceScale: {
+                borderColor: '#334155',
+                scaleMargins: { top: 0.1, bottom: 0.1 },
+            },
+            timeScale: {
+                borderColor: '#334155',
+                timeVisible: true,
+                secondsVisible: false,
+            },
+        });
+
+        const candleSeries = chart.addCandlestickSeries({
+            upColor: '#22c55e',
+            downColor: '#ef4444',
+            borderUpColor: '#22c55e',
+            borderDownColor: '#ef4444',
+            wickUpColor: '#22c55e',
+            wickDownColor: '#ef4444',
+        });
+
+        chartRef.current = chart;
+        candleSeriesRef.current = candleSeries;
+
+        const handleResize = () => {
+            if (chartContainerRef.current) {
+                chart.applyOptions({ width: chartContainerRef.current.clientWidth });
+            }
+        };
+        window.addEventListener('resize', handleResize);
+
+        return () => {
+            window.removeEventListener('resize', handleResize);
+            chart.remove();
+            chartRef.current = null;
+            candleSeriesRef.current = null;
+        };
+    }, []);
+
+    // Load candles when interval changes
+    useEffect(() => {
+        if (!candleSeriesRef.current) return;
+        setLoading(true);
+
+        fetch(`/api/candles?interval=${interval}&limit=300`)
+            .then(r => r.json())
+            .then(candles => {
+                if (candles.length > 0) {
+                    candleSeriesRef.current.setData(candles);
+                    chartRef.current.timeScale().fitContent();
+                }
+                setLoading(false);
+            })
+            .catch(() => setLoading(false));
+
+        // Refresh candles periodically
+        const t = window.setInterval(() => {
+            fetch(`/api/candles?interval=${interval}&limit=10`)
+                .then(r => r.json())
+                .then(candles => {
+                    candles.forEach(c => {
+                        try { candleSeriesRef.current.update(c); } catch(e) {}
+                    });
+                })
+                .catch(() => {});
+        }, 5000);
+
+        return () => window.clearInterval(t);
+    }, [interval]);
+
+    // Draw trade markers and price lines
+    useEffect(() => {
+        if (!candleSeriesRef.current || !chartRef.current) return;
+
+        // Remove old lines
+        linesRef.current.forEach(line => {
+            try { candleSeriesRef.current.removePriceLine(line); } catch(e) {}
+        });
+        linesRef.current = [];
+
+        // Build markers from trades
+        const markers = [];
+
+        // Historical trades
+        (trades || []).forEach(trade => {
+            if (!trade.opened_at) return;
+            const ts = trade.opened_at;
+            const utcTs = ts && !ts.endsWith('Z') ? ts + 'Z' : ts;
+            const time = Math.floor(new Date(utcTs).getTime() / 1000);
+            const isLong = trade.direction === 'long';
+
+            // Entry marker
+            markers.push({
+                time,
+                position: isLong ? 'belowBar' : 'aboveBar',
+                color: isLong ? '#22c55e' : '#ef4444',
+                shape: isLong ? 'arrowUp' : 'arrowDown',
+                text: `${isLong ? 'LONG' : 'SHORT'} $${Math.round(trade.entry_price)}`,
+            });
+
+            // Close marker
+            if (trade.closed_at) {
+                const closeUtc = trade.closed_at && !trade.closed_at.endsWith('Z') ? trade.closed_at + 'Z' : trade.closed_at;
+                const closeTime = Math.floor(new Date(closeUtc).getTime() / 1000);
+                const pnl = trade.realized_pnl || 0;
+                markers.push({
+                    time: closeTime,
+                    position: isLong ? 'aboveBar' : 'belowBar',
+                    color: pnl >= 0 ? '#22c55e' : '#ef4444',
+                    shape: 'circle',
+                    text: `CLOSE ${pnl >= 0 ? '+' : ''}$${pnl.toFixed(1)}`,
+                });
+            }
+        });
+
+        // Active positions — draw SL/TP lines
+        (positions || []).filter(p => p.status !== 'closed' && p.status !== 'stopped').forEach(pos => {
+            const isLong = pos.direction === 'long';
+
+            // Entry line
+            const entryLine = candleSeriesRef.current.createPriceLine({
+                price: pos.entry_price,
+                color: '#3b82f6',
+                lineWidth: 2,
+                lineStyle: LightweightCharts.LineStyle.Solid,
+                axisLabelVisible: true,
+                title: `Entry ${isLong ? '▲' : '▼'} $${Math.round(pos.entry_price)}`,
+            });
+            linesRef.current.push(entryLine);
+
+            // SL line
+            if (pos.stop_loss) {
+                const slLine = candleSeriesRef.current.createPriceLine({
+                    price: pos.stop_loss,
+                    color: '#ef4444',
+                    lineWidth: 2,
+                    lineStyle: LightweightCharts.LineStyle.Dashed,
+                    axisLabelVisible: true,
+                    title: `SL $${Math.round(pos.stop_loss)}`,
+                });
+                linesRef.current.push(slLine);
+            }
+
+            // TP1 line
+            if (pos.take_profit_1) {
+                const tp1Line = candleSeriesRef.current.createPriceLine({
+                    price: pos.take_profit_1,
+                    color: pos.tp1_filled ? '#6b7280' : '#22c55e',
+                    lineWidth: 1,
+                    lineStyle: pos.tp1_filled ? LightweightCharts.LineStyle.Dotted : LightweightCharts.LineStyle.Dashed,
+                    axisLabelVisible: true,
+                    title: `TP1 ${pos.tp1_filled ? '✓' : ''} $${Math.round(pos.take_profit_1)}`,
+                });
+                linesRef.current.push(tp1Line);
+            }
+
+            // TP2 line
+            if (pos.take_profit_2) {
+                const tp2Line = candleSeriesRef.current.createPriceLine({
+                    price: pos.take_profit_2,
+                    color: pos.tp2_filled ? '#6b7280' : '#a855f7',
+                    lineWidth: 1,
+                    lineStyle: pos.tp2_filled ? LightweightCharts.LineStyle.Dotted : LightweightCharts.LineStyle.Dashed,
+                    axisLabelVisible: true,
+                    title: `TP2 ${pos.tp2_filled ? '✓' : ''} $${Math.round(pos.take_profit_2)}`,
+                });
+                linesRef.current.push(tp2Line);
+            }
+
+            // Trailing stop line
+            if (pos.trailing_stop) {
+                const tsLine = candleSeriesRef.current.createPriceLine({
+                    price: pos.trailing_stop,
+                    color: '#eab308',
+                    lineWidth: 1,
+                    lineStyle: LightweightCharts.LineStyle.SparseDotted,
+                    axisLabelVisible: true,
+                    title: `Trail $${Math.round(pos.trailing_stop)}`,
+                });
+                linesRef.current.push(tsLine);
+            }
+        });
+
+        // Active alerts — draw range zones
+        (alerts || []).filter(a => a.pipeline?.range && !['expired','rejected','traded'].includes(a.status)).forEach(alert => {
+            const range = alert.pipeline.range;
+
+            // Range high line
+            const highLine = candleSeriesRef.current.createPriceLine({
+                price: range.local_high,
+                color: '#06b6d4',
+                lineWidth: 1,
+                lineStyle: LightweightCharts.LineStyle.Dotted,
+                axisLabelVisible: true,
+                title: `Range H $${Math.round(range.local_high)}`,
+            });
+            linesRef.current.push(highLine);
+
+            // Range low line
+            const lowLine = candleSeriesRef.current.createPriceLine({
+                price: range.local_low,
+                color: '#06b6d4',
+                lineWidth: 1,
+                lineStyle: LightweightCharts.LineStyle.Dotted,
+                axisLabelVisible: true,
+                title: `Range L $${Math.round(range.local_low)}`,
+            });
+            linesRef.current.push(lowLine);
+        });
+
+        // Set markers (sorted by time)
+        markers.sort((a, b) => a.time - b.time);
+        try {
+            candleSeriesRef.current.setMarkers(markers);
+        } catch(e) {}
+
+    }, [trades, positions, alerts]);
+
+    const intervals = [
+        { value: '5', label: '5m' },
+        { value: '15', label: '15m' },
+        { value: '60', label: '1H' },
+        { value: '240', label: '4H' },
+        { value: '1440', label: '1D' },
+    ];
+
+    return (
+        <div className="bg-gray-900 rounded-xl p-4">
+            <div className="flex items-center justify-between mb-3">
+                <h2 className="text-lg font-bold flex items-center gap-2">
+                    📊 BTC Chart
+                    {loading && <span className="text-xs text-gray-500 animate-pulse">Loading...</span>}
+                </h2>
+                <div className="flex gap-1">
+                    {intervals.map(iv => (
+                        <button key={iv.value}
+                            onClick={() => setInterval_(iv.value)}
+                            className={`px-3 py-1 text-xs rounded-lg font-medium transition-colors
+                                ${interval === iv.value
+                                    ? 'bg-blue-600 text-white'
+                                    : 'bg-gray-800 text-gray-400 hover:text-white hover:bg-gray-700'}`}>
+                            {iv.label}
+                        </button>
+                    ))}
+                </div>
+            </div>
+            <div className="flex gap-4 text-xs text-gray-500 mb-2 flex-wrap">
+                <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-blue-500 inline-block"/>Entry</span>
+                <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-red-500 inline-block" style={{borderTop:'2px dashed #ef4444',height:0}}/>SL</span>
+                <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-green-500 inline-block" style={{borderTop:'2px dashed #22c55e',height:0}}/>TP1</span>
+                <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-purple-500 inline-block" style={{borderTop:'2px dashed #a855f7',height:0}}/>TP2</span>
+                <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-yellow-500 inline-block" style={{borderTop:'2px dotted #eab308',height:0}}/>Trailing</span>
+                <span className="flex items-center gap-1"><span className="w-3 h-0.5 bg-cyan-500 inline-block" style={{borderTop:'2px dotted #06b6d4',height:0}}/>Range</span>
+            </div>
+            <div ref={chartContainerRef} className="rounded-lg overflow-hidden"/>
+        </div>
+    );
+}
+
 /* ── Main App ────────────────────────────────── */
 function App() {
     const [alerts, setAlerts]           = useState([]);
     const [positions, setPositions]     = useState([]);
+    const [trades, setTrades]           = useState([]);
     const [price, setPrice]             = useState({});
     const [stats, setStats]             = useState({});
     const [balance, setBalance]         = useState({});
@@ -687,26 +978,28 @@ function App() {
 
     useEffect(() => {
         const load = async () => {
-            const [a,pos,st,se,status,bal,bals] = await Promise.all([
+            const [a,pos,tr,st,se,status,bal,bals] = await Promise.all([
                 fetch('/api/alerts').then(r=>r.json()).catch(()=>[]),
                 fetch('/api/positions').then(r=>r.json()).catch(()=>[]),
+                fetch('/api/trades?limit=100').then(r=>r.json()).catch(()=>[]),
                 fetch('/api/stats').then(r=>r.json()).catch(()=>({})),
                 fetch('/api/settings').then(r=>r.json()).catch(()=>({})),
                 fetch('/api/settings/status').then(r=>r.json()).catch(()=>({is_active:false,testnet:true})),
                 fetch('/api/settings/balance').then(r=>r.json()).catch(()=>({})),
                 fetch('/api/balances').then(r=>r.json()).catch(()=>({})),
             ]);
-            setAlerts(a); setPositions(pos); setStats(st); setSettings(se); setBotStatus(status); setBalance(bal); setBalances(bals);
+            setAlerts(a); setPositions(pos); setTrades(tr); setStats(st); setSettings(se); setBotStatus(status); setBalance(bal); setBalances(bals);
         };
         load();
         const t = setInterval(async () => {
-            const [pos,st,bal,bals] = await Promise.all([
+            const [pos,tr,st,bal,bals] = await Promise.all([
                 fetch('/api/positions').then(r=>r.json()).catch(()=>[]),
+                fetch('/api/trades?limit=100').then(r=>r.json()).catch(()=>[]),
                 fetch('/api/stats').then(r=>r.json()).catch(()=>({})),
                 fetch('/api/settings/balance').then(r=>r.json()).catch(()=>({})),
                 fetch('/api/balances').then(r=>r.json()).catch(()=>({})),
             ]);
-            setPositions(pos); setStats(st); setBalance(bal); setBalances(bals);
+            setPositions(pos); setTrades(tr); setStats(st); setBalance(bal); setBalances(bals);
             // Refresh alerts — merge DB data with in-memory state (preserve WebSocket status/pipeline)
             fetch('/api/alerts').then(r=>r.json()).then(dbAlerts => {
                 setAlerts(current => {
@@ -729,7 +1022,7 @@ function App() {
     const startBot = async () => { await fetch('/api/settings/start',{method:'POST'}); setBotStatus(p=>({...p,is_active:true})); };
     const stopBot  = async () => { await fetch('/api/settings/stop',{method:'POST'});  setBotStatus(p=>({...p,is_active:false})); };
 
-    const tabs = ['dashboard','alerts','positions','logs','settings'];
+    const tabs = ['dashboard','chart','alerts','positions','logs','settings'];
 
     return (
         <div className="min-h-screen flex flex-col">
@@ -768,6 +1061,7 @@ function App() {
                     <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                         <div className="lg:col-span-2 space-y-4">
                             <PriceDisplay {...price} connected={connected}/>
+                            <TradingChart trades={trades} positions={positions} alerts={alerts} currentPrice={price?.price}/>
                             <div>
                                 <h2 className="text-lg font-bold mb-3">Active Positions ({positions.filter(p=>p.status!=='closed'&&p.status!=='stopped').length})</h2>
                                 {positions.length===0
@@ -781,6 +1075,17 @@ function App() {
                             <BotControl status={botStatus} onStart={startBot} onStop={stopBot} onCloseAll={() => fetch('/api/positions').then(r=>r.json()).then(setPositions)}/>
                             <StatsPanel stats={stats} balance={balance}/>
                             <ExchangeBalances balances={balances}/>
+                        </div>
+                    </div>
+                )}
+                {tab === 'chart' && (
+                    <div className="space-y-4">
+                        <TradingChart trades={trades} positions={positions} alerts={alerts} currentPrice={price?.price}/>
+                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            <AlertsPanel alerts={alerts.filter(a => !['expired','rejected'].includes(a.status))}/>
+                            <div className="space-y-3">
+                                {positions.filter(p=>p.status!=='closed'&&p.status!=='stopped').map((p,i)=><PositionCard key={p.id||i} pos={p}/>)}
+                            </div>
                         </div>
                     </div>
                 )}

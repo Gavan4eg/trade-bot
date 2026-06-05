@@ -272,6 +272,41 @@ async def get_balances():
     return result
 
 
+@router.get("/candles")
+async def get_candles(interval: str = "15", limit: int = 200):
+    """Get candlestick data for chart. interval in minutes."""
+    from ..main import bybit_client
+    if not bybit_client:
+        return []
+    candles = bybit_client.get_klines(interval=interval, limit=limit)
+    if not candles:
+        return []
+    result = []
+    for c in candles:
+        ts = c.get("timestamp")
+        if hasattr(ts, 'timestamp'):
+            time_val = int(ts.timestamp())
+        else:
+            time_val = int(ts) if ts else 0
+        result.append({
+            "time": time_val,
+            "open": c["open"],
+            "high": c["high"],
+            "low": c["low"],
+            "close": c["close"],
+            "volume": c.get("volume", 0),
+        })
+    # Sort ascending by time and deduplicate
+    result.sort(key=lambda x: x["time"])
+    seen = set()
+    deduped = []
+    for r in result:
+        if r["time"] not in seen:
+            seen.add(r["time"])
+            deduped.append(r)
+    return deduped
+
+
 @router.get("/alerts/active")
 async def get_active_alerts(db: AsyncSession = Depends(get_db)):
     """Get active alerts with live pipeline state."""
